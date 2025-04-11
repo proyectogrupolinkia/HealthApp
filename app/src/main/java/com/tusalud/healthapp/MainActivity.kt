@@ -3,30 +3,45 @@ package com.tusalud.healthapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.google.firebase.FirebaseApp
-import com.tusalud.healthapp.ui.theme.HealthappTheme
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.tusalud.healthapp.ui.theme.HealthappTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        //inicializar firebase
-        FirebaseApp.initializeApp(this)
-
+        enableEdgeToEdge()
         setContent {
             HealthappTheme {
-                //LoginScreen() //mostrar la pantalla de login
-
-                PlaceholderScreen() //pantalla temporal
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Greeting(
+                        name = "Android",
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
             }
         }
     }
 }
-//pantalla temporal
+
 @Composable
-fun PlaceholderScreen() {
-    Text(text = "Pantalla en construcción...")
+fun Greeting(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = "Hello $name!",
+        modifier = modifier
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    HealthappTheme {
+        Greeting("Android")
+    }
 }
