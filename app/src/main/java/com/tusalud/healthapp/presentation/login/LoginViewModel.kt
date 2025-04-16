@@ -14,13 +14,16 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val userRepository: UserRepository
-): ViewModel() {
+) : ViewModel() {
 
     var email by mutableStateOf("")
     var password by mutableStateOf("")
     var user by mutableStateOf<User?>(null)
     var error by mutableStateOf<String?>(null)
     var loading by mutableStateOf(false)
+    val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val isPasswordValid = password.length >= 6
+    val isFormValid = isEmailValid && isPasswordValid
 
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
@@ -31,11 +34,20 @@ class LoginViewModel @Inject constructor(
                 user = it
                 onSuccess()
             }.onFailure {
-                error = it.message
+                error = "Usuario o Contraseña incorrectos!"
             }
         }
     }
-    fun register(nombre: String, correo: String, edad: Int, peso: Float, altura: Float, password: String, onSuccess: () -> Unit) {
+
+    fun register(
+        nombre: String,
+        correo: String,
+        edad: Int,
+        peso: Float,
+        altura: Float,
+        password: String,
+        onSuccess: () -> Unit
+    ) {
         viewModelScope.launch {
             loading = true
             val user = User("", nombre, correo, edad, peso, altura)
@@ -64,3 +76,4 @@ class LoginViewModel @Inject constructor(
         }
     }
 }
+

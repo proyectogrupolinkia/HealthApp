@@ -1,5 +1,6 @@
 package com.tusalud.healthapp.presentation.login
 
+import android.R.attr.enabled
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,17 +23,30 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dagger.hilt.android.lifecycle.HiltViewModel
 
+
 @Composable
 fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
     Column(modifier = Modifier.padding(16.dp)) {
-        TextField(value = viewModel.email, onValueChange = { viewModel.email = it }, label = { Text("Correo") })
-        TextField(value = viewModel.password, onValueChange = { viewModel.password = it }, label = { Text("Contraseña") })
+
+
+        TextField(
+            value = viewModel.email,
+            onValueChange = { viewModel.email = it },
+            label = { Text("Correo") })
+        TextField(
+            value = viewModel.password,
+            onValueChange = { viewModel.password = it },
+            label = { Text("Contraseña") },
+            visualTransformation = PasswordVisualTransformation()
+        )
 
         Button(onClick = {
             viewModel.login {
+
                 navController.navigate("main")
             }
-        }) {
+
+        }, enabled = viewModel.isFormValid) {
             Text("Iniciar Sesión")
         }
 
