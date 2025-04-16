@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "306903724570",
+    "project_id": "healthapp-f4ef0",
+    "storage_bucket": "healthapp-f4ef0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:306903724570:android:314dd003a43de1752097a3",
+        "android_client_info": {
+          "package_name": "com.tusalud.healthapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "306903724570-2ro5068pva1h6cc66i48u296pcl7d1f4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tusalud.healthapp",
+            "certificate_hash": "0783ee7a11bfccd5f1d363a5ab190abcf9683677"
+          }
+        },
+        {
+          "client_id": "306903724570-95m8233oqg22s54otap7fipncs5tjmgm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1rolijeUasOd90Mpvcu5Ma_TsgQ4iDCk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "306903724570-95m8233oqg22s54otap7fipncs5tjmgm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
