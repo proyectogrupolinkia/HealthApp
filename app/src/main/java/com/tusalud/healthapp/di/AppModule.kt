@@ -28,4 +28,4 @@ object AppModule {
         auth: FirebaseAuth,
         firestore: FirebaseFirestore
     ): UserRepository = UserRepositoryImpl(auth, firestore)
-} //s
+} //sl
