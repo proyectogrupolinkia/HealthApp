@@ -70,4 +70,4 @@ fun PesoChart(pesos: List<Float>) {
             }
         }
     }
-}
+}//s
