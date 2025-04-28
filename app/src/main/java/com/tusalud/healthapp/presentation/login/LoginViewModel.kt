@@ -21,9 +21,9 @@ class LoginViewModel @Inject constructor(
     var user by mutableStateOf<User?>(null)
     var error by mutableStateOf<String?>(null)
     var loading by mutableStateOf(false)
-    val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    val isPasswordValid = password.length >= 6
-    val isFormValid = isEmailValid && isPasswordValid
+
+    val isFormValid: Boolean
+        get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length>=6
 
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
