@@ -1,73 +1,113 @@
 package com.tusalud.healthapp.presentation.main
 
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.tusalud.healthapp.domain.model.User
-import kotlin.math.pow
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 
 @Composable
-fun MainScreen(user: User) {
-    var pesoActual by remember { mutableStateOf(user.peso) }
-    var pesosHistoricos by remember { mutableStateOf(listOf(user.peso)) }
+fun MainScreen(
+    navController: NavHostController,
+    viewModel: ProgressViewModel = hiltViewModel()
+) {
+    val progressState by viewModel.progress.collectAsState()
 
-    val imc = if (user.altura > 0) pesoActual / (user.altura / 100).pow(2) else 0f
+    progressState?.let { progress ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF00BCD4)) // Fondo azul tipo progresión
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Progreso",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
 
-    Column(Modifier.padding(16.dp)) {
-        Text("Bienvenido, ${user.nombre}", style = MaterialTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Text("Peso inicial: ${user.peso} kg")
-        Text("Peso actual: $pesoActual kg")
-        Text("Peso objetivo: 70 kg") // puedes hacerlo editable si lo deseas
-        Text("IMC actual: ${String.format("%.1f", imc)}")
-        Spacer(modifier = Modifier.height(16.dp))
+            // Peso e IMC
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ProgressInfoCard(title = "Peso", value = "${progress.weightKg} kg")
+                ProgressInfoCard(title = "IMC", value = "${progress.bmi}")
+            }
 
-        Button(onClick = {
-            pesoActual += 0.5f
-            pesosHistoricos = pesosHistoricos + pesoActual
-        }) {
-            Text("Agregar peso (+0.5 kg)")
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Aquí podrías poner una gráfica
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.White.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "Gráfico de evolución", color = Color.White)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Porcentaje de grasa
+            ProgressInfoCard(title = "Porcentaje de grasa", value = "${progress.bodyFatPercentage} %")
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Desafío activo
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF7E57C2) // Violeta suave
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Desafío activo",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = progress.activeChallenge,
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
+            }
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-        Text("Progreso de peso", style = MaterialTheme.typography.titleMedium)
-        PesoChart(pesos = pesosHistoricos)
     }
 }
 
 @Composable
-fun PesoChart(pesos: List<Float>) {
-    val maxPeso = pesos.maxOrNull() ?: 1f
-    val minPeso = pesos.minOrNull() ?: 0f
-    val heightRange = maxPeso - minPeso
-
-    Canvas(modifier = Modifier
-        .fillMaxWidth()
-        .height(150.dp)
-        .padding(8.dp)) {
-
-        val spacing = size.width / (pesos.size.coerceAtLeast(2) - 1)
-
-        pesos.forEachIndexed { index, peso ->
-            if (index > 0) {
-                val x1 = spacing * (index - 1)
-                val y1 = size.height - ((pesos[index - 1] - minPeso) / heightRange * size.height)
-                val x2 = spacing * index
-                val y2 = size.height - ((peso - minPeso) / heightRange * size.height)
-
-                drawLine(
-                    color = Color.Blue,
-                    start = androidx.compose.ui.geometry.Offset(x1, y1),
-                    end = androidx.compose.ui.geometry.Offset(x2, y2),
-                    strokeWidth = 4f
-                )
-            }
-        }
+fun ProgressInfoCard(title: String, value: String) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White.copy(alpha = 0.2f))
+            .padding(16.dp)
+    ) {
+        Text(text = title, color = Color.White, fontSize = 16.sp)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
     }
 }

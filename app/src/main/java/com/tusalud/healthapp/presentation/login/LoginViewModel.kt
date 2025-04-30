@@ -22,8 +22,10 @@ class LoginViewModel @Inject constructor(
     var error by mutableStateOf<String?>(null)
     var loading by mutableStateOf(false)
 
+
     val isFormValid: Boolean
         get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length>=6
+
 
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
@@ -76,4 +78,3 @@ class LoginViewModel @Inject constructor(
         }
     }
 }
-

@@ -2,6 +2,8 @@ package com.tusalud.healthapp.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.tusalud.healthapp.data.repository.ProgressRepositoryImpl
+import com.tusalud.healthapp.domain.repository.ProgressRepository
 import com.tusalud.healthapp.domain.respository.UserRepository
 import com.tusalud.healthapp.domain.respository.UserRepositoryImpl
 import dagger.Module
@@ -28,4 +30,9 @@ object AppModule {
         auth: FirebaseAuth,
         firestore: FirebaseFirestore
     ): UserRepository = UserRepositoryImpl(auth, firestore)
-} //sl
+    @Provides
+    @Singleton
+    fun provideProgressRepository(): ProgressRepository {
+        return ProgressRepositoryImpl()
+    }
+}

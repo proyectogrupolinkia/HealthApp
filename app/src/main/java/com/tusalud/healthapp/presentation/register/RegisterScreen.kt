@@ -13,11 +13,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.tusalud.healthapp.presentation.login.LoginViewModel
 
 @Composable
-fun RegisterScreen(viewModel: LoginViewModel, navController: NavController) {
+fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
     var nombre by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var edad by remember { mutableStateOf("") }

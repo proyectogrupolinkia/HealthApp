@@ -20,12 +20,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
+fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
     Column(modifier = Modifier.padding(16.dp)) {
 
 

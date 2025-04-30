@@ -14,11 +14,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.tusalud.healthapp.presentation.login.LoginViewModel
 
 @Composable
-fun PasswordResetScreen(viewModel: LoginViewModel, navController: NavController) {
+fun PasswordResetScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
     var correo by remember { mutableStateOf("") }
 
     Column(Modifier.padding(16.dp)) {
