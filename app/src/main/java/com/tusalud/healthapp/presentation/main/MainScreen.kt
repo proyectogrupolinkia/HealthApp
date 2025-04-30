@@ -16,97 +16,53 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.tusalud.healthapp.R
+import com.tusalud.healthapp.presentation.menu.CalculadorasScreen
+import com.tusalud.healthapp.presentation.menu.PerfilScreen
+import com.tusalud.healthapp.presentation.menu.ProgressScreen
+import com.tusalud.healthapp.presentation.navigation.NavigationRoutes
+import com.tusalud.healthapp.presentation.navigation.AppNavigation
 
 @Composable
 fun MainScreen(
     navController: NavHostController,
     viewModel: ProgressViewModel = hiltViewModel()
 ) {
-    val progressState by viewModel.progress.collectAsState()
+    var selectedTab by remember { mutableStateOf(0) }
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar()
+            BottomNavigationBar(
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it },
+                navController = navController
+            )
         }
     ) { innerPadding ->
-        progressState?.let { progress ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .background(Color(0xFF00BCD4))
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Progreso",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    ProgressInfoCard(title = "Peso", value = "${progress.weightKg} kg")
-                    ProgressInfoCard(title = "IMC", value = "${progress.bmi}")
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White.copy(alpha = 0.3f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Gráfico de evolución", color = Color.White)
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                ProgressInfoCard(title = "Grasa corporal", value = "${progress.bodyFatPercentage} %")
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF7E57C2))
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "Desafío activo",
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = progress.activeChallenge,
-                            color = Color.White,
-                            fontSize = 16.sp
-                        )
-                    }
-                }
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+        ) {
+            when (selectedTab) {
+                0 -> ProgressScreen(navController, viewModel)
+                1 -> CalculadorasScreen(navController)
+                2 -> PerfilScreen(navController)
             }
         }
     }
 }
-
 @Composable
-fun BottomNavigationBar() {
-    NavigationBar(
-        containerColor = Color.White,
-        tonalElevation = 8.dp
-    ) {
+fun BottomNavigationBar(
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit,
+    navController: NavHostController
+) {
+    NavigationBar {
         NavigationBarItem(
-            selected = true,
-            onClick = { /* ya estás en progreso */ },
+            selected = selectedTab == 0,
+            onClick = {
+                onTabSelected(0)
+                navController.navigate("main") // O NavigationRoutes.MAIN
+            },
             icon = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_progreso),
@@ -116,8 +72,11 @@ fun BottomNavigationBar() {
             label = { Text("Progreso") }
         )
         NavigationBarItem(
-            selected = false,
-            onClick = { /* futuro: ir a Calculadoras */ },
+            selected = selectedTab == 1,
+            onClick = {
+                onTabSelected(1)
+                navController.navigate("calculadoras")
+            },
             icon = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_calculadora),
@@ -127,8 +86,11 @@ fun BottomNavigationBar() {
             label = { Text("Calculadoras") }
         )
         NavigationBarItem(
-            selected = false,
-            onClick = { /* futuro: ir a Perfil */ },
+            selected = selectedTab == 2,
+            onClick = {
+                onTabSelected(2)
+                navController.navigate("perfil")
+            },
             icon = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_perfil),
@@ -153,3 +115,6 @@ fun ProgressInfoCard(title: String, value: String) {
         Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
     }
 }
+
+
+
