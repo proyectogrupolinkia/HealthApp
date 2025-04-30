@@ -6,4 +6,4 @@ data class Progress(
     val bodyFatPercentage: Float,
     val bmi: Float,
     val activeChallenge: String
-)
+)//s
