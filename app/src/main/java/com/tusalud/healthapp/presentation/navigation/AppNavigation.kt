@@ -9,6 +9,9 @@ import com.tusalud.healthapp.presentation.main.MainScreen
 import com.tusalud.healthapp.presentation.menu.CalculadorasScreen
 import com.tusalud.healthapp.presentation.menu.DesafioScreen
 import com.tusalud.healthapp.presentation.menu.PerfilScreen
+import com.tusalud.healthapp.presentation.menu.EditarPerfilScreen
+import com.tusalud.healthapp.presentation.menu.RecordatoriosScreen
+import com.tusalud.healthapp.presentation.menu.ConfiguracionScreen
 import com.tusalud.healthapp.presentation.register.RegisterScreen
 import com.tusalud.healthapp.presentation.reset.PasswordResetScreen
 
@@ -33,6 +36,7 @@ fun AppNavigation(navController: NavHostController) {
         composable("main") {
             MainScreen(navController)
         }
+
         composable(NavigationRoutes.CALCULADORAS) {
             CalculadorasScreen(navController)
         }
@@ -41,8 +45,23 @@ fun AppNavigation(navController: NavHostController) {
             PerfilScreen(navController)
         }
 
+        composable("editarPerfil") {  //pantalla de editar perfil
+            EditarPerfilScreen(navController)
+        }
+
+        composable("recordatorios") {  //pantalla de recordatorios
+            RecordatoriosScreen(navController)
+        }
+
+        composable("configuracion") {  //pantalla de configuracion
+            ConfiguracionScreen(navController)
+        }
+
         composable(NavigationRoutes.DESAFIO) {
             DesafioScreen(navController)
         }
+
+
     }
 }
+

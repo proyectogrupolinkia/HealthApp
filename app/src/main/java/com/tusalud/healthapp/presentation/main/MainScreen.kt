@@ -19,8 +19,7 @@ import com.tusalud.healthapp.R
 import com.tusalud.healthapp.presentation.menu.CalculadorasScreen
 import com.tusalud.healthapp.presentation.menu.PerfilScreen
 import com.tusalud.healthapp.presentation.menu.ProgressScreen
-import com.tusalud.healthapp.presentation.navigation.NavigationRoutes
-import com.tusalud.healthapp.presentation.navigation.AppNavigation
+
 
 @Composable
 fun MainScreen(
@@ -115,6 +114,7 @@ fun ProgressInfoCard(title: String, value: String) {
         Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
     }
 }
+
 
 
 
