@@ -72,7 +72,7 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
             Text("¿No tienes cuenta? Regístrate", fontSize = 16.sp, color = Color(0xFF00C6A7))
         }
 
-        TextButton(onClick = { navController.navigate("reset") }) {
+        TextButton(onClick = { navController.navigate("reset_password") }) {
             Text("¿Olvidaste tu contraseña?", fontSize = 16.sp, color = Color(0xFF00C6A7))
         }
 
