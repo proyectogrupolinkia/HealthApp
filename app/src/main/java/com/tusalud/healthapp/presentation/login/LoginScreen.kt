@@ -2,16 +2,12 @@ package com.tusalud.healthapp.presentation.login
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,6 +22,7 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Espacio superior opcional
         Spacer(modifier = Modifier.height(48.dp))
 
         Text(
@@ -44,23 +41,12 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        var passwordVisible by remember { mutableStateOf(false) }
-
         OutlinedTextField(
             value = viewModel.password,
             onValueChange = { viewModel.password = it },
             label = { Text("Contraseña") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                val image = if (passwordVisible)
-                    Icons.Default.VisibilityOff
-                else Icons.Default.Visibility
-
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = if (passwordVisible) "Ocultar" else "Mostrar")
-                }
-            }
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -86,7 +72,7 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
             Text("¿No tienes cuenta? Regístrate", fontSize = 16.sp, color = Color(0xFF00C6A7))
         }
 
-        TextButton(onClick = { navController.navigate("reset") }) {
+        TextButton(onClick = { navController.navigate("reset_password") }) {
             Text("¿Olvidaste tu contraseña?", fontSize = 16.sp, color = Color(0xFF00C6A7))
         }
 
@@ -96,4 +82,6 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
             Text(text = it, color = Color.Red, fontSize = 14.sp)
         }
     }
+    //s
 }
+

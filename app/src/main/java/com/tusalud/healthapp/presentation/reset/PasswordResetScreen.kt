@@ -1,64 +1,42 @@
 package com.tusalud.healthapp.presentation.reset
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.tusalud.healthapp.presentation.login.LoginViewModel
 
 @Composable
-fun PasswordResetScreen(
-    navController: NavHostController,
-    viewModel: LoginViewModel = hiltViewModel()
-) {
+fun PasswordResetScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
     var correo by remember { mutableStateOf("") }
 
-    Scaffold { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Recuperar Contraseña", style = MaterialTheme.typography.headlineMedium)
+    Column(Modifier.padding(16.dp)) {
+        Text("Recuperar Contraseña", style = MaterialTheme.typography.titleLarge)
+        TextField(value = correo, onValueChange = { correo = it }, label = { Text("Correo") })
 
-                OutlinedTextField(
-                    value = correo,
-                    onValueChange = { correo = it },
-                    label = { Text("Correo electrónico") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Button(
-                    onClick = {
-                        viewModel.resetPassword(correo) {
-                            navController.popBackStack()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C6A7))
-                ) {
-                    Text("Enviar Correo", color = Color.White)
-                }
-
-                viewModel.error?.let {
-                    Text(text = it, color = MaterialTheme.colorScheme.error)
-                }
+        Button(onClick = {
+            viewModel.resetPassword(correo) {
+                navController.popBackStack()
             }
+        }) {
+            Text("Enviar Correo")
+        }
+
+        viewModel.error?.let {
+            Text(text = it, color = Color.Red)
         }
     }
 }
