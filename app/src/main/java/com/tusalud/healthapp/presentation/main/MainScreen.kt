@@ -17,7 +17,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tusalud.healthapp.R
-import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen
+import com.tusalud.healthapp.presentation.menu.CalculadorasScreen
+
+
 import com.tusalud.healthapp.presentation.menu.PerfilScreen
 import com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel
 import com.tusalud.healthapp.presentation.menu.Progress.ProgressScreen

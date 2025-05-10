@@ -72,6 +72,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1") // o la última versión estable
 }
 
 kapt {
