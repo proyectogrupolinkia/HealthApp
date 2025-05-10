@@ -6,8 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.tusalud.healthapp.presentation.login.LoginScreen
 import com.tusalud.healthapp.presentation.main.MainScreen
-import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen
-import com.tusalud.healthapp.presentation.menu.desafio.DesafioScreen
+import com.tusalud.healthapp.presentation.menu.CalculadorasScreen
+import com.tusalud.healthapp.presentation.menu.DesafioScreen
 import com.tusalud.healthapp.presentation.menu.PerfilScreen
 import com.tusalud.healthapp.presentation.menu.EditarPerfilScreen
 import com.tusalud.healthapp.presentation.menu.RecordatoriosScreen

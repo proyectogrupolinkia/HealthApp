@@ -1,4 +1,4 @@
-package com.tusalud.healthapp.presentation.menu.calculadoras
+package com.tusalud.healthapp.presentation.menu
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
