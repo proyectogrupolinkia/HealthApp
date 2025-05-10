@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
 import com.tusalud.healthapp.presentation.navigation.AppNavigation
+import com.tusalud.healthapp.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -16,8 +17,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val navController = rememberNavController()
-            AppNavigation(navController = navController)
+            AppTheme {
+
+                val navController = rememberNavController()
+                AppNavigation(navController = navController)
+            }
         }
     }
 }

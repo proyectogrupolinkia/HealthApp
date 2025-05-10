@@ -41,8 +41,8 @@ fun AppNavigation(navController: NavHostController) {
             CalculadorasScreen(navController)
         }
 
-        composable(NavigationRoutes.PERFIL) {
-            PerfilScreen(navController)
+        composable("perfil") {
+            PerfilScreen(navController = navController)
         }
 
         composable("editarPerfil") {  //pantalla de editar perfil

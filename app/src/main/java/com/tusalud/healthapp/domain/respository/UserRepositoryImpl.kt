@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import com.tusalud.healthapp.domain.model.User
+
 class UserRepositoryImpl(auth1: FirebaseAuth, firestore: FirebaseFirestore) : UserRepository {
 
     private val auth = FirebaseAuth.getInstance()
@@ -40,16 +41,16 @@ class UserRepositoryImpl(auth1: FirebaseAuth, firestore: FirebaseFirestore) : Us
         }
     }
 
-
     override suspend fun resetPassword(email: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             auth.sendPasswordResetEmail(email).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
-            }
+        }
     }
-    override suspend fun getUser(uid: String): Result<User> = withContext(Dispatchers.IO) {
+
+    override suspend fun getUserById(uid: String): Result<User> = withContext(Dispatchers.IO) {
         try {
             val doc = db.collection("usuarios").document(uid).get().await()
             val user = doc.toObject(UserDto::class.java)?.toDomain()

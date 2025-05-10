@@ -118,8 +118,3 @@ fun ProgressInfoCard(title: String, value: String) {
         Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
     }
 }
-
-
-
-
-
