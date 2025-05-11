@@ -52,6 +52,7 @@ fun MainScreen(
             }
         }
     }
+
 }
 @Composable
 fun BottomNavigationBar(

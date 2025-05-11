@@ -2,19 +2,9 @@ package com.tusalud.healthapp.presentation.menu.Progress
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,13 +29,15 @@ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewMode
                 .background(Color(0xFF00BCD4))
                 .padding(16.dp)
         ) {
+            Spacer(modifier = Modifier.height(48.dp))
             Text(
                 text = "Progreso",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
+
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()
@@ -53,7 +45,9 @@ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewMode
                 ProgressInfoCard(title = "Peso", value = "${progress.weightKg} kg")
                 ProgressInfoCard(title = "IMC", value = "${progress.bmi}")
             }
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -64,19 +58,26 @@ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewMode
             ) {
                 Text("Gráfico de evolución", color = Color.White)
             }
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             ProgressInfoCard(title = "Grasa corporal", value = "${progress.bodyFatPercentage} %")
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
-                        navController.navigate("desafio")
-                    },
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF7E57C2))
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { navController.navigate("desafio") },
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF9C27B0))
+
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.padding(24.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
                     Text(
                         text = "Desafío activo",
                         color = Color.White,
@@ -88,6 +89,26 @@ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewMode
                         text = progress.activeChallenge,
                         color = Color.White,
                         fontSize = 16.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = { navController.navigate("actualizar_peso") },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Row(
+                    modifier = Modifier.padding(36.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Actualizar peso",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
                     )
                 }
             }
