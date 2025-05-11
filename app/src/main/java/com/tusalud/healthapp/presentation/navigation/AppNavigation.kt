@@ -14,6 +14,7 @@ import com.tusalud.healthapp.presentation.menu.PerfilScreen
 import com.tusalud.healthapp.presentation.menu.EditarPerfilScreen
 import com.tusalud.healthapp.presentation.menu.RecordatoriosScreen
 import com.tusalud.healthapp.presentation.menu.ConfiguracionScreen
+import com.tusalud.healthapp.presentation.menu.EvolucionPesoScreen
 import com.tusalud.healthapp.presentation.menu.desafio.DesafioScreen
 import com.tusalud.healthapp.presentation.menu.Progress.ProgressScreen
 import com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel
@@ -72,6 +73,9 @@ fun AppNavigation(navController: NavHostController) {
 
         composable("actualizar_peso") {
             ActualizarPesoScreen(navController, progressViewModel)
+        }
+        composable("evolucion_peso") {
+            EvolucionPesoScreen(navController)
         }
     }
 }

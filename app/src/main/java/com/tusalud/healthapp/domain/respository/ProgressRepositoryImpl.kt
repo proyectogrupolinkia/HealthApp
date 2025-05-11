@@ -1,18 +1,28 @@
 package com.tusalud.healthapp.data.repository
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.tusalud.healthapp.domain.model.Progress
 import com.tusalud.healthapp.domain.repository.ProgressRepository
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class ProgressRepositoryImpl @Inject constructor() : ProgressRepository {
+
     override suspend fun getProgress(): Progress {
-        // Simulación de datos de progreso
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return Progress()
+        val db = FirebaseFirestore.getInstance()
+        val snapshot = db.collection("usuarios").document(userId).get().await()
+
+        val weight = snapshot.getDouble("weightKg")?.toFloat() ?: 0f
+        val height = snapshot.getDouble("altura")?.toFloat() ?: 0f
+
+        val bmi = if (height > 0) weight / ((height / 100) * (height / 100)) else 0f
+
         return Progress(
-            weightKg = 70f,
-            heightCm = 175f,
-            bodyFatPercentage = 20.5f,
-            bmi = 24.5f,
-            activeChallenge = "Bajar 6 kg en 3 meses"
+            weightKg = weight,
+            heightCm = height,
+            bmi = bmi
         )
     }
 }

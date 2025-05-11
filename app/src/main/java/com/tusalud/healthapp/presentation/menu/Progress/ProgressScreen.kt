@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -21,6 +22,12 @@ import com.tusalud.healthapp.presentation.main.ProgressInfoCard
 @Composable
 fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewModel) {
     val progressState by viewModel.progress.collectAsState()
+    // Garantiza que se recargue al entrar a esta pantalla
+    LaunchedEffect(Unit) {
+        viewModel.loadProgress()
+    }
+
+
 
     progressState?.let { progress ->
         Column(
@@ -43,7 +50,8 @@ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewMode
                 modifier = Modifier.fillMaxWidth()
             ) {
                 ProgressInfoCard(title = "Peso", value = "${progress.weightKg} kg")
-                ProgressInfoCard(title = "IMC", value = "${progress.bmi}")
+                ProgressInfoCard(title = "IMC", value = String.format("%.2f", progress.bmi))
+
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -53,15 +61,16 @@ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewMode
                     .fillMaxWidth()
                     .height(150.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White.copy(alpha = 0.3f)),
+                    .background(Color.White.copy(alpha = 0.3f))
+                    .clickable { navController.navigate("evolucion_peso") },
                 contentAlignment = Alignment.Center
             ) {
-                Text("Gráfico de evolución", color = Color.White)
+                Text("Gráfico de evolución", color =Color.White)
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            ProgressInfoCard(title = "Grasa corporal", value = "${progress.bodyFatPercentage} %")
+            ProgressInfoCard(title = "Grasa corporal", value = "0")
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -86,7 +95,7 @@ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewMode
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = progress.activeChallenge,
+                        text = " ",
                         color = Color.White,
                         fontSize = 16.sp
                     )
