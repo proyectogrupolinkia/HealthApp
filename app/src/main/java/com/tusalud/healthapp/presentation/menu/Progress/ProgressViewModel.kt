@@ -46,11 +46,11 @@ class ProgressViewModel @Inject constructor(
         val userRef = db.collection("usuarios").document(userId)
 
         userRef.get().addOnSuccessListener { doc ->
-            val pesoAnterior = doc.getDouble("weightKg")?.toFloat()
+            val pesoAnterior = doc.getDouble("peso")?.toFloat()
             val historial = doc.get("weightHistory") as? List<Float> ?: emptyList()
 
             val nuevosDatos = mapOf(
-                "weightKg" to nuevoPeso,
+                "peso" to nuevoPeso,
                 "weightHistory" to historial + listOfNotNull(pesoAnterior)
             )
 
