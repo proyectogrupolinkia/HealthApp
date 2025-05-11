@@ -1,0 +1,133 @@
+Index: app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.menu.Progress\r\n\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.runtime.mutableStateOf\r\nimport androidx.compose.runtime.setValue\r\nimport androidx.lifecycle.ViewModel\r\nimport androidx.lifecycle.viewModelScope\r\nimport com.google.firebase.auth.FirebaseAuth\r\nimport com.google.firebase.firestore.FirebaseFirestore\r\nimport com.google.firebase.firestore.SetOptions\r\nimport com.tusalud.healthapp.domain.model.Progress\r\nimport com.tusalud.healthapp.domain.repository.ProgressRepository\r\nimport dagger.hilt.android.lifecycle.HiltViewModel\r\nimport kotlinx.coroutines.flow.MutableStateFlow\r\nimport kotlinx.coroutines.flow.StateFlow\r\nimport kotlinx.coroutines.launch\r\nimport javax.inject.Inject\r\n\r\n@HiltViewModel\r\nclass ProgressViewModel @Inject constructor(\r\n    private val progressRepository: ProgressRepository\r\n) : ViewModel() {\r\n\r\n    private val _progress = MutableStateFlow<Progress?>(null)\r\n    val progress: StateFlow<Progress?> = _progress\r\n\r\n    // Renombrado para evitar conflictos\r\n    var snackbarActivo by mutableStateOf(false)\r\n        private set\r\n\r\n    init {\r\n        loadProgress()\r\n    }\r\n\r\n    fun loadProgress() {\r\n        viewModelScope.launch {\r\n            _progress.value = progressRepository.getProgress()\r\n        }\r\n    }\r\n\r\n    fun actualizarPeso(nuevoPeso: Float?) {\r\n        if (nuevoPeso == null) return\r\n\r\n        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return\r\n        val db = FirebaseFirestore.getInstance()\r\n        val userRef = db.collection(\"usuarios\").document(userId)\r\n\r\n        userRef.get().addOnSuccessListener { doc ->\r\n            val pesoAnterior = doc.getDouble(\"weightKg\")?.toFloat()\r\n            val historial = doc.get(\"weightHistory\") as? List<Float> ?: emptyList()\r\n\r\n            val nuevosDatos = mapOf(\r\n                \"weightKg\" to nuevoPeso,\r\n                \"weightHistory\" to historial + listOfNotNull(pesoAnterior)\r\n            )\r\n\r\n            userRef.set(nuevosDatos, SetOptions.merge())\r\n                .addOnSuccessListener {\r\n                    snackbarActivo = true\r\n                    loadProgress()\r\n                }\r\n                .addOnFailureListener {\r\n                    println(\"Error al actualizar peso: ${it.message}\")\r\n                }\r\n        }.addOnFailureListener {\r\n            println(\"Error al obtener documento del usuario: ${it.message}\")\r\n        }\r\n    }\r\n\r\n    fun resetSnackbar() {\r\n        snackbarActivo = false\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressViewModel.kt b/app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressViewModel.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressViewModel.kt	(revision c679d16d4e86076663f7f9499e8437f49fcce474)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressViewModel.kt	(date 1746964971287)
+@@ -9,6 +9,7 @@
+ import com.google.firebase.firestore.FirebaseFirestore
+ import com.google.firebase.firestore.SetOptions
+ import com.tusalud.healthapp.domain.model.Progress
++import com.tusalud.healthapp.domain.model.PesoConFecha
+ import com.tusalud.healthapp.domain.repository.ProgressRepository
+ import dagger.hilt.android.lifecycle.HiltViewModel
+ import kotlinx.coroutines.flow.MutableStateFlow
+@@ -24,10 +25,12 @@
+     private val _progress = MutableStateFlow<Progress?>(null)
+     val progress: StateFlow<Progress?> = _progress
+ 
+-    // Renombrado para evitar conflictos
+     var snackbarActivo by mutableStateOf(false)
+         private set
+ 
++    private val _historialPeso = MutableStateFlow<List<PesoConFecha>>(emptyList())
++    val historialPeso: StateFlow<List<PesoConFecha>> = _historialPeso
++
+     init {
+         loadProgress()
+     }
+@@ -47,17 +50,28 @@
+ 
+         userRef.get().addOnSuccessListener { doc ->
+             val pesoAnterior = doc.getDouble("weightKg")?.toFloat()
+-            val historial = doc.get("weightHistory") as? List<Float> ?: emptyList()
++            val historial = doc.get("weightHistory") as? List<Map<String, Any>> ?: emptyList()
++
++            val historialMutable = historial.toMutableList()
++            pesoAnterior?.let {
++                historialMutable.add(
++                    mapOf(
++                        "peso" to it,
++                        "timestamp" to System.currentTimeMillis()
++                    )
++                )
++            }
+ 
+             val nuevosDatos = mapOf(
+                 "weightKg" to nuevoPeso,
+-                "weightHistory" to historial + listOfNotNull(pesoAnterior)
++                "weightHistory" to historialMutable
+             )
+ 
+             userRef.set(nuevosDatos, SetOptions.merge())
+                 .addOnSuccessListener {
+                     snackbarActivo = true
+                     loadProgress()
++                    cargarHistorialDesdeArray()
+                 }
+                 .addOnFailureListener {
+                     println("Error al actualizar peso: ${it.message}")
+@@ -67,7 +81,68 @@
+         }
+     }
+ 
++    fun cargarHistorialDesdeArray() {
++        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
++        val db = FirebaseFirestore.getInstance()
++
++        db.collection("usuarios").document(userId).get()
++            .addOnSuccessListener { doc ->
++                try {
++                    val rawList = doc.get("weightHistory")
++                    if (rawList !is List<*>) {
++                        println("weightHistory no es una lista: $rawList")
++                        _historialPeso.value = emptyList()
++                        return@addOnSuccessListener
++                    }
++
++                    val datos = rawList.mapNotNull { entry ->
++                        if (entry !is Map<*, *>) {
++                            println("Elemento inválido en weightHistory: $entry")
++                            return@mapNotNull null
++                        }
++
++                        val peso = (entry["peso"] as? Number)?.toFloat()
++                        val timestamp = (entry["timestamp"] as? Number)?.toLong()
++
++                        if (peso != null && timestamp != null) {
++                            PesoConFecha(peso, timestamp)
++                        } else {
++                            println("Valores nulos o incorrectos: $entry")
++                            null
++                        }
++                    }
++
++                    _historialPeso.value = datos
++                    println("Historial cargado: $datos")
++                } catch (e: Exception) {
++                    println("Error global al procesar historial: ${e.message}")
++                    _historialPeso.value = emptyList()
++                }
++            }
++            .addOnFailureListener {
++                println("Error al obtener documento: ${it.message}")
++            }
++    }
+     fun resetSnackbar() {
+         snackbarActivo = false
+     }
++    fun migrarHistorialSinFechas() {
++        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
++        val db = FirebaseFirestore.getInstance()
++        val userRef = db.collection("usuarios").document(userId)
++
++        userRef.get().addOnSuccessListener { doc ->
++            val listaPesos = doc.get("weightHistory") as? List<Number> ?: return@addOnSuccessListener
++            val historialConFechas = listaPesos.mapIndexed { index, peso ->
++                mapOf(
++                    "peso" to peso.toFloat(),
++                    "timestamp" to System.currentTimeMillis() - (listaPesos.size - 1 - index) * 24 * 60 * 60 * 1000L
++                )
++            }
++
++            userRef.update("weightHistory", historialConFechas)
++                .addOnSuccessListener { println("Migración exitosa.") }
++                .addOnFailureListener { println("Error al migrar historial: ${it.message}") }
++        }
++    }
+ }
+\ No newline at end of file

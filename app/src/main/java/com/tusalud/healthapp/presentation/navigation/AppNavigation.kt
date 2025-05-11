@@ -17,9 +17,9 @@ import com.tusalud.healthapp.presentation.menu.RecordatoriosScreen
 import com.tusalud.healthapp.presentation.menu.ConfiguracionScreen
 //import com.tusalud.healthapp.presentation.menu.EvolucionPesoScreen
 import com.tusalud.healthapp.presentation.menu.desafio.DesafioScreen
-import com.tusalud.healthapp.presentation.menu.Progress.ProgressScreen
 import com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel
 import com.tusalud.healthapp.presentation.menu.Progress.ActualizarPesoScreen
+import com.tusalud.healthapp.presentation.menu.Progress.ProgressScreen
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -36,7 +36,7 @@ fun AppNavigation(navController: NavHostController) {
             RegisterScreen(navController)
         }
 
-        composable("reset_password") {
+        composable("reset") {
             PasswordResetScreen(navController)
         }
 

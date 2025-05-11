@@ -5,10 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,15 +16,23 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.tusalud.healthapp.presentation.main.ProgressInfoCard
 
+import me.bytebeats.views.charts.line.LineChart
+import me.bytebeats.views.charts.line.LineChartData
+import me.bytebeats.views.charts.line.LineChartData.Point
+import me.bytebeats.views.charts.line.render.line.SolidLineDrawer
+import me.bytebeats.views.charts.line.render.point.FilledCircularPointDrawer
+import me.bytebeats.views.charts.line.render.xaxis.SimpleXAxisDrawer
+import me.bytebeats.views.charts.line.render.yaxis.SimpleYAxisDrawer
+
 @Composable
 fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewModel) {
     val progressState by viewModel.progress.collectAsState()
+    val pesos by viewModel.pesos.collectAsState()
+
     // Garantiza que se recargue al entrar a esta pantalla
     LaunchedEffect(Unit) {
         viewModel.loadProgress()
     }
-
-
 
     progressState?.let { progress ->
         Column(
@@ -51,7 +56,6 @@ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewMode
             ) {
                 ProgressInfoCard(title = "Peso", value = "${progress.peso} kg")
                 ProgressInfoCard(title = "IMC", value = String.format("%.2f", progress.bmi))
-
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -59,13 +63,30 @@ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewMode
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
+                    .height(180.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.White.copy(alpha = 0.3f))
                     .clickable { navController.navigate("evolucion_peso") },
                 contentAlignment = Alignment.Center
             ) {
-                Text("Gráfico de evolución", color =Color.White)
+                if (pesos.isNotEmpty()) {
+                    val points = pesos.mapIndexed { index, peso ->
+                        Point(value = peso, label = "Día ${index + 1}")
+                    }
+                    val chartData = LineChartData(points)
+                    LineChart(
+                        lineChartData = chartData,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        pointDrawer = FilledCircularPointDrawer(color = Color.White),
+                        lineDrawer = SolidLineDrawer(color = Color.White),
+                        xAxisDrawer = SimpleXAxisDrawer(axisLineColor = Color.White),
+                        yAxisDrawer = SimpleYAxisDrawer(axisLineColor = Color.White)
+                    )
+                } else {
+                    Text("Gráfico de evolución", color = Color.White)
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -80,7 +101,6 @@ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewMode
                     .clip(RoundedCornerShape(12.dp))
                     .clickable { navController.navigate("desafio") },
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF9C27B0))
-
             ) {
                 Row(
                     modifier = Modifier.padding(24.dp),
@@ -106,20 +126,19 @@ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewMode
 
             Button(
                 onClick = { navController.navigate("actualizar_peso") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF388E3C), // verde oscuro
+                    contentColor = Color.White          // texto blanco que resalta
+                )
             ) {
-                Row(
-                    modifier = Modifier.padding(36.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Actualizar peso",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
-                }
+                Text(
+                    text = "Actualizar peso",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
             }
         }
     }

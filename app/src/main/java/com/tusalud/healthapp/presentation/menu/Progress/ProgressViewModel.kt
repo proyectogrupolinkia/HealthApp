@@ -23,6 +23,9 @@ class ProgressViewModel @Inject constructor(
 
     private val _progress = MutableStateFlow<Progress?>(null)
     val progress: StateFlow<Progress?> = _progress
+    private val _pesos = MutableStateFlow<List<Float>>(emptyList())
+    val pesos: StateFlow<List<Float>> = _pesos
+
 
     // Renombrado para evitar conflictos
     var snackbarActivo by mutableStateOf(false)
@@ -30,7 +33,27 @@ class ProgressViewModel @Inject constructor(
 
     init {
         loadProgress()
+        cargarPesosDesdeFirebase()
+
     }
+
+    private fun cargarPesosDesdeFirebase() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("usuarios").document(uid)
+            .get()
+            .addOnSuccessListener { document ->
+                val lista = document.get("weightHistory") as? List<Number>
+                lista?.let {
+                    _pesos.value = it.map { peso -> peso.toFloat() }
+                }
+            }
+            .addOnFailureListener {
+                _pesos.value = emptyList()
+            }
+    }
+
 
     fun loadProgress() {
         viewModelScope.launch {
