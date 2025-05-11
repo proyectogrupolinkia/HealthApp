@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.tusalud.healthapp"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -73,6 +73,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.compose.material:material-icons-extended")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1") // o la última versión estable
+    implementation(libs.compose.charts)
+    implementation("androidx.compose.ui:ui:1.8.1")
+
+
 }
 
 kapt {
