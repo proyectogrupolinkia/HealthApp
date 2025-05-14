@@ -1,34 +1,32 @@
+package com.tusalud.healthapp.presentation.menu.Progress
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import me.bytebeats.views.charts.line.LineChart
-import me.bytebeats.views.charts.line.LineChartData.Point
-import androidx.compose.runtime.getValue
-
-
 import me.bytebeats.views.charts.line.LineChartData
+import me.bytebeats.views.charts.line.LineChartData.Point
 import me.bytebeats.views.charts.line.render.line.SolidLineDrawer
 import me.bytebeats.views.charts.line.render.point.FilledCircularPointDrawer
 import me.bytebeats.views.charts.line.render.xaxis.SimpleXAxisDrawer
 import me.bytebeats.views.charts.line.render.yaxis.SimpleYAxisDrawer
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EvolucionPesoScreen(
     navController: NavHostController,
-    viewModel: EvolucionPesoViewModel = viewModel()
+    viewModel: ProgressViewModel = hiltViewModel()
 ) {
-    val pesos by viewModel.pesos.collectAsState()
+    val pesosConFechas by viewModel.pesosConFechas.collectAsState()
 
     Scaffold(
         topBar = {
@@ -48,10 +46,11 @@ fun EvolucionPesoScreen(
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            if (pesos.isNotEmpty()) {
-                val points = pesos.mapIndexed { index, peso ->
-                    Point(value = peso, label = "Día ${index + 1}")
+            if (pesosConFechas.isNotEmpty()) {
+                val points = pesosConFechas.map { (peso, fecha) ->
+                    Point(value = peso, label = fecha)
                 }
+
                 val lineChartData = LineChartData(points)
 
                 LineChart(

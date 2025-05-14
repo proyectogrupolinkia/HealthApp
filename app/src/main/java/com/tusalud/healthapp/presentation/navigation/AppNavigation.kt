@@ -1,6 +1,6 @@
 package com.tusalud.healthapp.presentation.navigation
 
-import EvolucionPesoScreen
+
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -19,6 +19,7 @@ import com.tusalud.healthapp.presentation.menu.ConfiguracionScreen
 import com.tusalud.healthapp.presentation.menu.desafio.DesafioScreen
 import com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel
 import com.tusalud.healthapp.presentation.menu.Progress.ActualizarPesoScreen
+import com.tusalud.healthapp.presentation.menu.Progress.EvolucionPesoScreen
 import com.tusalud.healthapp.presentation.menu.Progress.ProgressScreen
 
 @Composable

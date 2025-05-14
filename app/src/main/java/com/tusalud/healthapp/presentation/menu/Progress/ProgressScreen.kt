@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.tusalud.healthapp.presentation.main.ProgressInfoCard
 
@@ -25,13 +26,17 @@ import me.bytebeats.views.charts.line.render.xaxis.SimpleXAxisDrawer
 import me.bytebeats.views.charts.line.render.yaxis.SimpleYAxisDrawer
 
 @Composable
-fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewModel) {
+fun ProgressScreen(
+    navController: NavHostController,
+    viewModel: ProgressViewModel = hiltViewModel()
+){
     val progressState by viewModel.progress.collectAsState()
     val pesos by viewModel.pesos.collectAsState()
 
     // Garantiza que se recargue al entrar a esta pantalla
-    LaunchedEffect(Unit) {
+    LaunchedEffect(navController.currentBackStackEntry) {
         viewModel.loadProgress()
+        viewModel.cargarPesosDesdeFirebase()
     }
 
     progressState?.let { progress ->
