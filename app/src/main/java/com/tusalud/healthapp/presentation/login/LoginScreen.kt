@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -22,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.compose.animation.core.*
 
 @Composable
 fun AnimatedGradientBackground(content: @Composable BoxScope.() -> Unit) {
@@ -51,7 +51,10 @@ fun AnimatedGradientBackground(content: @Composable BoxScope.() -> Unit) {
 }
 
 @Composable
-fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
+fun LoginScreen(
+    navController: NavHostController,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
@@ -69,6 +72,17 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
             ) {
                 Spacer(modifier = Modifier.height(48.dp))
 
+                // Spinner grande arriba del título
+                if (viewModel.loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .padding(bottom = 24.dp),
+                        color = Color(0xFF00C6A7),
+                        strokeWidth = 4.dp
+                    )
+                }
+
                 Text(
                     "Bienvenido",
                     fontSize = 32.sp,
@@ -80,7 +94,8 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
                     value = viewModel.email,
                     onValueChange = { viewModel.email = it },
                     label = { Text("Correo electrónico") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !viewModel.loading
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -93,13 +108,17 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
                     label = { Text("Contraseña") },
                     modifier = Modifier.fillMaxWidth(),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    enabled = !viewModel.loading,
                     trailingIcon = {
                         val image = if (passwordVisible)
                             Icons.Default.VisibilityOff
                         else Icons.Default.Visibility
 
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(imageVector = image, contentDescription = if (passwordVisible) "Ocultar" else "Mostrar")
+                            Icon(
+                                imageVector = image,
+                                contentDescription = if (passwordVisible) "Ocultar" else "Mostrar"
+                            )
                         }
                     }
                 )
@@ -109,16 +128,26 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
                 Button(
                     onClick = {
                         viewModel.login {
-                            navController.navigate("main")
+                            navController.navigate("main") {
+                                popUpTo("login") { inclusive = true }
+                            }
                         }
                     },
-                    enabled = viewModel.isFormValid,
+                    enabled = viewModel.isFormValid && !viewModel.loading,
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C6A7)),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
                 ) {
-                    Text("Iniciar Sesión", fontSize = 18.sp, color = Color.Black)
+                    if (viewModel.loading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Iniciar sesión")
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -137,6 +166,6 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
                     Text(text = it, color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
                 }
             }
+            }
         }
-    }
 }

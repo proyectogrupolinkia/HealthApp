@@ -33,6 +33,7 @@ class LoginViewModel @Inject constructor(
     val isFormValid: Boolean
         get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length >= 6
 
+
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
             loading = true
