@@ -1,7 +1,7 @@
 package com.tusalud.healthapp
 
-import com.tusalud.healthapp.util.calcularIMC
-import com.tusalud.healthapp.util.calcularGrasaCorporal
+import com.tusalud.healthapp.utils.calcularIMC
+import com.tusalud.healthapp.utils.calcularGrasaCorporal
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

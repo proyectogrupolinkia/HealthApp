@@ -1,4 +1,4 @@
-package com.tusalud.healthapp.presentation.menu
+package com.tusalud.healthapp.presentation.menu.progress.recordatorios
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,12 +12,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 
 @Composable
-fun RecordatoriosScreen(navController: NavHostController) {
-    var recordatorios by remember { mutableStateOf(listOf<String>()) }
-    var nuevoRecordatorio by remember { mutableStateOf("") }
+fun RecordatoriosScreen(
+    navController: NavHostController,
+    viewModel: RecordatoriosViewModel = hiltViewModel()
+) {
+    val recordatorios by viewModel.recordatorios.collectAsState()
+    val nuevoRecordatorio by viewModel.nuevoRecordatorio.collectAsState()
 
     Column(
         modifier = Modifier
@@ -25,7 +29,7 @@ fun RecordatoriosScreen(navController: NavHostController) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(48.dp))  // Espacio superior
+        Spacer(modifier = Modifier.height(48.dp))
 
         Text(
             "Recordatorios",
@@ -36,7 +40,7 @@ fun RecordatoriosScreen(navController: NavHostController) {
 
         OutlinedTextField(
             value = nuevoRecordatorio,
-            onValueChange = { nuevoRecordatorio = it },
+            onValueChange = viewModel::onNuevoRecordatorioChanged,
             label = { Text("Nuevo recordatorio") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -44,12 +48,7 @@ fun RecordatoriosScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(
-            onClick = {
-                if (nuevoRecordatorio.isNotBlank()) {
-                    recordatorios = recordatorios + nuevoRecordatorio
-                    nuevoRecordatorio = ""
-                }
-            },
+            onClick = { viewModel.agregarRecordatorio() },
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("Agregar")
@@ -60,9 +59,7 @@ fun RecordatoriosScreen(navController: NavHostController) {
         if (recordatorios.isEmpty()) {
             Text("No hay recordatorios aún.", style = MaterialTheme.typography.bodyMedium)
         } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 items(recordatorios) { item ->
                     Card(
                         modifier = Modifier
@@ -78,9 +75,7 @@ fun RecordatoriosScreen(navController: NavHostController) {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(text = item, fontSize = 16.sp)
-                            IconButton(onClick = {
-                                recordatorios = recordatorios - item
-                            }) {
+                            IconButton(onClick = { viewModel.eliminarRecordatorio(item) }) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
                                     contentDescription = "Eliminar",
@@ -94,7 +89,6 @@ fun RecordatoriosScreen(navController: NavHostController) {
         }
     }
 }
-
 
 
 

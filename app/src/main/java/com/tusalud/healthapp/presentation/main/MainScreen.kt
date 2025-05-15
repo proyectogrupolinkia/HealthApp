@@ -16,12 +16,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.tusalud.healthapp.R
-import com.tusalud.healthapp.presentation.menu.CalculadorasScreen
-
-
-import com.tusalud.healthapp.presentation.menu.PerfilScreen
-import com.tusalud.healthapp.presentation.menu.Progress.ProgressScreen
-import com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel
+import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen
+import com.tusalud.healthapp.presentation.menu.progress.perfil.PerfilScreen
+import com.tusalud.healthapp.presentation.menu.progress.ProgressScreen
+import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
 
 
 @Composable

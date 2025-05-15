@@ -1,5 +1,7 @@
-package com.tusalud.healthapp.presentation.menu.Progress
 
+package com.tusalud.healthapp.presentation.menu.progress
+
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,13 +12,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.tusalud.healthapp.R
 import com.tusalud.healthapp.presentation.main.ProgressInfoCard
-
 import me.bytebeats.views.charts.line.LineChart
 import me.bytebeats.views.charts.line.LineChartData
 import me.bytebeats.views.charts.line.LineChartData.Point
@@ -33,7 +37,7 @@ fun ProgressScreen(
     val progressState by viewModel.progress.collectAsState()
     val pesos by viewModel.pesos.collectAsState()
 
-    // Garantiza que se recargue al entrar a esta pantalla
+    //garantiza que se recargue al entrar a esta pantalla
     LaunchedEffect(navController.currentBackStackEntry) {
         viewModel.loadProgress()
         viewModel.cargarPesosDesdeFirebase()
@@ -44,16 +48,16 @@ fun ProgressScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFF00BCD4))
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Text(
                 text = "Progreso",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -61,14 +65,16 @@ fun ProgressScreen(
             ) {
                 ProgressInfoCard(title = "Peso", value = "${progress.peso} kg")
                 ProgressInfoCard(title = "IMC", value = String.format("%.2f", progress.bmi))
+                ProgressInfoCard(title = "Peso objetivo", value = "${progress.pesoObjetivo ?: "--"} kg")
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
+            //grafico de evolucion
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(160.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.White.copy(alpha = 0.3f))
                     .clickable { navController.navigate("evolucion_peso") },
@@ -94,23 +100,22 @@ fun ProgressScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            ProgressInfoCard(title = "Grasa corporal", value = "0")
-
-            Spacer(modifier = Modifier.height(32.dp))
-
+            //boton de desafios
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(56.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .clickable { navController.navigate("desafio") },
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF9C27B0))
             ) {
-                Row(
-                    modifier = Modifier.padding(24.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "Desafío activo",
@@ -118,25 +123,39 @@ fun ProgressScreen(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = " ",
-                        color = Color.White,
-                        fontSize = 16.sp
-                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            // Usamos weight en lugar de height fijo para que la imagen ocupe el espacio disponible
+            Spacer(modifier = Modifier.height(24.dp))
+
+            //imagen de la bascula con tamaño más grande
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.bascula),
+                    contentDescription = "Báscula",
+                    modifier = Modifier
+                        .fillMaxHeight(0.9f)
+                        .aspectRatio(1f),
+                    contentScale = ContentScale.Fit
+                )
+            }
 
             Button(
                 onClick = { navController.navigate("actualizar_peso") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(56.dp)
+                    .padding(bottom = 8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF388E3C), // verde oscuro
-                    contentColor = Color.White          // texto blanco que resalta
+                    containerColor = Color(0xFF388E3C),
+                    contentColor = Color.White
                 )
             ) {
                 Text(

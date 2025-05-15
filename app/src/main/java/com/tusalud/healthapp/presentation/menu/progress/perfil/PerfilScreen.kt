@@ -1,4 +1,4 @@
-package com.tusalud.healthapp.presentation.menu
+package com.tusalud.healthapp.presentation.menu.progress.perfil
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,63 +8,61 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import com.tusalud.healthapp.presentation.components.BottomNavigationBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.google.firebase.auth.FirebaseAuth
+import com.tusalud.healthapp.presentation.components.BottomNavigationBar
 
 @Composable
-fun PerfilScreen(navController: NavHostController) {
-    var selectedTab by remember { mutableStateOf(2) }
+fun PerfilScreen(
+    navController: NavHostController,
+    viewModel: PerfilViewModel = hiltViewModel()
+) {
+    val selectedTab = 2
+
+    val displayName by viewModel.displayName.collectAsState(initial = "")
+    val email by viewModel.email.collectAsState(initial = "")
+    val showLogoutDialog by viewModel.showLogoutDialog.collectAsState(initial = false)
+    val showHelpDialog by viewModel.showHelpDialog.collectAsState(initial = false)
 
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
                 selectedTab = selectedTab,
-                onTabSelected = { selectedTab = it },
+                onTabSelected = { /* actualizar si es necesario */ },
                 navController = navController
             )
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
 
-            val auth = FirebaseAuth.getInstance()
-            var displayName by remember { mutableStateOf("") }
-            var email by remember { mutableStateOf("") }
-            var showLogoutDialog by remember { mutableStateOf(false) }
-            var showHelpDialog by remember { mutableStateOf(false) }
-
-            LaunchedEffect(Unit) {
-                auth.currentUser?.let { user ->
-                    displayName = user.displayName ?: "Usuario"
-                    email = user.email ?: "sin correo"
-                }
-            }
-
             if (showLogoutDialog) {
                 AlertDialog(
-                    onDismissRequest = { showLogoutDialog = false },
+                    onDismissRequest = { viewModel.setShowLogoutDialog(false) },
                     title = { Text("Cerrar sesión") },
                     text = { Text("¿Estás seguro que deseas cerrar sesión?") },
                     confirmButton = {
                         TextButton(onClick = {
-                            showLogoutDialog = false
-                            auth.signOut()
-                            navController.navigate("login") {
-                                popUpTo("perfil") { inclusive = true }
+                            viewModel.setShowLogoutDialog(false)
+                            viewModel.logout {
+                                navController.navigate("login") {
+                                    popUpTo("perfil") { inclusive = true }
+                                }
                             }
                         }) {
                             Text("Cerrar sesión")
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = { showLogoutDialog = false }) {
+                        TextButton(onClick = { viewModel.setShowLogoutDialog(false) }) {
                             Text("Cancelar")
                         }
                     }
@@ -73,13 +71,15 @@ fun PerfilScreen(navController: NavHostController) {
 
             if (showHelpDialog) {
                 AlertDialog(
-                    onDismissRequest = { showHelpDialog = false },
+                    onDismissRequest = { viewModel.setShowHelpDialog(false) },
                     title = { Text("Ayuda") },
                     text = {
-                        Text("¿Necesitás asistencia?\n\nContactanos a:\n📧 soporte@tusalud.com\n📞 +54 11 1234 5678\n\nO visitá nuestra web.")
+                        Text(
+                            "¿Necesitás asistencia?\n\nContactanos a:\n📧 soporte@tusalud.com\n📞 +54 11 1234 5678\n\nO visitá nuestra web."
+                        )
                     },
                     confirmButton = {
-                        TextButton(onClick = { showHelpDialog = false }) {
+                        TextButton(onClick = { viewModel.setShowHelpDialog(false) }) {
                             Text("Entendido")
                         }
                     }
@@ -126,7 +126,7 @@ fun PerfilScreen(navController: NavHostController) {
                             .padding(8.dp)
                     ) {
                         PerfilOptionItem(icon = Icons.Default.Edit, label = "Editar perfil") {
-                            navController.navigate("editarPerfil")
+                            navController.navigate("editar_perfil")
                         }
 
                         PerfilOptionItem(icon = Icons.Default.Notifications, label = "Recordatorios") {
@@ -138,13 +138,13 @@ fun PerfilScreen(navController: NavHostController) {
                         }
 
                         PerfilOptionItem(icon = Icons.Filled.Help, label = "Ayuda") {
-                            showHelpDialog = true
+                            viewModel.setShowHelpDialog(true)
                         }
 
                         Divider(modifier = Modifier.padding(vertical = 8.dp))
 
                         PerfilOptionItem(icon = Icons.Default.ExitToApp, label = "Cerrar sesión") {
-                            showLogoutDialog = true
+                            viewModel.setShowLogoutDialog(true)
                         }
                     }
                 }
@@ -167,3 +167,7 @@ fun PerfilOptionItem(icon: ImageVector, label: String, onClick: () -> Unit) {
         Text(text = label, fontSize = 16.sp, color = Color.Black)
     }
 }
+
+
+
+
