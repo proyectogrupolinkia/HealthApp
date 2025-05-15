@@ -1,26 +1,33 @@
 package com.tusalud.healthapp.presentation.navigation
 
-
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.tusalud.healthapp.presentation.login.LoginScreen
+import com.tusalud.healthapp.presentation.login.LoginViewModel
 import com.tusalud.healthapp.presentation.register.RegisterScreen
 import com.tusalud.healthapp.presentation.reset.PasswordResetScreen
 import com.tusalud.healthapp.presentation.main.MainScreen
-import com.tusalud.healthapp.presentation.menu.CalculadorasScreen
-import com.tusalud.healthapp.presentation.menu.PerfilScreen
-import com.tusalud.healthapp.presentation.menu.EditarPerfilScreen
-import com.tusalud.healthapp.presentation.menu.RecordatoriosScreen
-import com.tusalud.healthapp.presentation.menu.ConfiguracionScreen
-//import com.tusalud.healthapp.presentation.menu.EvolucionPesoScreen
-import com.tusalud.healthapp.presentation.menu.desafio.DesafioScreen
-import com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel
-import com.tusalud.healthapp.presentation.menu.Progress.ActualizarPesoScreen
-import com.tusalud.healthapp.presentation.menu.Progress.EvolucionPesoScreen
-import com.tusalud.healthapp.presentation.menu.Progress.ProgressScreen
+import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen
+import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasViewModel
+import com.tusalud.healthapp.presentation.menu.desafios.DesafiosScreen
+import com.tusalud.healthapp.presentation.menu.desafios.DesafiosViewModel
+import com.tusalud.healthapp.presentation.menu.progress.ProgressScreen
+import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
+import com.tusalud.healthapp.presentation.menu.progress.perfil.PerfilScreen
+import com.tusalud.healthapp.presentation.menu.progress.perfil.PerfilViewModel
+import com.tusalud.healthapp.presentation.menu.progress.perfil.EditarPerfilScreen
+import com.tusalud.healthapp.presentation.menu.progress.perfil.EditarPerfilViewModel
+import com.tusalud.healthapp.presentation.menu.progress.recordatorios.RecordatoriosScreen
+import com.tusalud.healthapp.presentation.menu.progress.recordatorios.RecordatoriosViewModel
+import com.tusalud.healthapp.presentation.menu.progress.configuracion.ConfiguracionScreen
+import com.tusalud.healthapp.presentation.menu.progress.configuracion.ConfiguracionViewModel
+import com.tusalud.healthapp.presentation.menu.progress.peso.ActualizarPesoScreen
+import com.tusalud.healthapp.presentation.menu.progress.peso.ActualizarPesoViewModel
+import com.tusalud.healthapp.presentation.menu.progress.peso.EvolucionPesoScreen
+import com.tusalud.healthapp.presentation.menu.progress.peso.EvolucionPesoViewModel
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -30,7 +37,8 @@ fun AppNavigation(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "login") {
 
         composable("login") {
-            LoginScreen(navController)
+            val viewModel: LoginViewModel = hiltViewModel()
+            LoginScreen(navController, viewModel)
         }
 
         composable("register") {
@@ -46,27 +54,33 @@ fun AppNavigation(navController: NavHostController) {
         }
 
         composable("perfil") {
-            PerfilScreen(navController)
+            val viewModel: PerfilViewModel = hiltViewModel()
+            PerfilScreen(navController, viewModel)
         }
 
         composable("editar_perfil") {
-            EditarPerfilScreen(navController)
+            val viewModel: EditarPerfilViewModel = hiltViewModel()
+            EditarPerfilScreen(navController, viewModel)
         }
 
         composable("recordatorios") {
-            RecordatoriosScreen(navController)
+            val viewModel: RecordatoriosViewModel = hiltViewModel()
+            RecordatoriosScreen(navController, viewModel)
         }
 
         composable("configuracion") {
-            ConfiguracionScreen(navController)
+            val viewModel: ConfiguracionViewModel = hiltViewModel()
+            ConfiguracionScreen(navController, viewModel)
         }
 
         composable("desafio") {
-            DesafioScreen(navController)
+            val viewModel: DesafiosViewModel = hiltViewModel()
+            DesafiosScreen(navController, viewModel)
         }
 
         composable("calculadoras") {
-            CalculadorasScreen(navController)
+            val viewModel: CalculadorasViewModel = hiltViewModel()
+            CalculadorasScreen(navController, viewModel)
         }
 
         composable("progress") {
@@ -74,10 +88,13 @@ fun AppNavigation(navController: NavHostController) {
         }
 
         composable("actualizar_peso") {
-            ActualizarPesoScreen(navController, progressViewModel)
+            val viewModel: ActualizarPesoViewModel = hiltViewModel()
+            ActualizarPesoScreen(navController, viewModel)
         }
+
         composable("evolucion_peso") {
-            EvolucionPesoScreen(navController)
+            val viewModel: EvolucionPesoViewModel = hiltViewModel()
+            EvolucionPesoScreen(navController, viewModel)
         }
     }
 }

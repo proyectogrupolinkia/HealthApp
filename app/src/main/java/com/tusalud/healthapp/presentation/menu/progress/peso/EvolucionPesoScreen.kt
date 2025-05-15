@@ -1,12 +1,10 @@
-package com.tusalud.healthapp.presentation.menu.Progress
+package com.tusalud.healthapp.presentation.menu.progress.peso
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -24,7 +22,7 @@ import me.bytebeats.views.charts.line.render.yaxis.SimpleYAxisDrawer
 @Composable
 fun EvolucionPesoScreen(
     navController: NavHostController,
-    viewModel: ProgressViewModel = hiltViewModel()
+    viewModel: EvolucionPesoViewModel = hiltViewModel()
 ) {
     val pesosConFechas by viewModel.pesosConFechas.collectAsState()
 

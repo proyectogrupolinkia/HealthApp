@@ -63,7 +63,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation("androidx.compose.ui:ui-text")
-    implementation("androidx.compose.material:material-icons-extended:1.0.0")  // Agrega esta línea
+    implementation("androidx.compose.material:material-icons-extended:1.0.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -72,14 +72,16 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("com.google.firebase:firebase-auth-ktx:22.3.1") // o la última versión estable
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     implementation(libs.compose.charts)
     implementation("androidx.compose.ui:ui:1.8.1")
-
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore:1.0.0")
 
 }
 
 kapt {
     correctErrorTypes = true
 }
+
 

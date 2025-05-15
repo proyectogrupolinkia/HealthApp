@@ -16,8 +16,16 @@ fun BottomNavigationBar(
         NavigationBarItem(
             selected = selectedTab == 0,
             onClick = {
-                onTabSelected(0)
-                navController.navigate("main")
+                if (selectedTab != 0) {
+                    onTabSelected(0)
+                    navController.navigate("main") {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                    }
+                }
             },
             icon = {
                 Icon(
@@ -30,8 +38,16 @@ fun BottomNavigationBar(
         NavigationBarItem(
             selected = selectedTab == 1,
             onClick = {
-                onTabSelected(1)
-                navController.navigate("calculadoras")
+                if (selectedTab != 1) {
+                    onTabSelected(1)
+                    navController.navigate("calculadoras") {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                    }
+                }
             },
             icon = {
                 Icon(
@@ -44,8 +60,16 @@ fun BottomNavigationBar(
         NavigationBarItem(
             selected = selectedTab == 2,
             onClick = {
-                onTabSelected(2)
-                navController.navigate("perfil")
+                if (selectedTab != 2) {
+                    onTabSelected(2)
+                    navController.navigate("perfil") {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                    }
+                }
             },
             icon = {
                 Icon(

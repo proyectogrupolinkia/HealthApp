@@ -1,4 +1,4 @@
-package com.tusalud.healthapp.util
+package com.tusalud.healthapp.utils
 
 import kotlin.math.log10
 

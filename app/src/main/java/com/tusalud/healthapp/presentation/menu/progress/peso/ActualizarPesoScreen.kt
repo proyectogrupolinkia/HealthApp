@@ -1,4 +1,4 @@
-package com.tusalud.healthapp.presentation.menu.Progress
+package com.tusalud.healthapp.presentation.menu.progress.peso
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -7,8 +7,9 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 
@@ -16,21 +17,30 @@ import kotlinx.coroutines.launch
 @Composable
 fun ActualizarPesoScreen(
     navController: NavHostController,
-    viewModel: ProgressViewModel
+    viewModel: ActualizarPesoViewModel = hiltViewModel()
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     var nuevoPeso by remember { mutableStateOf("") }
-    val snackbarActivo = viewModel.snackbarActivo
+    val snackbarActivo by viewModel.snackbarActivo.collectAsState()
+    val snackbarError by viewModel.snackbarError.collectAsState()
 
-    // Mostrar Snackbar cuando el peso se haya guardado
     LaunchedEffect(snackbarActivo) {
         if (snackbarActivo) {
             scope.launch {
                 snackbarHostState.showSnackbar("Peso guardado correctamente")
                 viewModel.resetSnackbar()
-                nuevoPeso = "" // limpiar campo tras guardar
+                nuevoPeso = "" //limpiar campo tras guardar
+            }
+        }
+    }
+
+    LaunchedEffect(snackbarError) {
+        snackbarError?.let { errorMsg ->
+            scope.launch {
+                snackbarHostState.showSnackbar(errorMsg)
+                viewModel.resetSnackbarError()
             }
         }
     }
@@ -47,9 +57,7 @@ fun ActualizarPesoScreen(
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-
     ) { padding ->
-
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -76,3 +84,4 @@ fun ActualizarPesoScreen(
         }
     }
 }
+
