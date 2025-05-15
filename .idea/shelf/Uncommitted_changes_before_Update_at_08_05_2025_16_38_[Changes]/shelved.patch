@@ -1,0 +1,240 @@
+Index: app/src/main/java/com/tusalud/healthapp/presentation/menu/ProgressScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.menu\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.clickable\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Box\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material3.Card\r\nimport androidx.compose.material3.CardDefaults\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.collectAsState\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.navigation.NavHostController\r\nimport com.tusalud.healthapp.presentation.main.ProgressInfoCard\r\nimport com.tusalud.healthapp.presentation.main.ProgressViewModel\r\n\r\n@Composable\r\nfun ProgressScreen(navController: NavHostController, viewModel: ProgressViewModel) {\r\n    val progressState by viewModel.progress.collectAsState()\r\n\r\n    progressState?.let { progress ->\r\n        Column(\r\n            modifier = Modifier\r\n                .fillMaxSize()\r\n                .background(Color(0xFF00BCD4))\r\n                .padding(16.dp)\r\n        ) {\r\n            Text(\r\n                text = \"Progreso\",\r\n                fontSize = 32.sp,\r\n                fontWeight = FontWeight.Bold,\r\n                color = Color.White\r\n            )\r\n            Spacer(modifier = Modifier.height(16.dp))\r\n            Row(\r\n                horizontalArrangement = Arrangement.SpaceEvenly,\r\n                modifier = Modifier.fillMaxWidth()\r\n            ) {\r\n                ProgressInfoCard(title = \"Peso\", value = \"${progress.weightKg} kg\")\r\n                ProgressInfoCard(title = \"IMC\", value = \"${progress.bmi}\")\r\n            }\r\n            Spacer(modifier = Modifier.height(16.dp))\r\n            Box(\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .height(150.dp)\r\n                    .clip(RoundedCornerShape(12.dp))\r\n                    .background(Color.White.copy(alpha = 0.3f)),\r\n                contentAlignment = Alignment.Center\r\n            ) {\r\n                Text(\"Gráfico de evolución\", color = Color.White)\r\n            }\r\n            Spacer(modifier = Modifier.height(16.dp))\r\n            ProgressInfoCard(title = \"Grasa corporal\", value = \"${progress.bodyFatPercentage} %\")\r\n            Spacer(modifier = Modifier.height(16.dp))\r\n            Card(\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .clickable {\r\n                        navController.navigate(\"desafio\")\r\n                    },\r\n                shape = RoundedCornerShape(12.dp),\r\n                colors = CardDefaults.cardColors(containerColor = Color(0xFF7E57C2))\r\n            ) {\r\n                Column(modifier = Modifier.padding(16.dp)) {\r\n                    Text(\r\n                        text = \"Desafío activo\",\r\n                        color = Color.White,\r\n                        fontSize = 18.sp,\r\n                        fontWeight = FontWeight.Bold\r\n                    )\r\n                    Spacer(modifier = Modifier.height(8.dp))\r\n                    Text(\r\n                        text = progress.activeChallenge,\r\n                        color = Color.White,\r\n                        fontSize = 16.sp\r\n                    )\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/menu/ProgressScreen.kt b/app/src/main/java/com/tusalud/healthapp/presentation/menu/ProgressScreen.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/menu/ProgressScreen.kt	(revision 76c91dbc874c81374be17b90a3eb4cd8389ea1fb)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/menu/ProgressScreen.kt	(date 1746715063123)
+@@ -2,15 +2,7 @@
+ 
+ import androidx.compose.foundation.background
+ import androidx.compose.foundation.clickable
+-import androidx.compose.foundation.layout.Arrangement
+-import androidx.compose.foundation.layout.Box
+-import androidx.compose.foundation.layout.Column
+-import androidx.compose.foundation.layout.Row
+-import androidx.compose.foundation.layout.Spacer
+-import androidx.compose.foundation.layout.fillMaxSize
+-import androidx.compose.foundation.layout.fillMaxWidth
+-import androidx.compose.foundation.layout.height
+-import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.layout.*
+ import androidx.compose.foundation.shape.RoundedCornerShape
+ import androidx.compose.material3.Card
+ import androidx.compose.material3.CardDefaults
+@@ -32,6 +24,7 @@
+ @Composable
+ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewModel) {
+     val progressState by viewModel.progress.collectAsState()
++    val userState by viewModel.user.collectAsState()
+ 
+     progressState?.let { progress ->
+         Column(
+@@ -40,13 +33,34 @@
+                 .background(Color(0xFF00BCD4))
+                 .padding(16.dp)
+         ) {
+-            Text(
+-                text = "Progreso",
+-                fontSize = 32.sp,
+-                fontWeight = FontWeight.Bold,
+-                color = Color.White
+-            )
+-            Spacer(modifier = Modifier.height(16.dp))
++            Row(
++                modifier = Modifier.fillMaxWidth(),
++                horizontalArrangement = Arrangement.SpaceBetween,
++                verticalAlignment = Alignment.Top
++            ) {
++                Text(
++                    text = "Bienvenido, ${userState?.nombre ?: "usuario"}",
++                    fontSize = 24.sp,
++                    fontWeight = FontWeight.Bold,
++                    color = Color.White
++                )
++                Text(
++                    text = "Cerrar sesión",
++                    color = Color.White,
++                    fontSize = 14.sp,
++                    modifier = Modifier
++                        .clickable {
++                            viewModel.logout()
++                            navController.navigate("login") {
++                                popUpTo("progress") { inclusive = true }
++                            }
++                        }
++                        .padding(8.dp)
++                )
++            }
++
++            Spacer(modifier = Modifier.height(24.dp))
++
+             Row(
+                 horizontalArrangement = Arrangement.SpaceEvenly,
+                 modifier = Modifier.fillMaxWidth()
+@@ -54,7 +68,9 @@
+                 ProgressInfoCard(title = "Peso", value = "${progress.weightKg} kg")
+                 ProgressInfoCard(title = "IMC", value = "${progress.bmi}")
+             }
++
+             Spacer(modifier = Modifier.height(16.dp))
++
+             Box(
+                 modifier = Modifier
+                     .fillMaxWidth()
+@@ -65,9 +81,13 @@
+             ) {
+                 Text("Gráfico de evolución", color = Color.White)
+             }
++
+             Spacer(modifier = Modifier.height(16.dp))
++
+             ProgressInfoCard(title = "Grasa corporal", value = "${progress.bodyFatPercentage} %")
++
+             Spacer(modifier = Modifier.height(16.dp))
++
+             Card(
+                 modifier = Modifier
+                     .fillMaxWidth()
+@@ -94,4 +114,4 @@
+             }
+         }
+     }
+-}
++}
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/domain/respository/UserRespository.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.domain.respository\r\n\r\nimport com.tusalud.healthapp.domain.model.User\r\ninterface UserRepository {\r\n    suspend fun login(email: String, password: String): Result<User>\r\n    suspend fun register(user: User, password: String): Result<User>\r\n    suspend fun resetPassword(email: String): Result<Unit>\r\n    suspend fun getUser(uid: String): Result<User>\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRespository.kt b/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRespository.kt
+--- a/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRespository.kt	(revision 76c91dbc874c81374be17b90a3eb4cd8389ea1fb)
++++ b/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRespository.kt	(date 1746715063119)
+@@ -6,4 +6,6 @@
+     suspend fun register(user: User, password: String): Result<User>
+     suspend fun resetPassword(email: String): Result<Unit>
+     suspend fun getUser(uid: String): Result<User>
++    suspend fun logout()
++    suspend fun getCurrentUser():User
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/presentation/main/ProgressViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.main\r\n\r\nimport androidx.lifecycle.ViewModel\r\nimport androidx.lifecycle.viewModelScope\r\nimport com.tusalud.healthapp.domain.model.Progress\r\nimport com.tusalud.healthapp.domain.repository.ProgressRepository\r\nimport dagger.hilt.android.lifecycle.HiltViewModel\r\nimport kotlinx.coroutines.flow.MutableStateFlow\r\nimport kotlinx.coroutines.flow.StateFlow\r\nimport kotlinx.coroutines.launch\r\nimport javax.inject.Inject\r\n\r\n@HiltViewModel\r\nclass ProgressViewModel @Inject constructor(\r\n    private val progressRepository: ProgressRepository\r\n) : ViewModel() {\r\n\r\n    private val _progress = MutableStateFlow<Progress?>(null)\r\n    val progress: StateFlow<Progress?> = _progress\r\n\r\n    init {\r\n        loadProgress()\r\n    }\r\n\r\n    private fun loadProgress() {\r\n        viewModelScope.launch {\r\n            _progress.value = progressRepository.getProgress()\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/main/ProgressViewModel.kt b/app/src/main/java/com/tusalud/healthapp/presentation/main/ProgressViewModel.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/main/ProgressViewModel.kt	(revision 76c91dbc874c81374be17b90a3eb4cd8389ea1fb)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/main/ProgressViewModel.kt	(date 1746715063121)
+@@ -3,7 +3,9 @@
+ import androidx.lifecycle.ViewModel
+ import androidx.lifecycle.viewModelScope
+ import com.tusalud.healthapp.domain.model.Progress
++import com.tusalud.healthapp.domain.model.User
+ import com.tusalud.healthapp.domain.repository.ProgressRepository
++import com.tusalud.healthapp.domain.respository.UserRepository
+ import dagger.hilt.android.lifecycle.HiltViewModel
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.StateFlow
+@@ -12,14 +14,19 @@
+ 
+ @HiltViewModel
+ class ProgressViewModel @Inject constructor(
+-    private val progressRepository: ProgressRepository
++    private val progressRepository: ProgressRepository,
++    private val userRepository: UserRepository
+ ) : ViewModel() {
+ 
+     private val _progress = MutableStateFlow<Progress?>(null)
+     val progress: StateFlow<Progress?> = _progress
+ 
++    private val _user = MutableStateFlow<User?>(null)
++    val user: StateFlow<User?> = _user
++
+     init {
+         loadProgress()
++        loadUser()
+     }
+ 
+     private fun loadProgress() {
+@@ -27,4 +34,16 @@
+             _progress.value = progressRepository.getProgress()
+         }
+     }
++
++    private fun loadUser() {
++        viewModelScope.launch {
++            _user.value = userRepository.getCurrentUser()
++        }
++    }
++
++    fun logout() {
++        viewModelScope.launch {
++            userRepository.logout()
++        }
++    }
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/domain/respository/UserRepositoryImpl.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.domain.respository\r\n\r\nimport com.google.firebase.auth.FirebaseAuth\r\nimport com.google.firebase.firestore.FirebaseFirestore\r\nimport com.tusalud.healthapp.domain.model.UserDto\r\nimport kotlinx.coroutines.Dispatchers\r\nimport kotlinx.coroutines.tasks.await\r\nimport kotlinx.coroutines.withContext\r\nimport com.tusalud.healthapp.domain.model.User\r\nclass UserRepositoryImpl(auth1: FirebaseAuth, firestore: FirebaseFirestore) : UserRepository {\r\n\r\n    private val auth = FirebaseAuth.getInstance()\r\n    private val db = FirebaseFirestore.getInstance()\r\n\r\n    override suspend fun login(email: String, password: String): Result<User> = withContext(Dispatchers.IO) {\r\n        try {\r\n            val result = auth.signInWithEmailAndPassword(email, password).await()\r\n            val uid = result.user?.uid ?: return@withContext Result.failure(Exception(\"UID nulo\"))\r\n\r\n            val doc = db.collection(\"usuarios\").document(uid).get().await()\r\n            val user = doc.toObject(UserDto::class.java)?.toDomain()\r\n                ?: return@withContext Result.failure(Exception(\"Usuario no encontrado\"))\r\n\r\n            Result.success(user)\r\n        } catch (e: Exception) {\r\n            Result.failure(e)\r\n        }\r\n    }\r\n\r\n    override suspend fun register(user: User, password: String): Result<User> = withContext(Dispatchers.IO) {\r\n        try {\r\n            val result = auth.createUserWithEmailAndPassword(user.correo, password).await()\r\n            val uid = result.user?.uid ?: return@withContext Result.failure(Exception(\"UID nulo\"))\r\n            val userWithId = user.copy(id = uid)\r\n\r\n            db.collection(\"usuarios\").document(uid).set(userWithId).await()\r\n            Result.success(userWithId)\r\n        } catch (e: Exception) {\r\n            Result.failure(e)\r\n        }\r\n    }\r\n\r\n\r\n    override suspend fun resetPassword(email: String): Result<Unit> = withContext(Dispatchers.IO) {\r\n        try {\r\n            auth.sendPasswordResetEmail(email).await()\r\n            Result.success(Unit)\r\n        } catch (e: Exception) {\r\n            Result.failure(e)\r\n            }\r\n    }\r\n    override suspend fun getUser(uid: String): Result<User> = withContext(Dispatchers.IO) {\r\n        try {\r\n            val doc = db.collection(\"usuarios\").document(uid).get().await()\r\n            val user = doc.toObject(UserDto::class.java)?.toDomain()\r\n                ?: return@withContext Result.failure(Exception(\"Usuario no encontrado\"))\r\n\r\n            Result.success(user)\r\n        } catch (e: Exception) {\r\n            Result.failure(e)\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRepositoryImpl.kt b/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRepositoryImpl.kt
+--- a/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRepositoryImpl.kt	(revision 76c91dbc874c81374be17b90a3eb4cd8389ea1fb)
++++ b/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRepositoryImpl.kt	(date 1746715063117)
+@@ -60,4 +60,18 @@
+             Result.failure(e)
+         }
+     }
++    override suspend fun logout() {
++        FirebaseAuth.getInstance().signOut()
++        }
++    override suspend fun getCurrentUser(): User {
++        val firebaseUser = FirebaseAuth.getInstance().currentUser
++        return User(
++            id = firebaseUser?.uid ?: "",
++            nombre = firebaseUser?.displayName ?: firebaseUser?.email ?: "Usuario",
++            correo = firebaseUser?.email ?: "",
++            edad = 0,
++            peso = 0f,
++            altura = 0f
++        )
++    }
+ }
+\ No newline at end of file
+Index: .idea/deploymentTargetSelector.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"deploymentTargetSelector\">\r\n    <selectionStates>\r\n      <SelectionState runConfigName=\"Healthapp.app\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n      </SelectionState>\r\n      <SelectionState runConfigName=\"MainActivity\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n      </SelectionState>\r\n    </selectionStates>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetSelector.xml b/.idea/deploymentTargetSelector.xml
+--- a/.idea/deploymentTargetSelector.xml	(revision 76c91dbc874c81374be17b90a3eb4cd8389ea1fb)
++++ b/.idea/deploymentTargetSelector.xml	(date 1746715063114)
+@@ -7,6 +7,14 @@
+       </SelectionState>
+       <SelectionState runConfigName="MainActivity">
+         <option name="selectionMode" value="DROPDOWN" />
++        <DropdownSelection timestamp="2025-05-08T14:15:25.956546900Z">
++          <Target type="DEFAULT_BOOT">
++            <handle>
++              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\MiriamyJavi\.android\avd\Medium_Phone.avd" />
++            </handle>
++          </Target>
++        </DropdownSelection>
++        <DialogSelection />
+       </SelectionState>
+     </selectionStates>
+   </component>

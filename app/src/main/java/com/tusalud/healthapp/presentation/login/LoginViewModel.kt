@@ -9,6 +9,8 @@ import com.tusalud.healthapp.domain.model.User
 import com.tusalud.healthapp.domain.respository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,9 +24,14 @@ class LoginViewModel @Inject constructor(
     var error by mutableStateOf<String?>(null)
     var loading by mutableStateOf(false)
 
+    private val _nombreUsuario = MutableStateFlow("")
+    val nombreUsuario: StateFlow<String> = _nombreUsuario
+
+    private val _emailUsuario = MutableStateFlow("")
+    val emailUsuario: StateFlow<String> = _emailUsuario
 
     val isFormValid: Boolean
-        get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length>=6
+        get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length >= 6
 
 
     fun login(onSuccess: () -> Unit) {
@@ -52,8 +59,8 @@ class LoginViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             loading = true
-            val user = User("", nombre, correo, edad, peso, altura)
-            val result = userRepository.register(user, password)
+            val newUser = User("", nombre, correo, edad, peso, altura)
+            val result = userRepository.register(newUser, password)
             loading = false
             result.onSuccess {
                 this@LoginViewModel.user = it
@@ -77,6 +84,16 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    fun cargarNombreUsuario(uid: String) {
+        viewModelScope.launch {
+            val result = userRepository.getUserById(uid)
+            result.onSuccess { user ->
+                _nombreUsuario.value = user.nombre
+                _emailUsuario.value = user.correo
+            }.onFailure {
+                // Manejo de error opcional
+            }
+        }
+    }
 }
-
-

@@ -1,0 +1,264 @@
+Index: app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.menu.Progress\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.clickable\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Box\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material3.Card\r\nimport androidx.compose.material3.CardDefaults\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.collectAsState\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.navigation.NavHostController\r\nimport com.tusalud.healthapp.presentation.main.ProgressInfoCard\r\n\r\n@Composable\r\nfun ProgressScreen(navController: NavHostController, viewModel: ProgressViewModel) {\r\n    val progressState by viewModel.progress.collectAsState()\r\n\r\n    progressState?.let { progress ->\r\n        Column(\r\n            modifier = Modifier\r\n                .fillMaxSize()\r\n                .background(Color(0xFF00BCD4))\r\n                .padding(16.dp)\r\n        ) {\r\n            Text(\r\n                text = \"Progreso\",\r\n                fontSize = 32.sp,\r\n                fontWeight = FontWeight.Bold,\r\n                color = Color.White\r\n            )\r\n            Spacer(modifier = Modifier.height(16.dp))\r\n            Row(\r\n                horizontalArrangement = Arrangement.SpaceEvenly,\r\n                modifier = Modifier.fillMaxWidth()\r\n            ) {\r\n                ProgressInfoCard(title = \"Peso\", value = \"${progress.weightKg} kg\")\r\n                ProgressInfoCard(title = \"IMC\", value = \"${progress.bmi}\")\r\n            }\r\n            Spacer(modifier = Modifier.height(16.dp))\r\n            Box(\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .height(150.dp)\r\n                    .clip(RoundedCornerShape(12.dp))\r\n                    .background(Color.White.copy(alpha = 0.3f)),\r\n                contentAlignment = Alignment.Center\r\n            ) {\r\n                Text(\"Gráfico de evolución\", color = Color.White)\r\n            }\r\n            Spacer(modifier = Modifier.height(16.dp))\r\n            ProgressInfoCard(title = \"Grasa corporal\", value = \"${progress.bodyFatPercentage} %\")\r\n            Spacer(modifier = Modifier.height(16.dp))\r\n            Card(\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .clickable {\r\n                        navController.navigate(\"desafio\")\r\n                    },\r\n                shape = RoundedCornerShape(12.dp),\r\n                colors = CardDefaults.cardColors(containerColor = Color(0xFF7E57C2))\r\n            ) {\r\n                Column(modifier = Modifier.padding(16.dp)) {\r\n                    Text(\r\n                        text = \"Desafío activo\",\r\n                        color = Color.White,\r\n                        fontSize = 18.sp,\r\n                        fontWeight = FontWeight.Bold\r\n                    )\r\n                    Spacer(modifier = Modifier.height(8.dp))\r\n                    Text(\r\n                        text = progress.activeChallenge,\r\n                        color = Color.White,\r\n                        fontSize = 16.sp\r\n                    )\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressScreen.kt b/app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressScreen.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressScreen.kt	(revision 3acb2332d7c9f9dcf1689b13e94aedbcc4878907)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressScreen.kt	(date 1746858560091)
+@@ -26,7 +26,7 @@
+ import androidx.compose.ui.unit.dp
+ import androidx.compose.ui.unit.sp
+ import androidx.navigation.NavHostController
+-import com.tusalud.healthapp.presentation.main.ProgressInfoCard
++import com.tusalud.healthapp.presentation.components.ProgressInfoCard
+ 
+ @Composable
+ fun ProgressScreen(navController: NavHostController, viewModel: ProgressViewModel) {
+Index: app/src/main/java/com/tusalud/healthapp/presentation/navigation/NavigationRoutes.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.navigation\r\n\r\nobject NavigationRoutes {\r\n    const val LOGIN = \"login\"\r\n    const val MAIN = \"main\"\r\n    const val PROGRESO = \"progreso\"\r\n    const val CALCULADORAS = \"calculadoras\"\r\n    const val PERFIL = \"perfil\"\r\n    const val DESAFIO = \"desafio\"\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/navigation/NavigationRoutes.kt b/app/src/main/java/com/tusalud/healthapp/presentation/navigation/NavigationRoutes.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/navigation/NavigationRoutes.kt	(revision 3acb2332d7c9f9dcf1689b13e94aedbcc4878907)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/navigation/NavigationRoutes.kt	(date 1746859772533)
+@@ -2,9 +2,15 @@
+ 
+ object NavigationRoutes {
+     const val LOGIN = "login"
+-    const val MAIN = "main"
+-    const val PROGRESO = "progreso"
+-    const val CALCULADORAS = "calculadoras"
+-    const val PERFIL = "perfil"
+-    const val DESAFIO = "desafio"
++    const val REGISTER = "register"
++    const val RESET = "reset_password"
++
++    // Esta ruta es dinámica, se completa con un índice: "main/{tab}"
++    const val MAIN_BASE = "main"
++    const val MAIN_WITH_TAB = "main/{tab}"
++
++    // Índices para pestañas (puedes usarlos como documentación o constantes)
++    const val TAB_PROGRESO = 0
++    const val TAB_CALCULADORAS = 1
++    const val TAB_PERFIL = 2
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.main\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.*\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.res.painterResource\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.hilt.navigation.compose.hiltViewModel\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.currentBackStackEntryAsState\r\nimport com.tusalud.healthapp.R\r\nimport com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen\r\nimport com.tusalud.healthapp.presentation.menu.PerfilScreen\r\nimport com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel\r\nimport com.tusalud.healthapp.presentation.menu.Progress.ProgressScreen\r\n\r\n\r\n@Composable\r\nfun MainScreen(\r\n    navController: NavHostController,\r\n    viewModel: ProgressViewModel = hiltViewModel()\r\n) {\r\n    var selectedTab by remember { mutableStateOf(0) }\r\n\r\n    Scaffold(\r\n        bottomBar = {\r\n            BottomNavigationBar(\r\n                selectedTab = selectedTab,\r\n                onTabSelected = { selectedTab = it },\r\n                navController = navController\r\n            )\r\n        }\r\n    ) { innerPadding ->\r\n        Box(modifier = Modifier\r\n            .fillMaxSize()\r\n            .padding(innerPadding)\r\n        ) {\r\n            when (selectedTab) {\r\n                0 -> ProgressScreen(navController, viewModel)\r\n                1 -> CalculadorasScreen(navController)\r\n                2 -> PerfilScreen(navController)\r\n            }\r\n        }\r\n    }\r\n}\r\n@Composable\r\nfun BottomNavigationBar(\r\n    selectedTab: Int,\r\n    onTabSelected: (Int) -> Unit,\r\n    navController: NavHostController\r\n) {\r\n    NavigationBar {\r\n        NavigationBarItem(\r\n            selected = selectedTab == 0,\r\n            onClick = {\r\n                onTabSelected(0)\r\n                navController.navigate(\"main\") // O NavigationRoutes.MAIN\r\n            },\r\n            icon = {\r\n                Icon(\r\n                    painter = painterResource(id = R.drawable.ic_progreso),\r\n                    contentDescription = \"Progreso\"\r\n                )\r\n            },\r\n            label = { Text(\"Progreso\") }\r\n        )\r\n        NavigationBarItem(\r\n            selected = selectedTab == 1,\r\n            onClick = {\r\n                onTabSelected(1)\r\n                navController.navigate(\"calculadoras\")\r\n            },\r\n            icon = {\r\n                Icon(\r\n                    painter = painterResource(id = R.drawable.ic_calculadora),\r\n                    contentDescription = \"Calculadoras\"\r\n                )\r\n            },\r\n            label = { Text(\"Calculadoras\") }\r\n        )\r\n        NavigationBarItem(\r\n            selected = selectedTab == 2,\r\n            onClick = {\r\n                onTabSelected(2)\r\n                navController.navigate(\"perfil\")\r\n            },\r\n            icon = {\r\n                Icon(\r\n                    painter = painterResource(id = R.drawable.ic_perfil),\r\n                    contentDescription = \"Perfil\"\r\n                )\r\n            },\r\n            label = { Text(\"Perfil\") }\r\n        )\r\n    }\r\n}\r\n@Composable\r\nfun ProgressInfoCard(title: String, value: String) {\r\n    Column(\r\n        horizontalAlignment = Alignment.CenterHorizontally,\r\n        modifier = Modifier\r\n            .clip(RoundedCornerShape(12.dp))\r\n            .background(Color.White.copy(alpha = 0.2f))\r\n            .padding(16.dp)\r\n    ) {\r\n        Text(text = title, color = Color.White, fontSize = 16.sp)\r\n        Spacer(modifier = Modifier.height(4.dp))\r\n        Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)\r\n    }\r\n}\r\n\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt b/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt	(revision 3acb2332d7c9f9dcf1689b13e94aedbcc4878907)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt	(date 1746859722306)
+@@ -15,20 +15,19 @@
+ import androidx.compose.ui.unit.sp
+ import androidx.hilt.navigation.compose.hiltViewModel
+ import androidx.navigation.NavHostController
+-import androidx.navigation.compose.currentBackStackEntryAsState
+ import com.tusalud.healthapp.R
+ import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen
+ import com.tusalud.healthapp.presentation.menu.PerfilScreen
+-import com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel
+ import com.tusalud.healthapp.presentation.menu.Progress.ProgressScreen
+-
++import com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel
+ 
+ @Composable
+ fun MainScreen(
+     navController: NavHostController,
++    defaultTab: Int = 0,
+     viewModel: ProgressViewModel = hiltViewModel()
+ ) {
+-    var selectedTab by remember { mutableStateOf(0) }
++    var selectedTab by remember { mutableStateOf(defaultTab) }
+ 
+     Scaffold(
+         bottomBar = {
+@@ -39,9 +38,10 @@
+             )
+         }
+     ) { innerPadding ->
+-        Box(modifier = Modifier
+-            .fillMaxSize()
+-            .padding(innerPadding)
++        Box(
++            modifier = Modifier
++                .fillMaxSize()
++                .padding(innerPadding)
+         ) {
+             when (selectedTab) {
+                 0 -> ProgressScreen(navController, viewModel)
+@@ -51,6 +51,7 @@
+         }
+     }
+ }
++
+ @Composable
+ fun BottomNavigationBar(
+     selectedTab: Int,
+@@ -62,7 +63,7 @@
+             selected = selectedTab == 0,
+             onClick = {
+                 onTabSelected(0)
+-                navController.navigate("main") // O NavigationRoutes.MAIN
++                navController.navigate("main/0")
+             },
+             icon = {
+                 Icon(
+@@ -76,7 +77,7 @@
+             selected = selectedTab == 1,
+             onClick = {
+                 onTabSelected(1)
+-                navController.navigate("calculadoras")
++                navController.navigate("main/1")
+             },
+             icon = {
+                 Icon(
+@@ -90,7 +91,7 @@
+             selected = selectedTab == 2,
+             onClick = {
+                 onTabSelected(2)
+-                navController.navigate("perfil")
++                navController.navigate("main/2")
+             },
+             icon = {
+                 Icon(
+@@ -102,6 +103,7 @@
+         )
+     }
+ }
++
+ @Composable
+ fun ProgressInfoCard(title: String, value: String) {
+     Column(
+@@ -115,9 +117,4 @@
+         Spacer(modifier = Modifier.height(4.dp))
+         Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+     }
+-}
+-
+-
+-
+-
+-
++}
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.navigation\r\n\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.NavHost\r\nimport androidx.navigation.compose.composable\r\nimport com.tusalud.healthapp.presentation.login.LoginScreen\r\nimport com.tusalud.healthapp.presentation.main.MainScreen\r\nimport com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen\r\nimport com.tusalud.healthapp.presentation.menu.desafio.DesafioScreen\r\nimport com.tusalud.healthapp.presentation.menu.PerfilScreen\r\nimport com.tusalud.healthapp.presentation.menu.EditarPerfilScreen\r\nimport com.tusalud.healthapp.presentation.menu.RecordatoriosScreen\r\nimport com.tusalud.healthapp.presentation.menu.ConfiguracionScreen\r\nimport com.tusalud.healthapp.presentation.register.RegisterScreen\r\nimport com.tusalud.healthapp.presentation.reset.PasswordResetScreen\r\n\r\n\r\n\r\n@Composable\r\nfun AppNavigation(navController: NavHostController) {\r\n    NavHost(navController = navController, startDestination = \"login\") {\r\n\r\n        composable(\"login\") {\r\n            LoginScreen(navController)\r\n        }\r\n\r\n        composable(\"register\") {\r\n            RegisterScreen(navController)\r\n        }\r\n\r\n        composable(\"reset_password\") {\r\n            PasswordResetScreen(navController)\r\n        }\r\n\r\n        composable(\"main\") {\r\n            MainScreen(navController)\r\n        }\r\n\r\n        composable(NavigationRoutes.CALCULADORAS) {\r\n            CalculadorasScreen(navController)\r\n        }\r\n\r\n        composable(NavigationRoutes.PERFIL) {\r\n            PerfilScreen(navController)\r\n        }\r\n\r\n        composable(\"editarPerfil\") {  //pantalla de editar perfil\r\n            EditarPerfilScreen(navController)\r\n        }\r\n\r\n        composable(\"recordatorios\") {  //pantalla de recordatorios\r\n            RecordatoriosScreen(navController)\r\n        }\r\n\r\n        composable(\"configuracion\") {  //pantalla de configuracion\r\n            ConfiguracionScreen(navController)\r\n        }\r\n\r\n        composable(NavigationRoutes.DESAFIO) {\r\n            DesafioScreen(navController)\r\n        }\r\n\r\n\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt b/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt	(revision 3acb2332d7c9f9dcf1689b13e94aedbcc4878907)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt	(date 1746859759625)
+@@ -6,17 +6,9 @@
+ import androidx.navigation.compose.composable
+ import com.tusalud.healthapp.presentation.login.LoginScreen
+ import com.tusalud.healthapp.presentation.main.MainScreen
+-import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen
+-import com.tusalud.healthapp.presentation.menu.desafio.DesafioScreen
+-import com.tusalud.healthapp.presentation.menu.PerfilScreen
+-import com.tusalud.healthapp.presentation.menu.EditarPerfilScreen
+-import com.tusalud.healthapp.presentation.menu.RecordatoriosScreen
+-import com.tusalud.healthapp.presentation.menu.ConfiguracionScreen
+ import com.tusalud.healthapp.presentation.register.RegisterScreen
+ import com.tusalud.healthapp.presentation.reset.PasswordResetScreen
+ 
+-
+-
+ @Composable
+ fun AppNavigation(navController: NavHostController) {
+     NavHost(navController = navController, startDestination = "login") {
+@@ -33,35 +25,10 @@
+             PasswordResetScreen(navController)
+         }
+ 
+-        composable("main") {
+-            MainScreen(navController)
+-        }
+-
+-        composable(NavigationRoutes.CALCULADORAS) {
+-            CalculadorasScreen(navController)
+-        }
+-
+-        composable(NavigationRoutes.PERFIL) {
+-            PerfilScreen(navController)
+-        }
+-
+-        composable("editarPerfil") {  //pantalla de editar perfil
+-            EditarPerfilScreen(navController)
++        // Ruta con argumento para abrir una pestaña específica
++        composable("main/{tab}") { backStackEntry ->
++            val tabIndex = backStackEntry.arguments?.getString("tab")?.toIntOrNull() ?: 0
++            MainScreen(navController, defaultTab = tabIndex)
+         }
+-
+-        composable("recordatorios") {  //pantalla de recordatorios
+-            RecordatoriosScreen(navController)
+-        }
+-
+-        composable("configuracion") {  //pantalla de configuracion
+-            ConfiguracionScreen(navController)
+-        }
+-
+-        composable(NavigationRoutes.DESAFIO) {
+-            DesafioScreen(navController)
+-        }
+-
+-
+     }
+-}
+-
++}
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressInfoCard.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressInfoCard.kt b/app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressInfoCard.kt
+new file mode 100644
+--- /dev/null	(date 1746858544890)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/menu/Progress/ProgressInfoCard.kt	(date 1746858544890)
+@@ -0,0 +1,29 @@
++package com.tusalud.healthapp.presentation.components
++
++import androidx.compose.foundation.background
++import androidx.compose.foundation.layout.*
++import androidx.compose.foundation.shape.RoundedCornerShape
++import androidx.compose.material3.Text
++import androidx.compose.runtime.Composable
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.draw.clip
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.unit.dp
++import androidx.compose.ui.unit.sp
++import androidx.compose.ui.text.font.FontWeight
++
++@Composable
++fun ProgressInfoCard(title: String, value: String) {
++    Column(
++        horizontalAlignment = Alignment.CenterHorizontally,
++        modifier = Modifier
++            .clip(RoundedCornerShape(12.dp))
++            .background(Color.White.copy(alpha = 0.2f))
++            .padding(16.dp)
++    ) {
++        Text(text = title, color = Color.White, fontSize = 16.sp)
++        Spacer(modifier = Modifier.height(4.dp))
++        Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
++    }
++}
+\ No newline at end of file

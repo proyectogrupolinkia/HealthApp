@@ -1,0 +1,259 @@
+Index: app/src/main/java/com/tusalud/healthapp/domain/model/Progress.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.domain.model\r\n\r\ndata class Progress(\r\n    val weightKg: Float = 0f,\r\n    val heightCm: Float = 0f,\r\n    val bmi: Float = 0f\r\n)
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/domain/model/Progress.kt b/app/src/main/java/com/tusalud/healthapp/domain/model/Progress.kt
+--- a/app/src/main/java/com/tusalud/healthapp/domain/model/Progress.kt	(revision c679d16d4e86076663f7f9499e8437f49fcce474)
++++ b/app/src/main/java/com/tusalud/healthapp/domain/model/Progress.kt	(date 1746963525731)
+@@ -4,4 +4,5 @@
+     val weightKg: Float = 0f,
+     val heightCm: Float = 0f,
+     val bmi: Float = 0f
++
+ )
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.navigation\r\n\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.hilt.navigation.compose.hiltViewModel\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.NavHost\r\nimport androidx.navigation.compose.composable\r\nimport com.tusalud.healthapp.presentation.login.LoginScreen\r\nimport com.tusalud.healthapp.presentation.register.RegisterScreen\r\nimport com.tusalud.healthapp.presentation.reset.PasswordResetScreen\r\nimport com.tusalud.healthapp.presentation.main.MainScreen\r\nimport com.tusalud.healthapp.presentation.menu.CalculadorasScreen\r\nimport com.tusalud.healthapp.presentation.menu.PerfilScreen\r\nimport com.tusalud.healthapp.presentation.menu.EditarPerfilScreen\r\nimport com.tusalud.healthapp.presentation.menu.RecordatoriosScreen\r\nimport com.tusalud.healthapp.presentation.menu.ConfiguracionScreen\r\nimport com.tusalud.healthapp.presentation.menu.EvolucionPesoScreen\r\nimport com.tusalud.healthapp.presentation.menu.desafio.DesafioScreen\r\nimport com.tusalud.healthapp.presentation.menu.Progress.ProgressScreen\r\nimport com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel\r\nimport com.tusalud.healthapp.presentation.menu.Progress.ActualizarPesoScreen\r\n\r\n@Composable\r\nfun AppNavigation(navController: NavHostController) {\r\n\r\n    val progressViewModel: ProgressViewModel = hiltViewModel()\r\n\r\n    NavHost(navController = navController, startDestination = \"login\") {\r\n\r\n        composable(\"login\") {\r\n            LoginScreen(navController)\r\n        }\r\n\r\n        composable(\"register\") {\r\n            RegisterScreen(navController)\r\n        }\r\n\r\n        composable(\"reset_password\") {\r\n            PasswordResetScreen(navController)\r\n        }\r\n\r\n        composable(\"main\") {\r\n            MainScreen(navController)\r\n        }\r\n\r\n        composable(\"perfil\") {\r\n            PerfilScreen(navController)\r\n        }\r\n\r\n        composable(\"editar_perfil\") {\r\n            EditarPerfilScreen(navController)\r\n        }\r\n\r\n        composable(\"recordatorios\") {\r\n            RecordatoriosScreen(navController)\r\n        }\r\n\r\n        composable(\"configuracion\") {\r\n            ConfiguracionScreen(navController)\r\n        }\r\n\r\n        composable(\"desafio\") {\r\n            DesafioScreen(navController)\r\n        }\r\n\r\n        composable(\"calculadoras\") {\r\n            CalculadorasScreen(navController)\r\n        }\r\n\r\n        composable(\"progress\") {\r\n            ProgressScreen(navController, progressViewModel)\r\n        }\r\n\r\n        composable(\"actualizar_peso\") {\r\n            ActualizarPesoScreen(navController, progressViewModel)\r\n        }\r\n        composable(\"evolucion_peso\") {\r\n            EvolucionPesoScreen(navController)\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt b/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt	(revision c679d16d4e86076663f7f9499e8437f49fcce474)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt	(date 1746960950270)
+@@ -75,7 +75,7 @@
+             ActualizarPesoScreen(navController, progressViewModel)
+         }
+         composable("evolucion_peso") {
+-            EvolucionPesoScreen(navController)
++            EvolucionPesoScreen(navController, progressViewModel)
+         }
+     }
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/domain/model/PesoConfecha.kt
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/domain/model/PesoConfecha.kt b/app/src/main/java/com/tusalud/healthapp/domain/model/PesoConfecha.kt
+new file mode 100644
+--- /dev/null	(date 1746963525722)
++++ b/app/src/main/java/com/tusalud/healthapp/domain/model/PesoConfecha.kt	(date 1746963525722)
+@@ -0,0 +1,6 @@
++package com.tusalud.healthapp.domain.model
++
++data class PesoConFecha(
++    val peso: Float = 0f,
++    val timestamp: Long = 0L
++)
+\ No newline at end of file
+Index: app/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    alias(libs.plugins.android.application)\r\n    alias(libs.plugins.kotlin.android)\r\n    alias(libs.plugins.kotlin.compose)\r\n    alias(libs.plugins.googleServices)\r\n    alias(libs.plugins.crashlytics)\r\n    id(\"kotlin-kapt\")\r\n    id(\"com.google.dagger.hilt.android\")\r\n}\r\n\r\nandroid {\r\n    namespace = \"com.tusalud.healthapp\"\r\n    compileSdk = 35\r\n\r\n    defaultConfig {\r\n        applicationId = \"com.tusalud.healthapp\"\r\n        minSdk = 23\r\n        targetSdk = 35\r\n        versionCode = 1\r\n        versionName = \"1.0\"\r\n\r\n        testInstrumentationRunner = \"androidx.test.runner.AndroidJUnitRunner\"\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            isMinifyEnabled = false\r\n            proguardFiles(\r\n                getDefaultProguardFile(\"proguard-android-optimize.txt\"),\r\n                \"proguard-rules.pro\"\r\n            )\r\n        }\r\n    }\r\n    compileOptions {\r\n        sourceCompatibility = JavaVersion.VERSION_11\r\n        targetCompatibility = JavaVersion.VERSION_11\r\n    }\r\n    kotlinOptions {\r\n        jvmTarget = \"11\"\r\n    }\r\n    buildFeatures {\r\n        compose = true\r\n    }\r\n}\r\n\r\ndependencies {\r\n    implementation(platform(libs.firebase.bom))\r\n    implementation(libs.firebase.crashlytics)\r\n    implementation(libs.firebase.auth)\r\n    implementation(\"com.google.firebase:firebase-firestore\")\r\n    implementation(\"com.google.firebase:firebase-firestore-ktx\")\r\n    implementation(libs.androidx.navigation.compose)\r\n    implementation(libs.androidx.core.ktx)\r\n    implementation(libs.androidx.lifecycle.runtime.ktx)\r\n    implementation(\"androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1\")\r\n    implementation(libs.androidx.activity.compose)\r\n    implementation(platform(libs.androidx.compose.bom))\r\n    implementation(\"com.google.dagger:hilt-android:2.51.1\")\r\n    kapt(\"com.google.dagger:hilt-android-compiler:2.51.1\")\r\n    implementation(\"androidx.hilt:hilt-navigation-compose:1.1.0\")\r\n    implementation(libs.androidx.ui)\r\n    implementation(libs.androidx.ui.graphics)\r\n    implementation(libs.androidx.ui.tooling.preview)\r\n    implementation(libs.androidx.material3)\r\n    implementation(\"androidx.compose.ui:ui-text\")\r\n    implementation(\"androidx.compose.material:material-icons-extended:1.0.0\")  // Agrega esta línea\r\n    testImplementation(libs.junit)\r\n    androidTestImplementation(libs.androidx.junit)\r\n    androidTestImplementation(libs.androidx.espresso.core)\r\n    androidTestImplementation(platform(libs.androidx.compose.bom))\r\n    androidTestImplementation(libs.androidx.ui.test.junit4)\r\n    debugImplementation(libs.androidx.ui.tooling)\r\n    debugImplementation(libs.androidx.ui.test.manifest)\r\n    implementation(\"androidx.compose.material:material-icons-extended\")\r\n    implementation(\"com.google.firebase:firebase-auth-ktx:22.3.1\") // o la última versión estable\r\n    implementation(\"com.patrykandpatrick.vico:compose:1.13.0\")\r\n}\r\n\r\nkapt {\r\n    correctErrorTypes = true\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+--- a/app/build.gradle.kts	(revision c679d16d4e86076663f7f9499e8437f49fcce474)
++++ b/app/build.gradle.kts	(date 1746961812142)
+@@ -74,6 +74,11 @@
+     implementation("androidx.compose.material:material-icons-extended")
+     implementation("com.google.firebase:firebase-auth-ktx:22.3.1") // o la última versión estable
+     implementation("com.patrykandpatrick.vico:compose:1.13.0")
++    implementation("com.patrykandpatrick.vico:core:1.13.0")
++    implementation("com.patrykandpatrick.vico:compose-m3:1.13.0")
++    implementation("com.patrykandpatrick.vico:core:1.13.0")
++    implementation("com.patrykandpatrick.vico:compose:1.13.0")
++
+ }
+ 
+ kapt {
+Index: app/src/main/java/com/tusalud/healthapp/presentation/menu/PesoLineChart.kt
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/menu/PesoLineChart.kt b/app/src/main/java/com/tusalud/healthapp/presentation/menu/PesoLineChart.kt
+new file mode 100644
+--- /dev/null	(date 1746962616061)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/menu/PesoLineChart.kt	(date 1746962616061)
+@@ -0,0 +1,52 @@
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.remember
++import com.patrykandpatrick.vico.compose.chart.Chart
++import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
++import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
++import com.patrykandpatrick.vico.core.chart.line.LineChart
++import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
++import com.patrykandpatrick.vico.core.entry.entryOf
++import java.text.SimpleDateFormat
++import java.util.*
++import kotlin.math.roundToInt
++
++
++
++    @Composable
++    fun PesoLineChart(
++        pesos: List<Float>,
++        timestamps: List<Long> // lista de fechas en milisegundos
++    ) {
++        val fechas = convertirTimestampsAFechas(timestamps)
++
++        val entries = pesos.mapIndexed { index, peso ->
++            entryOf(index.toFloat(), peso)
++        }
++
++        val modelProducer = remember {
++            ChartEntryModelProducer(entries)
++        }
++
++        val bottomAxis = rememberBottomAxis(
++            valueFormatter = { value, _ ->
++                val index = value.roundToInt()
++                fechas.getOrNull(index) ?: ""
++            }
++        )
++
++        Chart(
++            chart = LineChart(),
++            chartModelProducer = modelProducer,
++            startAxis = rememberStartAxis(),
++            bottomAxis = bottomAxis
++        )
++
++
++    }
++
++fun convertirTimestampsAFechas(timestamps: List<Long>): List<String> {
++    val formato = SimpleDateFormat("dd/MM", Locale.getDefault())
++    return timestamps.map { millis ->
++        formato.format(Date(millis))
++    }
++}
+Index: .idea/deploymentTargetSelector.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"deploymentTargetSelector\">\r\n    <selectionStates>\r\n      <SelectionState runConfigName=\"MainActivity\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n      </SelectionState>\r\n    </selectionStates>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetSelector.xml b/.idea/deploymentTargetSelector.xml
+--- a/.idea/deploymentTargetSelector.xml	(revision c679d16d4e86076663f7f9499e8437f49fcce474)
++++ b/.idea/deploymentTargetSelector.xml	(date 1746961812378)
+@@ -5,6 +5,9 @@
+       <SelectionState runConfigName="MainActivity">
+         <option name="selectionMode" value="DROPDOWN" />
+       </SelectionState>
++      <SelectionState runConfigName="Healthapp.app">
++        <option name="selectionMode" value="DROPDOWN" />
++      </SelectionState>
+     </selectionStates>
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/appInsightsSettings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AppInsightsSettings\">\r\n    <option name=\"selectedTabId\" value=\"Firebase Crashlytics\" />\r\n    <option name=\"tabSettings\">\r\n      <map>\r\n        <entry key=\"Firebase Crashlytics\">\r\n          <value>\r\n            <InsightsFilterSettings>\r\n              <option name=\"connection\">\r\n                <ConnectionSetting>\r\n                  <option name=\"appId\" value=\"com.tusalud.healthapp\" />\r\n                  <option name=\"mobileSdkAppId\" value=\"1:306903724570:android:314dd003a43de1752097a3\" />\r\n                  <option name=\"projectId\" value=\"healthapp-f4ef0\" />\r\n                  <option name=\"projectNumber\" value=\"306903724570\" />\r\n                </ConnectionSetting>\r\n              </option>\r\n              <option name=\"signal\" value=\"SIGNAL_UNSPECIFIED\" />\r\n              <option name=\"timeIntervalDays\" value=\"THIRTY_DAYS\" />\r\n              <option name=\"visibilityType\" value=\"ALL\" />\r\n            </InsightsFilterSettings>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/appInsightsSettings.xml b/.idea/appInsightsSettings.xml
+--- a/.idea/appInsightsSettings.xml	(revision c679d16d4e86076663f7f9499e8437f49fcce474)
++++ b/.idea/appInsightsSettings.xml	(date 1746964317851)
+@@ -15,6 +15,11 @@
+                   <option name="projectNumber" value="306903724570" />
+                 </ConnectionSetting>
+               </option>
++              <option name="failureTypes">
++                <list>
++                  <option value="ANR" />
++                </list>
++              </option>
+               <option name="signal" value="SIGNAL_UNSPECIFIED" />
+               <option name="timeIntervalDays" value="THIRTY_DAYS" />
+               <option name="visibilityType" value="ALL" />
+Index: app/src/main/java/com/tusalud/healthapp/presentation/menu/EvolucionPesoScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.menu\r\n\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.material.icons.Icons\r\nimport androidx.compose.material.icons.filled.ArrowBack\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.navigation.NavHostController\r\n\r\n@OptIn(ExperimentalMaterial3Api::class)\r\n@Composable\r\nfun EvolucionPesoScreen(navController: NavHostController) {\r\n    Scaffold(\r\n        topBar = {\r\n            TopAppBar(\r\n                title = { Text(\"Evolución del peso\") },\r\n                navigationIcon = {\r\n                    IconButton(onClick = { navController.popBackStack() }) {\r\n                        Icon(Icons.Default.ArrowBack, contentDescription = \"Volver\")\r\n                    }\r\n                }\r\n            )\r\n        }\r\n    ) { padding ->\r\n        // Aquí irá el gráfico\r\n        Box(modifier = Modifier.padding(padding)) {\r\n            Text(\"Aquí irá el gráfico de evolución\")\r\n        }\r\n    }\r\n}\r\n\r\n
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/menu/EvolucionPesoScreen.kt b/app/src/main/java/com/tusalud/healthapp/presentation/menu/EvolucionPesoScreen.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/menu/EvolucionPesoScreen.kt	(revision c679d16d4e86076663f7f9499e8437f49fcce474)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/menu/EvolucionPesoScreen.kt	(date 1746965031782)
+@@ -1,17 +1,38 @@
+ package com.tusalud.healthapp.presentation.menu
+ 
++import PesoLineChart
+ import androidx.compose.foundation.layout.*
+ import androidx.compose.material.icons.Icons
+ import androidx.compose.material.icons.filled.ArrowBack
+ import androidx.compose.material3.*
+-import androidx.compose.runtime.Composable
++import androidx.compose.runtime.*
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.unit.dp
+ import androidx.navigation.NavHostController
++import com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel
++
++import kotlinx.coroutines.delay
+ 
+ @OptIn(ExperimentalMaterial3Api::class)
+ @Composable
+-fun EvolucionPesoScreen(navController: NavHostController) {
++fun EvolucionPesoScreen(
++    navController: NavHostController,
++    viewModel: ProgressViewModel
++) {
++    val historial = viewModel.historialPeso.collectAsState().value
++    var cargando by remember { mutableStateOf(true) }
++
++    LaunchedEffect(Unit) {
++        viewModel.cargarHistorialDesdeArray()
++        delay(500) // esperar breve tiempo para que se actualice el flujo
++        if (historial.isEmpty()) {
++            viewModel.migrarHistorialSinFechas()
++            delay(500)
++            viewModel.cargarHistorialDesdeArray()
++        }
++        cargando = false
++    }
++
+     Scaffold(
+         topBar = {
+             TopAppBar(
+@@ -24,10 +45,26 @@
+             )
+         }
+     ) { padding ->
+-        // Aquí irá el gráfico
+-        Box(modifier = Modifier.padding(padding)) {
+-            Text("Aquí irá el gráfico de evolución")
+-        }
+-    }
+-}
+-
++        Box(
++            modifier = Modifier
++                .fillMaxSize()
++                .padding(padding)
++        ) {
++            when {
++                cargando -> {
++                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
++                }
++
++                historial.isNotEmpty() -> {
++                    val pesos = historial.map { it.peso }
++                    val timestamps = historial.map { it.timestamp }
++
++                    PesoLineChart(pesos = pesos, timestamps = timestamps)
++                }
++
++                else -> {
++                    Text("Sin datos de historial", modifier = Modifier.padding(16.dp))
++                }
++            }
++            }}
++}
+\ No newline at end of file

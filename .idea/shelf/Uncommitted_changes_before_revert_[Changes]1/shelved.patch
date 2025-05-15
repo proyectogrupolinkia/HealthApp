@@ -1,0 +1,315 @@
+Index: app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.main\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.*\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.res.painterResource\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.hilt.navigation.compose.hiltViewModel\r\nimport androidx.navigation.NavHostController\r\nimport com.tusalud.healthapp.R\r\nimport com.tusalud.healthapp.presentation.menu.CalculadorasScreen\r\nimport com.tusalud.healthapp.presentation.menu.PerfilScreen\r\nimport com.tusalud.healthapp.presentation.menu.ProgressScreen\r\n\r\n\r\n@Composable\r\nfun MainScreen(\r\n    navController: NavHostController,\r\n    viewModel: ProgressViewModel = hiltViewModel()\r\n) {\r\n    var selectedTab by remember { mutableStateOf(0) }\r\n\r\n    Scaffold(\r\n        bottomBar = {\r\n            BottomNavigationBar(\r\n                selectedTab = selectedTab,\r\n                onTabSelected = { selectedTab = it },\r\n                navController = navController\r\n            )\r\n        }\r\n    ) { innerPadding ->\r\n        Box(modifier = Modifier\r\n            .fillMaxSize()\r\n            .padding(innerPadding)\r\n        ) {\r\n            when (selectedTab) {\r\n                0 -> ProgressScreen(navController, viewModel)\r\n                1 -> CalculadorasScreen(navController)\r\n                2 -> PerfilScreen(navController)\r\n            }\r\n        }\r\n    }\r\n}\r\n@Composable\r\nfun BottomNavigationBar(\r\n    selectedTab: Int,\r\n    onTabSelected: (Int) -> Unit,\r\n    navController: NavHostController\r\n) {\r\n    NavigationBar {\r\n        NavigationBarItem(\r\n            selected = selectedTab == 0,\r\n            onClick = {\r\n                onTabSelected(0)\r\n                navController.navigate(\"main\") // O NavigationRoutes.MAIN\r\n            },\r\n            icon = {\r\n                Icon(\r\n                    painter = painterResource(id = R.drawable.ic_progreso),\r\n                    contentDescription = \"Progreso\"\r\n                )\r\n            },\r\n            label = { Text(\"Progreso\") }\r\n        )\r\n        NavigationBarItem(\r\n            selected = selectedTab == 1,\r\n            onClick = {\r\n                onTabSelected(1)\r\n                navController.navigate(\"calculadoras\")\r\n            },\r\n            icon = {\r\n                Icon(\r\n                    painter = painterResource(id = R.drawable.ic_calculadora),\r\n                    contentDescription = \"Calculadoras\"\r\n                )\r\n            },\r\n            label = { Text(\"Calculadoras\") }\r\n        )\r\n        NavigationBarItem(\r\n            selected = selectedTab == 2,\r\n            onClick = {\r\n                onTabSelected(2)\r\n                navController.navigate(\"perfil\")\r\n            },\r\n            icon = {\r\n                Icon(\r\n                    painter = painterResource(id = R.drawable.ic_perfil),\r\n                    contentDescription = \"Perfil\"\r\n                )\r\n            },\r\n            label = { Text(\"Perfil\") }\r\n        )\r\n    }\r\n}\r\n@Composable\r\nfun ProgressInfoCard(title: String, value: String) {\r\n    Column(\r\n        horizontalAlignment = Alignment.CenterHorizontally,\r\n        modifier = Modifier\r\n            .clip(RoundedCornerShape(12.dp))\r\n            .background(Color.White.copy(alpha = 0.2f))\r\n            .padding(16.dp)\r\n    ) {\r\n        Text(text = title, color = Color.White, fontSize = 16.sp)\r\n        Spacer(modifier = Modifier.height(4.dp))\r\n        Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)\r\n    }\r\n}\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt b/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt	(revision 73dd1712c46456bff3adccb4634910eb36307d09)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt	(date 1746862636852)
+@@ -15,91 +15,56 @@
+ import androidx.compose.ui.unit.sp
+ import androidx.hilt.navigation.compose.hiltViewModel
+ import androidx.navigation.NavHostController
++import androidx.navigation.compose.NavHost
++import androidx.navigation.compose.composable
++import androidx.navigation.compose.currentBackStackEntryAsState
++import androidx.navigation.compose.rememberNavController
+ import com.tusalud.healthapp.R
++import com.tusalud.healthapp.presentation.components.BottomNavigationBar
+ import com.tusalud.healthapp.presentation.menu.CalculadorasScreen
++import com.tusalud.healthapp.presentation.menu.DesafioScreen
+ import com.tusalud.healthapp.presentation.menu.PerfilScreen
+ import com.tusalud.healthapp.presentation.menu.ProgressScreen
++import com.tusalud.healthapp.presentation.navigation.NavigationRoutes
+ 
+ 
+ @Composable
+-fun MainScreen(
+-    navController: NavHostController,
+-    viewModel: ProgressViewModel = hiltViewModel()
+-) {
+-    var selectedTab by remember { mutableStateOf(0) }
++fun MainScreen(navController: NavHostController) {
++    val innerNavController = rememberNavController()
++    val navBackStackEntry by innerNavController.currentBackStackEntryAsState()
++    val currentRoute = navBackStackEntry?.destination?.route
++
++    val bottomNavItems = listOf(
++        NavigationRoutes.CALCULADORAS,
++        NavigationRoutes.DESAFIO,
++        NavigationRoutes.PERFIL
++    )
+ 
+     Scaffold(
+         bottomBar = {
+-            BottomNavigationBar(
+-                selectedTab = selectedTab,
+-                onTabSelected = { selectedTab = it },
+-                navController = navController
+-            )
++            if (currentRoute in bottomNavItems) {
++                BottomNavigationBar(navController = innerNavController)
++            }
+         }
+     ) { innerPadding ->
+-        Box(modifier = Modifier
+-            .fillMaxSize()
+-            .padding(innerPadding)
++        NavHost(
++            navController = innerNavController,
++            startDestination = NavigationRoutes.CALCULADORAS,
++            modifier = Modifier.padding(innerPadding)
+         ) {
+-            when (selectedTab) {
+-                0 -> ProgressScreen(navController, viewModel)
+-                1 -> CalculadorasScreen(navController)
+-                2 -> PerfilScreen(navController)
++            composable(NavigationRoutes.CALCULADORAS) {
++                CalculadorasScreen(navController = innerNavController)
+             }
+-        }
+-    }
+-}
+-@Composable
+-fun BottomNavigationBar(
+-    selectedTab: Int,
+-    onTabSelected: (Int) -> Unit,
+-    navController: NavHostController
+-) {
+-    NavigationBar {
+-        NavigationBarItem(
+-            selected = selectedTab == 0,
+-            onClick = {
+-                onTabSelected(0)
+-                navController.navigate("main") // O NavigationRoutes.MAIN
+-            },
+-            icon = {
+-                Icon(
+-                    painter = painterResource(id = R.drawable.ic_progreso),
+-                    contentDescription = "Progreso"
+-                )
+-            },
+-            label = { Text("Progreso") }
+-        )
+-        NavigationBarItem(
+-            selected = selectedTab == 1,
+-            onClick = {
+-                onTabSelected(1)
+-                navController.navigate("calculadoras")
+-            },
+-            icon = {
+-                Icon(
+-                    painter = painterResource(id = R.drawable.ic_calculadora),
+-                    contentDescription = "Calculadoras"
+-                )
+-            },
+-            label = { Text("Calculadoras") }
+-        )
+-        NavigationBarItem(
+-            selected = selectedTab == 2,
+-            onClick = {
+-                onTabSelected(2)
+-                navController.navigate("perfil")
+-            },
+-            icon = {
+-                Icon(
+-                    painter = painterResource(id = R.drawable.ic_perfil),
+-                    contentDescription = "Perfil"
+-                )
+-            },
+-            label = { Text("Perfil") }
+-        )
+-    }
++            composable(NavigationRoutes.DESAFIO) {
++                DesafioScreen(navController = innerNavController)
++            }
++            composable(NavigationRoutes.PERFIL) {
++                PerfilScreen(navController = innerNavController)
++            }
++            }
++        }
+ }
++
+ @Composable
+ fun ProgressInfoCard(title: String, value: String) {
+     Column(
+Index: app/src/main/java/com/tusalud/healthapp/MainActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp\r\n\r\nimport android.os.Bundle\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport androidx.activity.enableEdgeToEdge\r\nimport androidx.navigation.compose.rememberNavController\r\nimport com.tusalud.healthapp.presentation.navigation.AppNavigation\r\nimport dagger.hilt.android.AndroidEntryPoint\r\n\r\n\r\n@AndroidEntryPoint\r\nclass MainActivity : ComponentActivity() {\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        enableEdgeToEdge()\r\n\r\n        setContent {\r\n            val navController = rememberNavController()\r\n            AppNavigation(navController = navController)\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/MainActivity.kt b/app/src/main/java/com/tusalud/healthapp/MainActivity.kt
+--- a/app/src/main/java/com/tusalud/healthapp/MainActivity.kt	(revision 73dd1712c46456bff3adccb4634910eb36307d09)
++++ b/app/src/main/java/com/tusalud/healthapp/MainActivity.kt	(date 1746861758922)
+@@ -20,4 +20,4 @@
+             AppNavigation(navController = navController)
+         }
+     }
+-}
+\ No newline at end of file
++}
+Index: app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.navigation\r\n\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.NavHost\r\nimport androidx.navigation.compose.composable\r\nimport com.tusalud.healthapp.presentation.login.LoginScreen\r\nimport com.tusalud.healthapp.presentation.main.MainScreen\r\nimport com.tusalud.healthapp.presentation.menu.CalculadorasScreen\r\nimport com.tusalud.healthapp.presentation.menu.DesafioScreen\r\nimport com.tusalud.healthapp.presentation.menu.PerfilScreen\r\nimport com.tusalud.healthapp.presentation.menu.EditarPerfilScreen\r\nimport com.tusalud.healthapp.presentation.menu.RecordatoriosScreen\r\nimport com.tusalud.healthapp.presentation.menu.ConfiguracionScreen\r\nimport com.tusalud.healthapp.presentation.register.RegisterScreen\r\nimport com.tusalud.healthapp.presentation.reset.PasswordResetScreen\r\n\r\n\r\n\r\n@Composable\r\nfun AppNavigation(navController: NavHostController) {\r\n    NavHost(navController = navController, startDestination = \"login\") {\r\n\r\n        composable(\"login\") {\r\n            LoginScreen(navController)\r\n        }\r\n\r\n        composable(\"register\") {\r\n            RegisterScreen(navController)\r\n        }\r\n\r\n        composable(\"reset_password\") {\r\n            PasswordResetScreen(navController)\r\n        }\r\n\r\n        composable(\"main\") {\r\n            MainScreen(navController)\r\n        }\r\n\r\n        composable(NavigationRoutes.CALCULADORAS) {\r\n            CalculadorasScreen(navController)\r\n        }\r\n\r\n        composable(NavigationRoutes.PERFIL) {\r\n            PerfilScreen(navController)\r\n        }\r\n\r\n        composable(\"editarPerfil\") {  //pantalla de editar perfil\r\n            EditarPerfilScreen(navController)\r\n        }\r\n\r\n        composable(\"recordatorios\") {  //pantalla de recordatorios\r\n            RecordatoriosScreen(navController)\r\n        }\r\n\r\n        composable(\"configuracion\") {  //pantalla de configuracion\r\n            ConfiguracionScreen(navController)\r\n        }\r\n\r\n        composable(NavigationRoutes.DESAFIO) {\r\n            DesafioScreen(navController)\r\n        }\r\n\r\n\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt b/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt	(revision 73dd1712c46456bff3adccb4634910eb36307d09)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt	(date 1746862542289)
+@@ -6,62 +6,35 @@
+ import androidx.navigation.compose.composable
+ import com.tusalud.healthapp.presentation.login.LoginScreen
+ import com.tusalud.healthapp.presentation.main.MainScreen
+-import com.tusalud.healthapp.presentation.menu.CalculadorasScreen
+-import com.tusalud.healthapp.presentation.menu.DesafioScreen
+-import com.tusalud.healthapp.presentation.menu.PerfilScreen
++import com.tusalud.healthapp.presentation.register.RegisterScreen
++import com.tusalud.healthapp.presentation.reset.PasswordResetScreen
+ import com.tusalud.healthapp.presentation.menu.EditarPerfilScreen
+ import com.tusalud.healthapp.presentation.menu.RecordatoriosScreen
+ import com.tusalud.healthapp.presentation.menu.ConfiguracionScreen
+-import com.tusalud.healthapp.presentation.register.RegisterScreen
+-import com.tusalud.healthapp.presentation.reset.PasswordResetScreen
+-
+-
+ 
+ @Composable
+ fun AppNavigation(navController: NavHostController) {
+     NavHost(navController = navController, startDestination = "login") {
+-
+         composable("login") {
+             LoginScreen(navController)
+         }
+-
+         composable("register") {
+             RegisterScreen(navController)
+         }
+-
+         composable("reset_password") {
+             PasswordResetScreen(navController)
+         }
+-
+         composable("main") {
+             MainScreen(navController)
+         }
+-
+-        composable(NavigationRoutes.CALCULADORAS) {
+-            CalculadorasScreen(navController)
+-        }
+-
+-        composable(NavigationRoutes.PERFIL) {
+-            PerfilScreen(navController)
+-        }
+-
+-        composable("editarPerfil") {  //pantalla de editar perfil
++        composable("editarPerfil") {
+             EditarPerfilScreen(navController)
+         }
+-
+-        composable("recordatorios") {  //pantalla de recordatorios
++        composable("recordatorios") {
+             RecordatoriosScreen(navController)
+         }
+-
+-        composable("configuracion") {  //pantalla de configuracion
++        composable("configuracion") {
+             ConfiguracionScreen(navController)
+         }
+-
+-        composable(NavigationRoutes.DESAFIO) {
+-            DesafioScreen(navController)
+-        }
+-
+-
+     }
+-}
+-
++}
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/presentation/main/BottomNavigationBar.kt
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/main/BottomNavigationBar.kt b/app/src/main/java/com/tusalud/healthapp/presentation/main/BottomNavigationBar.kt
+new file mode 100644
+--- /dev/null	(date 1746862636859)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/main/BottomNavigationBar.kt	(date 1746862636859)
+@@ -0,0 +1,60 @@
++package com.tusalud.healthapp.presentation.components
++
++import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.filled.Calculate
++import androidx.compose.material.icons.filled.Person
++import androidx.compose.material.icons.filled.Star
++import androidx.compose.material3.*
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.getValue
++import androidx.navigation.NavController
++import androidx.navigation.compose.currentBackStackEntryAsState
++import com.tusalud.healthapp.presentation.navigation.NavigationRoutes
++
++data class BottomNavItem(
++    val route: String,
++    val icon: androidx.compose.ui.graphics.vector.ImageVector,
++    val label: String
++)
++
++@Composable
++fun BottomNavigationBar(navController: NavController) {
++    val items = listOf(
++        BottomNavItem(
++            route = NavigationRoutes.CALCULADORAS,
++            icon = Icons.Filled.Calculate,
++            label = "Calculadoras"
++        ),
++        BottomNavItem(
++            route = NavigationRoutes.DESAFIO,
++            icon = Icons.Filled.Star,
++            label = "Desafío"
++        ),
++        BottomNavItem(
++            route = NavigationRoutes.PERFIL,
++            icon = Icons.Filled.Person,
++            label = "Perfil"
++        )
++    )
++
++    val currentRoute by navController.currentBackStackEntryAsState()
++    val selectedRoute = currentRoute?.destination?.route
++
++    NavigationBar {
++        items.forEach { item ->
++            NavigationBarItem(
++                selected = selectedRoute == item.route,
++                onClick = {
++                    if (selectedRoute != item.route) {
++                        navController.navigate(item.route) {
++                            popUpTo(NavigationRoutes.CALCULADORAS) { inclusive = false }
++                            launchSingleTop = true
++                        }
++                    }
++                },
++                icon = { Icon(imageVector = item.icon, contentDescription = item.label) },
++                label = { Text(item.label) }
++            )
++        }
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/presentation/menu/CalculadorasScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.menu\r\n\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.foundation.text.KeyboardOptions\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.*\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.text.input.KeyboardType\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.navigation.NavController\r\nimport com.google.firebase.auth.FirebaseAuth\r\nimport com.google.firebase.firestore.FirebaseFirestore\r\nimport kotlinx.coroutines.launch\r\nimport kotlin.math.log10\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\n\r\n\r\n@Composable\r\nfun CalculadorasScreen(navController: NavController) {\r\n    var peso by remember { mutableStateOf(\"\") }\r\n    var altura by remember { mutableStateOf(\"\") }\r\n    var cintura by remember { mutableStateOf(\"\") }\r\n    var cuello by remember { mutableStateOf(\"\") }\r\n    var cadera by remember { mutableStateOf(\"\") }\r\n    var esHombre by remember { mutableStateOf(true) }\r\n\r\n    var imc by remember { mutableStateOf<Float?>(null) }\r\n    var grasaCorporal by remember { mutableStateOf<Float?>(null) }\r\n\r\n    val snackbarHostState = remember { SnackbarHostState() }\r\n    val scope = rememberCoroutineScope()\r\n\r\n    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->\r\n\r\n        Column(\r\n            modifier = Modifier\r\n                .fillMaxSize()\r\n                .padding(16.dp)\r\n                .padding(paddingValues),\r\n            verticalArrangement = Arrangement.spacedBy(16.dp),\r\n            horizontalAlignment = Alignment.CenterHorizontally\r\n        ) {\r\n            Text(\r\n                text = \"Calculadora de Salud\",\r\n                style = MaterialTheme.typography.headlineSmall,\r\n                color = Color(0xFF00C6A7)\r\n            )\r\n\r\n            Card(\r\n                shape = RoundedCornerShape(16.dp),\r\n                colors = CardDefaults.cardColors(containerColor = Color.White),\r\n                elevation = CardDefaults.cardElevation(8.dp),\r\n                modifier = Modifier.fillMaxWidth()\r\n            ) {\r\n                Column(\r\n                    modifier = Modifier.padding(16.dp),\r\n                    verticalArrangement = Arrangement.spacedBy(12.dp)\r\n                ) {\r\n                    OutlinedTextField(\r\n                        value = peso,\r\n                        onValueChange = { peso = it },\r\n                        label = { Text(\"Peso (kg)\") },\r\n                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),\r\n                        modifier = Modifier.fillMaxWidth()\r\n                    )\r\n\r\n                    OutlinedTextField(\r\n                        value = altura,\r\n                        onValueChange = { altura = it },\r\n                        label = { Text(\"Altura (cm)\") },\r\n                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),\r\n                        modifier = Modifier.fillMaxWidth()\r\n                    )\r\n\r\n                    OutlinedTextField(\r\n                        value = cintura,\r\n                        onValueChange = { cintura = it },\r\n                        label = { Text(\"Cintura (cm)\") },\r\n                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),\r\n                        modifier = Modifier.fillMaxWidth()\r\n                    )\r\n\r\n                    OutlinedTextField(\r\n                        value = cuello,\r\n                        onValueChange = { cuello = it },\r\n                        label = { Text(\"Cuello (cm)\") },\r\n                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),\r\n                        modifier = Modifier.fillMaxWidth()\r\n                    )\r\n\r\n                    if (!esHombre) {\r\n                        OutlinedTextField(\r\n                            value = cadera,\r\n                            onValueChange = { cadera = it },\r\n                            label = { Text(\"Cadera (cm)\") },\r\n                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),\r\n                            modifier = Modifier.fillMaxWidth()\r\n                        )\r\n                    }\r\n\r\n                    Row(\r\n                        verticalAlignment = Alignment.CenterVertically,\r\n                        horizontalArrangement = Arrangement.spacedBy(8.dp)\r\n                    ) {\r\n                        Text(\"Sexo:\")\r\n                        RadioButton(selected = esHombre, onClick = { esHombre = true })\r\n                        Text(\"Hombre\")\r\n                        RadioButton(selected = !esHombre, onClick = { esHombre = false })\r\n                        Text(\"Mujer\")\r\n                    }\r\n\r\n                    Button(\r\n                        onClick = {\r\n                            val p = peso.toFloatOrNull()\r\n                            val a = altura.toFloatOrNull()?.div(100f)\r\n                            val c = cintura.toFloatOrNull()\r\n                            val cu = cuello.toFloatOrNull()\r\n                            val ca = cadera.toFloatOrNull()\r\n\r\n                            if (p != null && a != null && a > 0f && c != null && cu != null && (esHombre || ca != null)) {\r\n                                imc = calcularIMC(p, a)\r\n                                grasaCorporal = calcularGrasaCorporal(c, cu, a * 100f, ca, esHombre)\r\n                                guardarDatosSalud(imc!!, grasaCorporal!!)\r\n\r\n                                scope.launch {\r\n                                    snackbarHostState.showSnackbar(\"Datos guardados correctamente\")\r\n                                }\r\n                            } else {\r\n                                scope.launch {\r\n                                    snackbarHostState.showSnackbar(\"Por favor completa todos los campos correctamente\")\r\n                                }\r\n                            }\r\n                        },\r\n                        modifier = Modifier.fillMaxWidth(),\r\n                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C6A7))\r\n                    ) {\r\n                        Text(\"Calcular y Guardar\", color = Color.White)\r\n                    }\r\n                }\r\n            }\r\n\r\n            //resultados\r\n            imc?.let {\r\n                Text(\"IMC: %.2f\".format(it), style = MaterialTheme.typography.bodyLarge)\r\n            }\r\n            grasaCorporal?.let {\r\n                Text(\"Grasa Corporal: %.2f%%\".format(it), style = MaterialTheme.typography.bodyLarge)\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n//calculo del IMC\r\nfun calcularIMC(peso: Float, altura: Float): Float {\r\n    return peso / (altura * altura)\r\n}\r\n\r\n//calculo de grasa corporal\r\nfun calcularGrasaCorporal(\r\n    cintura: Float,\r\n    cuello: Float,\r\n    altura: Float,\r\n    cadera: Float?,\r\n    esHombre: Boolean\r\n): Float {\r\n    return if (esHombre) {\r\n        495f / (1.0324f - 0.19077f * log10((cintura - cuello).toDouble()) + 0.15456f * log10(altura.toDouble())).toFloat() - 450f\r\n    } else {\r\n        495f / (1.29579f - 0.35004f * log10((cintura + (cadera ?: 0f) - cuello).toDouble()) + 0.221f * log10(altura.toDouble())).toFloat() - 450f\r\n    }\r\n}\r\n\r\n//guardado en Firestore\r\nfun guardarDatosSalud(imc: Float, grasa: Float) {\r\n    val user = FirebaseAuth.getInstance().currentUser\r\n    val db = FirebaseFirestore.getInstance()\r\n\r\n    user?.let {\r\n        val datos = hashMapOf(\r\n            \"imc\" to imc,\r\n            \"grasaCorporal\" to grasa\r\n        )\r\n        db.collection(\"usuarios\").document(user.uid).set(datos)\r\n    }\r\n}\r\n\r\n\r\n
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/menu/CalculadorasScreen.kt b/app/src/main/java/com/tusalud/healthapp/presentation/menu/CalculadorasScreen.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/menu/CalculadorasScreen.kt	(revision 73dd1712c46456bff3adccb4634910eb36307d09)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/menu/CalculadorasScreen.kt	(date 1746861474900)
+@@ -187,3 +187,4 @@
+ }
+ 
+ 
++

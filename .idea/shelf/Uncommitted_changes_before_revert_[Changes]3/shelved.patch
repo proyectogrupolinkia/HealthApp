@@ -1,0 +1,770 @@
+Index: app/src/main/java/com/tusalud/healthapp/presentation/login/LoginScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.login\r\n\r\nimport android.widget.Toast\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.material.icons.Icons\r\nimport androidx.compose.material.icons.filled.Visibility\r\nimport androidx.compose.material.icons.filled.VisibilityOff\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.*\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.text.input.PasswordVisualTransformation\r\nimport androidx.compose.ui.text.input.VisualTransformation\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.hilt.navigation.compose.hiltViewModel\r\nimport androidx.navigation.NavHostController\r\n\r\n@Composable\r\nfun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {\r\n    Column(\r\n        modifier = Modifier\r\n            .fillMaxSize()\r\n            .padding(24.dp),\r\n        verticalArrangement = Arrangement.Center,\r\n        horizontalAlignment = Alignment.CenterHorizontally\r\n    ) {\r\n        Spacer(modifier = Modifier.height(48.dp))\r\n\r\n        Text(\r\n            \"Bienvenido\",\r\n            fontSize = 32.sp,\r\n            color = Color(0xFF00C6A7),\r\n            modifier = Modifier.padding(bottom = 32.dp)\r\n        )\r\n\r\n        OutlinedTextField(\r\n            value = viewModel.email,\r\n            onValueChange = { viewModel.email = it },\r\n            label = { Text(\"Correo electrónico\") },\r\n            modifier = Modifier.fillMaxWidth()\r\n        )\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        var passwordVisible by remember { mutableStateOf(false) }\r\n\r\n        OutlinedTextField(\r\n            value = viewModel.password,\r\n            onValueChange = { viewModel.password = it },\r\n            label = { Text(\"Contraseña\") },\r\n            modifier = Modifier.fillMaxWidth(),\r\n            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),\r\n            trailingIcon = {\r\n                val image = if (passwordVisible)\r\n                    Icons.Default.VisibilityOff\r\n                else Icons.Default.Visibility\r\n\r\n                IconButton(onClick = { passwordVisible = !passwordVisible }) {\r\n                    Icon(imageVector = image, contentDescription = if (passwordVisible) \"Ocultar\" else \"Mostrar\")\r\n                }\r\n            }\r\n        )\r\n\r\n        Spacer(modifier = Modifier.height(32.dp))\r\n\r\n        Button(\r\n            onClick = {\r\n                viewModel.login {\r\n                    navController.navigate(\"main\")\r\n                }\r\n            },\r\n            enabled = viewModel.isFormValid,\r\n            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C6A7)),\r\n            modifier = Modifier\r\n                .fillMaxWidth()\r\n                .height(56.dp)\r\n        ) {\r\n            Text(\"Iniciar Sesión\", fontSize = 18.sp, color = Color.White)\r\n        }\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        TextButton(onClick = { navController.navigate(\"register\") }) {\r\n            Text(\"¿No tienes cuenta? Regístrate\", fontSize = 16.sp, color = Color(0xFF00C6A7))\r\n        }\r\n\r\n        TextButton(onClick = { navController.navigate(\"reset\") }) {\r\n            Text(\"¿Olvidaste tu contraseña?\", fontSize = 16.sp, color = Color(0xFF00C6A7))\r\n        }\r\n\r\n        Spacer(modifier = Modifier.height(16.dp))\r\n\r\n        viewModel.error?.let {\r\n            Text(text = it, color = Color.Red, fontSize = 14.sp)\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/login/LoginScreen.kt b/app/src/main/java/com/tusalud/healthapp/presentation/login/LoginScreen.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/login/LoginScreen.kt	(revision cfb96612ef0328525f4b6c990475dc19776182ea)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/login/LoginScreen.kt	(date 1746873416980)
+@@ -1,6 +1,10 @@
+ package com.tusalud.healthapp.presentation.login
+ 
+ import android.widget.Toast
++import androidx.compose.animation.AnimatedVisibility
++import androidx.compose.animation.fadeIn
++import androidx.compose.animation.slideInVertically
++import androidx.compose.foundation.background
+ import androidx.compose.foundation.layout.*
+ import androidx.compose.material.icons.Icons
+ import androidx.compose.material.icons.filled.Visibility
+@@ -9,6 +13,8 @@
+ import androidx.compose.runtime.*
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
++import androidx.compose.ui.geometry.Offset
++import androidx.compose.ui.graphics.Brush
+ import androidx.compose.ui.graphics.Color
+ import androidx.compose.ui.text.input.PasswordVisualTransformation
+ import androidx.compose.ui.text.input.VisualTransformation
+@@ -16,84 +22,121 @@
+ import androidx.compose.ui.unit.sp
+ import androidx.hilt.navigation.compose.hiltViewModel
+ import androidx.navigation.NavHostController
++import androidx.compose.animation.core.*
++
++@Composable
++fun AnimatedGradientBackground(content: @Composable BoxScope.() -> Unit) {
++    val infiniteTransition = rememberInfiniteTransition(label = "gradient")
++    val offset by infiniteTransition.animateFloat(
++        initialValue = 0f,
++        targetValue = 1000f,
++        animationSpec = infiniteRepeatable(
++            animation = tween(durationMillis = 4000, easing = LinearEasing),
++            repeatMode = RepeatMode.Restart
++        ), label = "gradientShift"
++    )
++
++    val gradient = Brush.linearGradient(
++        colors = listOf(Color(0xFFFFC107), Color(0xFFC107FF)),
++        start = Offset(0f, offset),
++        end = Offset(offset, 0f)
++    )
++
++    Box(
++        modifier = Modifier
++            .fillMaxSize()
++            .background(brush = gradient),
++        content = content
++    )
++}
+ 
+ @Composable
+ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
+-    Column(
+-        modifier = Modifier
+-            .fillMaxSize()
+-            .padding(24.dp),
+-        verticalArrangement = Arrangement.Center,
+-        horizontalAlignment = Alignment.CenterHorizontally
+-    ) {
+-        Spacer(modifier = Modifier.height(48.dp))
++    var visible by remember { mutableStateOf(false) }
++    LaunchedEffect(Unit) { visible = true }
++
++    AnimatedGradientBackground {
++        AnimatedVisibility(
++            visible = visible,
++            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 })
++        ) {
++            Column(
++                modifier = Modifier
++                    .fillMaxSize()
++                    .padding(24.dp),
++                verticalArrangement = Arrangement.Center,
++                horizontalAlignment = Alignment.CenterHorizontally
++            ) {
++                Spacer(modifier = Modifier.height(48.dp))
+ 
+-        Text(
+-            "Bienvenido",
+-            fontSize = 32.sp,
+-            color = Color(0xFF00C6A7),
+-            modifier = Modifier.padding(bottom = 32.dp)
+-        )
++                Text(
++                    "Bienvenido",
++                    fontSize = 32.sp,
++                    color = Color.Black,
++                    modifier = Modifier.padding(bottom = 32.dp)
++                )
+ 
+-        OutlinedTextField(
+-            value = viewModel.email,
+-            onValueChange = { viewModel.email = it },
+-            label = { Text("Correo electrónico") },
+-            modifier = Modifier.fillMaxWidth()
+-        )
++                OutlinedTextField(
++                    value = viewModel.email,
++                    onValueChange = { viewModel.email = it },
++                    label = { Text("Correo electrónico") },
++                    modifier = Modifier.fillMaxWidth()
++                )
+ 
+-        Spacer(modifier = Modifier.height(16.dp))
++                Spacer(modifier = Modifier.height(16.dp))
+ 
+-        var passwordVisible by remember { mutableStateOf(false) }
++                var passwordVisible by remember { mutableStateOf(false) }
+ 
+-        OutlinedTextField(
+-            value = viewModel.password,
+-            onValueChange = { viewModel.password = it },
+-            label = { Text("Contraseña") },
+-            modifier = Modifier.fillMaxWidth(),
+-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+-            trailingIcon = {
+-                val image = if (passwordVisible)
+-                    Icons.Default.VisibilityOff
+-                else Icons.Default.Visibility
++                OutlinedTextField(
++                    value = viewModel.password,
++                    onValueChange = { viewModel.password = it },
++                    label = { Text("Contraseña") },
++                    modifier = Modifier.fillMaxWidth(),
++                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
++                    trailingIcon = {
++                        val image = if (passwordVisible)
++                            Icons.Default.VisibilityOff
++                        else Icons.Default.Visibility
+ 
+-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+-                    Icon(imageVector = image, contentDescription = if (passwordVisible) "Ocultar" else "Mostrar")
+-                }
+-            }
+-        )
++                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
++                            Icon(imageVector = image, contentDescription = if (passwordVisible) "Ocultar" else "Mostrar")
++                        }
++                    }
++                )
+ 
+-        Spacer(modifier = Modifier.height(32.dp))
++                Spacer(modifier = Modifier.height(32.dp))
+ 
+-        Button(
+-            onClick = {
+-                viewModel.login {
+-                    navController.navigate("main")
+-                }
+-            },
+-            enabled = viewModel.isFormValid,
+-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C6A7)),
+-            modifier = Modifier
+-                .fillMaxWidth()
+-                .height(56.dp)
+-        ) {
+-            Text("Iniciar Sesión", fontSize = 18.sp, color = Color.White)
+-        }
++                Button(
++                    onClick = {
++                        viewModel.login {
++                            navController.navigate("main")
++                        }
++                    },
++                    enabled = viewModel.isFormValid,
++                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C6A7)),
++                    modifier = Modifier
++                        .fillMaxWidth()
++                        .height(56.dp)
++                ) {
++                    Text("Iniciar Sesión", fontSize = 18.sp, color = Color.Black)
++                }
+ 
+-        Spacer(modifier = Modifier.height(16.dp))
++                Spacer(modifier = Modifier.height(16.dp))
+ 
+-        TextButton(onClick = { navController.navigate("register") }) {
+-            Text("¿No tienes cuenta? Regístrate", fontSize = 16.sp, color = Color(0xFF00C6A7))
+-        }
++                TextButton(onClick = { navController.navigate("register") }) {
++                    Text("¿No tienes cuenta? Regístrate", fontSize = 16.sp, color = Color.Black)
++                }
+ 
+-        TextButton(onClick = { navController.navigate("reset") }) {
+-            Text("¿Olvidaste tu contraseña?", fontSize = 16.sp, color = Color(0xFF00C6A7))
+-        }
++                TextButton(onClick = { navController.navigate("reset") }) {
++                    Text("¿Olvidaste tu contraseña?", fontSize = 16.sp, color = Color.Black)
++                }
+ 
+-        Spacer(modifier = Modifier.height(16.dp))
++                Spacer(modifier = Modifier.height(16.dp))
+ 
+-        viewModel.error?.let {
+-            Text(text = it, color = Color.Red, fontSize = 14.sp)
++                viewModel.error?.let {
++                    Text(text = it, color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
++                }
++            }
+         }
+     }
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/presentation/menu/PerfilScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.menu\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.clickable\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.foundation.shape.CircleShape\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material.icons.Icons\r\nimport androidx.compose.material.icons.filled.*\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.*\r\nimport androidx.compose.ui.Modifier\r\nimport com.tusalud.healthapp.presentation.components.BottomNavigationBar\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.graphics.vector.ImageVector\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.navigation.NavHostController\r\nimport com.google.firebase.auth.FirebaseAuth\r\n\r\n@Composable\r\nfun PerfilScreen(navController: NavHostController) {\r\n    var selectedTab by remember { mutableStateOf(2) }\r\n\r\n    Scaffold(\r\n        bottomBar = {\r\n            BottomNavigationBar(\r\n                selectedTab = selectedTab,\r\n                onTabSelected = { selectedTab = it },\r\n                navController = navController\r\n            )\r\n        }\r\n    ) { innerPadding ->\r\n        Box(modifier = Modifier.padding(innerPadding)) {\r\n\r\n            val auth = FirebaseAuth.getInstance()\r\n            var displayName by remember { mutableStateOf(\"\") }\r\n            var email by remember { mutableStateOf(\"\") }\r\n            var showLogoutDialog by remember { mutableStateOf(false) }\r\n            var showHelpDialog by remember { mutableStateOf(false) }\r\n\r\n            LaunchedEffect(Unit) {\r\n                auth.currentUser?.let { user ->\r\n                    displayName = user.displayName ?: \"Usuario\"\r\n                    email = user.email ?: \"sin correo\"\r\n                }\r\n            }\r\n\r\n            if (showLogoutDialog) {\r\n                AlertDialog(\r\n                    onDismissRequest = { showLogoutDialog = false },\r\n                    title = { Text(\"Cerrar sesión\") },\r\n                    text = { Text(\"¿Estás seguro que deseas cerrar sesión?\") },\r\n                    confirmButton = {\r\n                        TextButton(onClick = {\r\n                            showLogoutDialog = false\r\n                            auth.signOut()\r\n                            navController.navigate(\"login\") {\r\n                                popUpTo(\"perfil\") { inclusive = true }\r\n                            }\r\n                        }) {\r\n                            Text(\"Cerrar sesión\")\r\n                        }\r\n                    },\r\n                    dismissButton = {\r\n                        TextButton(onClick = { showLogoutDialog = false }) {\r\n                            Text(\"Cancelar\")\r\n                        }\r\n                    }\r\n                )\r\n            }\r\n\r\n            if (showHelpDialog) {\r\n                AlertDialog(\r\n                    onDismissRequest = { showHelpDialog = false },\r\n                    title = { Text(\"Ayuda\") },\r\n                    text = {\r\n                        Text(\"¿Necesitás asistencia?\\n\\nContactanos a:\\n\uD83D\uDCE7 soporte@tusalud.com\\n\uD83D\uDCDE +54 11 1234 5678\\n\\nO visitá nuestra web.\")\r\n                    },\r\n                    confirmButton = {\r\n                        TextButton(onClick = { showHelpDialog = false }) {\r\n                            Text(\"Entendido\")\r\n                        }\r\n                    }\r\n                )\r\n            }\r\n\r\n            Box(\r\n                modifier = Modifier\r\n                    .fillMaxSize()\r\n                    .background(Color(0xFF00C6A7))\r\n                    .padding(24.dp)\r\n            ) {\r\n                Column(\r\n                    horizontalAlignment = Alignment.CenterHorizontally,\r\n                    modifier = Modifier.fillMaxWidth()\r\n                ) {\r\n                    Spacer(modifier = Modifier.height(40.dp))\r\n\r\n                    Box(\r\n                        modifier = Modifier\r\n                            .size(100.dp)\r\n                            .background(Color.White, CircleShape),\r\n                        contentAlignment = Alignment.Center\r\n                    ) {\r\n                        Icon(\r\n                            imageVector = Icons.Default.Person,\r\n                            contentDescription = \"Perfil\",\r\n                            tint = Color(0xFF00C6A7),\r\n                            modifier = Modifier.size(60.dp)\r\n                        )\r\n                    }\r\n\r\n                    Spacer(modifier = Modifier.height(16.dp))\r\n\r\n                    Text(displayName, fontSize = 24.sp, color = Color.White)\r\n                    Text(email, fontSize = 16.sp, color = Color.White)\r\n\r\n                    Spacer(modifier = Modifier.height(32.dp))\r\n\r\n                    Column(\r\n                        modifier = Modifier\r\n                            .fillMaxWidth()\r\n                            .background(Color.White, RoundedCornerShape(12.dp))\r\n                            .padding(8.dp)\r\n                    ) {\r\n                        PerfilOptionItem(icon = Icons.Default.Edit, label = \"Editar perfil\") {\r\n                            navController.navigate(\"editarPerfil\")\r\n                        }\r\n\r\n                        PerfilOptionItem(icon = Icons.Default.Notifications, label = \"Recordatorios\") {\r\n                            navController.navigate(\"recordatorios\")\r\n                        }\r\n\r\n                        PerfilOptionItem(icon = Icons.Default.Settings, label = \"Configuración\") {\r\n                            navController.navigate(\"configuracion\")\r\n                        }\r\n\r\n                        PerfilOptionItem(icon = Icons.Filled.Help, label = \"Ayuda\") {\r\n                            showHelpDialog = true\r\n                        }\r\n\r\n                        Divider(modifier = Modifier.padding(vertical = 8.dp))\r\n\r\n                        PerfilOptionItem(icon = Icons.Default.ExitToApp, label = \"Cerrar sesión\") {\r\n                            showLogoutDialog = true\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun PerfilOptionItem(icon: ImageVector, label: String, onClick: () -> Unit) {\r\n    Row(\r\n        verticalAlignment = Alignment.CenterVertically,\r\n        modifier = Modifier\r\n            .fillMaxWidth()\r\n            .clickable { onClick() }\r\n            .padding(vertical = 12.dp, horizontal = 16.dp)\r\n    ) {\r\n        Icon(imageVector = icon, contentDescription = label, tint = Color(0xFF00C6A7))\r\n        Spacer(modifier = Modifier.width(16.dp))\r\n        Text(text = label, fontSize = 16.sp, color = Color.Black)\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/menu/PerfilScreen.kt b/app/src/main/java/com/tusalud/healthapp/presentation/menu/PerfilScreen.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/menu/PerfilScreen.kt	(revision cfb96612ef0328525f4b6c990475dc19776182ea)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/menu/PerfilScreen.kt	(date 1746878542945)
+@@ -9,150 +9,144 @@
+ import androidx.compose.material.icons.filled.*
+ import androidx.compose.material3.*
+ import androidx.compose.runtime.*
+-import androidx.compose.ui.Modifier
+-import com.tusalud.healthapp.presentation.components.BottomNavigationBar
+ import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
+ import androidx.compose.ui.graphics.Color
+ import androidx.compose.ui.graphics.vector.ImageVector
+ import androidx.compose.ui.unit.dp
+ import androidx.compose.ui.unit.sp
++import androidx.hilt.navigation.compose.hiltViewModel
+ import androidx.navigation.NavHostController
+ import com.google.firebase.auth.FirebaseAuth
++import com.google.firebase.firestore.FirebaseFirestore
++import com.tusalud.healthapp.presentation.login.LoginViewModel
++import androidx.hilt.navigation.compose.hiltViewModel
++
+ 
+ @Composable
+-fun PerfilScreen(navController: NavHostController) {
+-    var selectedTab by remember { mutableStateOf(2) }
+-
+-    Scaffold(
+-        bottomBar = {
+-            BottomNavigationBar(
+-                selectedTab = selectedTab,
+-                onTabSelected = { selectedTab = it },
+-                navController = navController
+-            )
+-        }
+-    ) { innerPadding ->
+-        Box(modifier = Modifier.padding(innerPadding)) {
+-
+-            val auth = FirebaseAuth.getInstance()
+-            var displayName by remember { mutableStateOf("") }
+-            var email by remember { mutableStateOf("") }
+-            var showLogoutDialog by remember { mutableStateOf(false) }
+-            var showHelpDialog by remember { mutableStateOf(false) }
++fun PerfilScreen(
++    viewModel: LoginViewModel = hiltViewModel(),
++    navController: NavHostController
++) {
++    val auth = FirebaseAuth.getInstance()
++    val firestore = FirebaseFirestore.getInstance()
++
++    val nombre by viewModel.nombreUsuario.collectAsState()
++    val email by viewModel.emailUsuario.collectAsState()
++
++    LaunchedEffect(Unit) {
++        val uid = auth.currentUser?.uid
++        if (uid != null) {
++            viewModel.cargarNombreUsuario(uid)
++        }
++    }
++
++    var showLogoutDialog by remember { mutableStateOf(false) }
++    var showHelpDialog by remember { mutableStateOf(false) }
+ 
+-            LaunchedEffect(Unit) {
+-                auth.currentUser?.let { user ->
+-                    displayName = user.displayName ?: "Usuario"
+-                    email = user.email ?: "sin correo"
+-                }
+-            }
+-
+-            if (showLogoutDialog) {
+-                AlertDialog(
+-                    onDismissRequest = { showLogoutDialog = false },
+-                    title = { Text("Cerrar sesión") },
+-                    text = { Text("¿Estás seguro que deseas cerrar sesión?") },
+-                    confirmButton = {
+-                        TextButton(onClick = {
+-                            showLogoutDialog = false
+-                            auth.signOut()
+-                            navController.navigate("login") {
+-                                popUpTo("perfil") { inclusive = true }
+-                            }
+-                        }) {
+-                            Text("Cerrar sesión")
+-                        }
+-                    },
+-                    dismissButton = {
+-                        TextButton(onClick = { showLogoutDialog = false }) {
+-                            Text("Cancelar")
+-                        }
+-                    }
+-                )
+-            }
++    if (showLogoutDialog) {
++        AlertDialog(
++            onDismissRequest = { showLogoutDialog = false },
++            title = { Text("Cerrar sesión") },
++            text = { Text("¿Estás seguro que deseas cerrar sesión?") },
++            confirmButton = {
++                TextButton(colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C6A7)), onClick = {
++                    showLogoutDialog = false
++                    auth.signOut()
++                    navController.navigate("login") {
++                        popUpTo("perfil") { inclusive = true }
++                    }
++                }) {
++                    Text("Cerrar sesión")
++                }
++            },
++            dismissButton = {
++                TextButton(colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C6A7)), onClick = { showLogoutDialog = false }) {
++                    Text("Cancelar")
++                }
++            }
++        )
++    }
+ 
+-            if (showHelpDialog) {
+-                AlertDialog(
+-                    onDismissRequest = { showHelpDialog = false },
+-                    title = { Text("Ayuda") },
+-                    text = {
+-                        Text("¿Necesitás asistencia?\n\nContactanos a:\n📧 soporte@tusalud.com\n📞 +54 11 1234 5678\n\nO visitá nuestra web.")
+-                    },
+-                    confirmButton = {
+-                        TextButton(onClick = { showHelpDialog = false }) {
+-                            Text("Entendido")
+-                        }
+-                    }
+-                )
+-            }
++    if (showHelpDialog) {
++        AlertDialog(
++            onDismissRequest = { showHelpDialog = false },
++            title = { Text("Ayuda") },
++            text = {
++                Text("¿Necesitás asistencia?\n\nContactanos a:\n📧 soporte@tusalud.com\n📞 +54 11 1234 5678\n\nO visitá nuestra web.")
++            },
++            confirmButton = {
++                TextButton(colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C6A7)), onClick = { showHelpDialog = false }) {
++                    Text("Entendido")
++                }
++            }
++        )
++    }
+ 
+-            Box(
+-                modifier = Modifier
+-                    .fillMaxSize()
+-                    .background(Color(0xFF00C6A7))
+-                    .padding(24.dp)
+-            ) {
+-                Column(
+-                    horizontalAlignment = Alignment.CenterHorizontally,
+-                    modifier = Modifier.fillMaxWidth()
+-                ) {
+-                    Spacer(modifier = Modifier.height(40.dp))
++    Box(
++        modifier = Modifier
++            .fillMaxSize()
++            .background(Color(0xFF00C6A7))
++            .padding(24.dp)
++    ) {
++        Column(
++            horizontalAlignment = Alignment.CenterHorizontally,
++            modifier = Modifier.fillMaxWidth()
++        ) {
++            Spacer(modifier = Modifier.height(40.dp))
+ 
+-                    Box(
+-                        modifier = Modifier
+-                            .size(100.dp)
+-                            .background(Color.White, CircleShape),
+-                        contentAlignment = Alignment.Center
+-                    ) {
+-                        Icon(
+-                            imageVector = Icons.Default.Person,
+-                            contentDescription = "Perfil",
+-                            tint = Color(0xFF00C6A7),
+-                            modifier = Modifier.size(60.dp)
+-                        )
+-                    }
++            Box(
++                modifier = Modifier
++                    .size(100.dp)
++                    .background(Color.White, CircleShape),
++                contentAlignment = Alignment.Center
++            ) {
++                Icon(
++                    imageVector = Icons.Default.Person,
++                    contentDescription = "Perfil",
++                    tint = Color(0xFF00C6A7),
++                    modifier = Modifier.size(60.dp)
++                )
++            }
+ 
+-                    Spacer(modifier = Modifier.height(16.dp))
++            Spacer(modifier = Modifier.height(16.dp))
+ 
+-                    Text(displayName, fontSize = 24.sp, color = Color.White)
+-                    Text(email, fontSize = 16.sp, color = Color.White)
++            Text(nombre, fontSize = 24.sp, color = Color.White)
++            Text(email, fontSize = 16.sp, color = Color.White)
+ 
+-                    Spacer(modifier = Modifier.height(32.dp))
++            Spacer(modifier = Modifier.height(32.dp))
+ 
+-                    Column(
+-                        modifier = Modifier
+-                            .fillMaxWidth()
+-                            .background(Color.White, RoundedCornerShape(12.dp))
+-                            .padding(8.dp)
+-                    ) {
+-                        PerfilOptionItem(icon = Icons.Default.Edit, label = "Editar perfil") {
+-                            navController.navigate("editarPerfil")
+-                        }
++            Column(
++                modifier = Modifier
++                    .fillMaxWidth()
++                    .background(Color.White, RoundedCornerShape(12.dp))
++                    .padding(8.dp)
++            ) {
++                PerfilOptionItem(icon = Icons.Default.Edit, label = "Editar perfil") {
++                    navController.navigate("editarPerfil")
++                }
+ 
+-                        PerfilOptionItem(icon = Icons.Default.Notifications, label = "Recordatorios") {
+-                            navController.navigate("recordatorios")
+-                        }
++                PerfilOptionItem(icon = Icons.Default.Notifications, label = "Recordatorios") {
++                    navController.navigate("recordatorios")
++                }
+ 
+-                        PerfilOptionItem(icon = Icons.Default.Settings, label = "Configuración") {
+-                            navController.navigate("configuracion")
+-                        }
++                PerfilOptionItem(icon = Icons.Default.Settings, label = "Configuración") {
++                    navController.navigate("configuracion")
++                }
+ 
+-                        PerfilOptionItem(icon = Icons.Filled.Help, label = "Ayuda") {
+-                            showHelpDialog = true
+-                        }
++                PerfilOptionItem(icon = Icons.Filled.Help, label = "Ayuda") {
++                    showHelpDialog = true
++                }
+ 
+-                        Divider(modifier = Modifier.padding(vertical = 8.dp))
++                Divider(modifier = Modifier.padding(vertical = 8.dp))
+ 
+-                        PerfilOptionItem(icon = Icons.Default.ExitToApp, label = "Cerrar sesión") {
+-                            showLogoutDialog = true
+-                        }
+-                    }
++                PerfilOptionItem(icon = Icons.Default.ExitToApp, label = "Cerrar sesión") {
++                    showLogoutDialog = true
+                 }
+             }
+         }
+     }
+ }
+-
+ @Composable
+ fun PerfilOptionItem(icon: ImageVector, label: String, onClick: () -> Unit) {
+     Row(
+Index: app/src/main/java/com/tusalud/healthapp/presentation/login/LoginViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.login\r\n\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.runtime.mutableStateOf\r\nimport androidx.compose.runtime.setValue\r\nimport androidx.lifecycle.ViewModel\r\nimport androidx.lifecycle.viewModelScope\r\nimport com.tusalud.healthapp.domain.model.User\r\nimport com.tusalud.healthapp.domain.respository.UserRepository\r\nimport dagger.hilt.android.lifecycle.HiltViewModel\r\nimport kotlinx.coroutines.launch\r\nimport javax.inject.Inject\r\n\r\n@HiltViewModel\r\nclass LoginViewModel @Inject constructor(\r\n    private val userRepository: UserRepository\r\n) : ViewModel() {\r\n\r\n    var email by mutableStateOf(\"\")\r\n    var password by mutableStateOf(\"\")\r\n    var user by mutableStateOf<User?>(null)\r\n    var error by mutableStateOf<String?>(null)\r\n    var loading by mutableStateOf(false)\r\n\r\n\r\n    val isFormValid: Boolean\r\n        get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length>=6\r\n\r\n\r\n    fun login(onSuccess: () -> Unit) {\r\n        viewModelScope.launch {\r\n            loading = true\r\n            val result = userRepository.login(email, password)\r\n            loading = false\r\n            result.onSuccess {\r\n                user = it\r\n                onSuccess()\r\n            }.onFailure {\r\n                error = \"Usuario o Contraseña incorrectos!\"\r\n            }\r\n        }\r\n    }\r\n\r\n    fun register(\r\n        nombre: String,\r\n        correo: String,\r\n        edad: Int,\r\n        peso: Float,\r\n        altura: Float,\r\n        password: String,\r\n        onSuccess: () -> Unit\r\n    ) {\r\n        viewModelScope.launch {\r\n            loading = true\r\n            val user = User(\"\", nombre, correo, edad, peso, altura)\r\n            val result = userRepository.register(user, password)\r\n            loading = false\r\n            result.onSuccess {\r\n                this@LoginViewModel.user = it\r\n                onSuccess()\r\n            }.onFailure {\r\n                error = it.message\r\n            }\r\n        }\r\n    }\r\n\r\n    fun resetPassword(correo: String, onSent: () -> Unit) {\r\n        viewModelScope.launch {\r\n            loading = true\r\n            val result = userRepository.resetPassword(correo)\r\n            loading = false\r\n            result.onSuccess {\r\n                error = \"Correo enviado para recuperar contraseña\"\r\n                onSent()\r\n            }.onFailure {\r\n                error = it.message\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/login/LoginViewModel.kt b/app/src/main/java/com/tusalud/healthapp/presentation/login/LoginViewModel.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/login/LoginViewModel.kt	(revision cfb96612ef0328525f4b6c990475dc19776182ea)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/login/LoginViewModel.kt	(date 1746876457728)
+@@ -9,6 +9,8 @@
+ import com.tusalud.healthapp.domain.respository.UserRepository
+ import dagger.hilt.android.lifecycle.HiltViewModel
+ import kotlinx.coroutines.launch
++import kotlinx.coroutines.flow.MutableStateFlow
++import kotlinx.coroutines.flow.StateFlow
+ import javax.inject.Inject
+ 
+ @HiltViewModel
+@@ -22,11 +24,15 @@
+     var error by mutableStateOf<String?>(null)
+     var loading by mutableStateOf(false)
+ 
++    private val _nombreUsuario = MutableStateFlow("")
++    val nombreUsuario: StateFlow<String> = _nombreUsuario
++
++    private val _emailUsuario = MutableStateFlow("")
++    val emailUsuario: StateFlow<String> = _emailUsuario
+ 
+     val isFormValid: Boolean
+-        get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length>=6
++        get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length >= 6
+ 
+-
+     fun login(onSuccess: () -> Unit) {
+         viewModelScope.launch {
+             loading = true
+@@ -52,8 +58,8 @@
+     ) {
+         viewModelScope.launch {
+             loading = true
+-            val user = User("", nombre, correo, edad, peso, altura)
+-            val result = userRepository.register(user, password)
++            val newUser = User("", nombre, correo, edad, peso, altura)
++            val result = userRepository.register(newUser, password)
+             loading = false
+             result.onSuccess {
+                 this@LoginViewModel.user = it
+@@ -77,6 +83,16 @@
+             }
+         }
+     }
+-}
+-
+-
++
++    fun cargarNombreUsuario(uid: String) {
++        viewModelScope.launch {
++            val result = userRepository.getUserById(uid)
++            result.onSuccess { user ->
++                _nombreUsuario.value = user.nombre
++                _emailUsuario.value = user.correo
++            }.onFailure {
++                // Manejo de error opcional
++            }
++        }
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/ui/theme/Theme.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.ui.theme\r\n\r\nimport android.app.Activity\r\nimport android.os.Build\r\nimport androidx.compose.foundation.isSystemInDarkTheme\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.material3.Surface\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.darkColorScheme\r\nimport androidx.compose.material3.dynamicDarkColorScheme\r\nimport androidx.compose.material3.dynamicLightColorScheme\r\nimport androidx.compose.material3.lightColorScheme\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.platform.LocalContext\r\n\r\nprivate val DarkColorScheme = darkColorScheme(\r\n    primary = Purple80,\r\n    secondary = PurpleGrey80,\r\n    tertiary = Pink80\r\n)\r\n\r\nprivate val LightColorScheme = lightColorScheme(\r\n    primary = Purple40,\r\n    secondary = PurpleGrey40,\r\n    tertiary = Pink40\r\n\r\n)\r\n\r\n@Composable\r\nfun HealthappTheme(\r\n    darkTheme: Boolean = isSystemInDarkTheme(),\r\n    dynamicColor: Boolean = true,\r\n    content: @Composable () -> Unit\r\n) {\r\n    val colorScheme = when {\r\n        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {\r\n            val context = LocalContext.current\r\n            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)\r\n        }\r\n\r\n        darkTheme -> DarkColorScheme\r\n        else -> LightColorScheme\r\n    }\r\n\r\n    MaterialTheme(\r\n        colorScheme = colorScheme,\r\n        typography = Typography,\r\n        content = {\r\n            Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {\r\n                content()\r\n            }\r\n        }\r\n    )\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/ui/theme/Theme.kt b/app/src/main/java/com/tusalud/healthapp/ui/theme/Theme.kt
+--- a/app/src/main/java/com/tusalud/healthapp/ui/theme/Theme.kt	(revision cfb96612ef0328525f4b6c990475dc19776182ea)
++++ b/app/src/main/java/com/tusalud/healthapp/ui/theme/Theme.kt	(date 1746871906804)
+@@ -1,55 +1,24 @@
+ package com.tusalud.healthapp.ui.theme
+ 
+-import android.app.Activity
+-import android.os.Build
+-import androidx.compose.foundation.isSystemInDarkTheme
+-import androidx.compose.foundation.layout.fillMaxSize
+-import androidx.compose.material3.Surface
+-import androidx.compose.ui.Modifier
+-import androidx.compose.material3.MaterialTheme
+-import androidx.compose.material3.darkColorScheme
+-import androidx.compose.material3.dynamicDarkColorScheme
+-import androidx.compose.material3.dynamicLightColorScheme
+-import androidx.compose.material3.lightColorScheme
++import androidx.compose.material3.*
+ import androidx.compose.runtime.Composable
+-import androidx.compose.ui.platform.LocalContext
+-
+-private val DarkColorScheme = darkColorScheme(
+-    primary = Purple80,
+-    secondary = PurpleGrey80,
+-    tertiary = Pink80
+-)
++import androidx.compose.ui.graphics.Color
+ 
+ private val LightColorScheme = lightColorScheme(
+-    primary = Purple40,
+-    secondary = PurpleGrey40,
+-    tertiary = Pink40
+-
++    primary = Color(0xFF00C6A7),
++    onPrimary = Color.White,
++    secondary = Color(0xFF007B82),
++    background = Color.White,
++    surface = Color.White,
++    onBackground = Color.Black,
++    onSurface = Color.Black
+ )
+ 
+ @Composable
+-fun HealthappTheme(
+-    darkTheme: Boolean = isSystemInDarkTheme(),
+-    dynamicColor: Boolean = true,
+-    content: @Composable () -> Unit
+-) {
+-    val colorScheme = when {
+-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+-            val context = LocalContext.current
+-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+-        }
+-
+-        darkTheme -> DarkColorScheme
+-        else -> LightColorScheme
+-    }
+-
++fun AppTheme(content: @Composable () -> Unit) {
+     MaterialTheme(
+-        colorScheme = colorScheme,
+-        typography = Typography,
+-        content = {
+-            Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+-                content()
+-            }
+-        }
++        colorScheme = LightColorScheme,
++        typography = Typography(), // o tu propia tipografía
++        content = content
+     )
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/domain/respository/UserRespository.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.domain.respository\r\n\r\nimport com.tusalud.healthapp.domain.model.User\r\ninterface UserRepository {\r\n    suspend fun login(email: String, password: String): Result<User>\r\n    suspend fun register(user: User, password: String): Result<User>\r\n    suspend fun resetPassword(email: String): Result<Unit>\r\n    suspend fun getUser(uid: String): Result<User>\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRespository.kt b/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRespository.kt
+--- a/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRespository.kt	(revision cfb96612ef0328525f4b6c990475dc19776182ea)
++++ b/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRespository.kt	(date 1746876832828)
+@@ -1,9 +1,10 @@
+ package com.tusalud.healthapp.domain.respository
+ 
+ import com.tusalud.healthapp.domain.model.User
++
+ interface UserRepository {
+     suspend fun login(email: String, password: String): Result<User>
+     suspend fun register(user: User, password: String): Result<User>
+     suspend fun resetPassword(email: String): Result<Unit>
+-    suspend fun getUser(uid: String): Result<User>
++    suspend fun getUserById(uid: String): Result<User>
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.main\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.*\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.res.painterResource\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.hilt.navigation.compose.hiltViewModel\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.currentBackStackEntryAsState\r\nimport com.tusalud.healthapp.R\r\nimport com.tusalud.healthapp.presentation.menu.CalculadorasScreen\r\n\r\n\r\nimport com.tusalud.healthapp.presentation.menu.PerfilScreen\r\nimport com.tusalud.healthapp.presentation.menu.Progress.ProgressViewModel\r\nimport com.tusalud.healthapp.presentation.menu.Progress.ProgressScreen\r\n\r\n\r\n@Composable\r\nfun MainScreen(\r\n    navController: NavHostController,\r\n    viewModel: ProgressViewModel = hiltViewModel()\r\n) {\r\n    var selectedTab by remember { mutableStateOf(0) }\r\n\r\n    Scaffold(\r\n        bottomBar = {\r\n            BottomNavigationBar(\r\n                selectedTab = selectedTab,\r\n                onTabSelected = { selectedTab = it },\r\n                navController = navController\r\n            )\r\n        }\r\n    ) { innerPadding ->\r\n        Box(modifier = Modifier\r\n            .fillMaxSize()\r\n            .padding(innerPadding)\r\n        ) {\r\n            when (selectedTab) {\r\n                0 -> ProgressScreen(navController, viewModel)\r\n                1 -> CalculadorasScreen(navController)\r\n                2 -> PerfilScreen(navController)\r\n            }\r\n        }\r\n    }\r\n}\r\n@Composable\r\nfun BottomNavigationBar(\r\n    selectedTab: Int,\r\n    onTabSelected: (Int) -> Unit,\r\n    navController: NavHostController\r\n) {\r\n    NavigationBar {\r\n        NavigationBarItem(\r\n            selected = selectedTab == 0,\r\n            onClick = {\r\n                onTabSelected(0)\r\n                navController.navigate(\"main\") // O NavigationRoutes.MAIN\r\n            },\r\n            icon = {\r\n                Icon(\r\n                    painter = painterResource(id = R.drawable.ic_progreso),\r\n                    contentDescription = \"Progreso\"\r\n                )\r\n            },\r\n            label = { Text(\"Progreso\") }\r\n        )\r\n        NavigationBarItem(\r\n            selected = selectedTab == 1,\r\n            onClick = {\r\n                onTabSelected(1)\r\n                navController.navigate(\"calculadoras\")\r\n            },\r\n            icon = {\r\n                Icon(\r\n                    painter = painterResource(id = R.drawable.ic_calculadora),\r\n                    contentDescription = \"Calculadoras\"\r\n                )\r\n            },\r\n            label = { Text(\"Calculadoras\") }\r\n        )\r\n        NavigationBarItem(\r\n            selected = selectedTab == 2,\r\n            onClick = {\r\n                onTabSelected(2)\r\n                navController.navigate(\"perfil\")\r\n            },\r\n            icon = {\r\n                Icon(\r\n                    painter = painterResource(id = R.drawable.ic_perfil),\r\n                    contentDescription = \"Perfil\"\r\n                )\r\n            },\r\n            label = { Text(\"Perfil\") }\r\n        )\r\n    }\r\n}\r\n@Composable\r\nfun ProgressInfoCard(title: String, value: String) {\r\n    Column(\r\n        horizontalAlignment = Alignment.CenterHorizontally,\r\n        modifier = Modifier\r\n            .clip(RoundedCornerShape(12.dp))\r\n            .background(Color.White.copy(alpha = 0.2f))\r\n            .padding(16.dp)\r\n    ) {\r\n        Text(text = title, color = Color.White, fontSize = 16.sp)\r\n        Spacer(modifier = Modifier.height(4.dp))\r\n        Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)\r\n    }\r\n}\r\n\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt b/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt	(revision cfb96612ef0328525f4b6c990475dc19776182ea)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/main/MainScreen.kt	(date 1746878853300)
+@@ -48,7 +48,7 @@
+             when (selectedTab) {
+                 0 -> ProgressScreen(navController, viewModel)
+                 1 -> CalculadorasScreen(navController)
+-                2 -> PerfilScreen(navController)
++                2 -> PerfilScreen(viewModel = hiltViewModel(), navController = navController)
+             }
+         }
+     }
+Index: app/src/main/java/com/tusalud/healthapp/domain/respository/UserRepositoryImpl.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.domain.respository\r\n\r\nimport com.google.firebase.auth.FirebaseAuth\r\nimport com.google.firebase.firestore.FirebaseFirestore\r\nimport com.tusalud.healthapp.domain.model.UserDto\r\nimport kotlinx.coroutines.Dispatchers\r\nimport kotlinx.coroutines.tasks.await\r\nimport kotlinx.coroutines.withContext\r\nimport com.tusalud.healthapp.domain.model.User\r\nclass UserRepositoryImpl(auth1: FirebaseAuth, firestore: FirebaseFirestore) : UserRepository {\r\n\r\n    private val auth = FirebaseAuth.getInstance()\r\n    private val db = FirebaseFirestore.getInstance()\r\n\r\n    override suspend fun login(email: String, password: String): Result<User> = withContext(Dispatchers.IO) {\r\n        try {\r\n            val result = auth.signInWithEmailAndPassword(email, password).await()\r\n            val uid = result.user?.uid ?: return@withContext Result.failure(Exception(\"UID nulo\"))\r\n\r\n            val doc = db.collection(\"usuarios\").document(uid).get().await()\r\n            val user = doc.toObject(UserDto::class.java)?.toDomain()\r\n                ?: return@withContext Result.failure(Exception(\"Usuario no encontrado\"))\r\n\r\n            Result.success(user)\r\n        } catch (e: Exception) {\r\n            Result.failure(e)\r\n        }\r\n    }\r\n\r\n    override suspend fun register(user: User, password: String): Result<User> = withContext(Dispatchers.IO) {\r\n        try {\r\n            val result = auth.createUserWithEmailAndPassword(user.correo, password).await()\r\n            val uid = result.user?.uid ?: return@withContext Result.failure(Exception(\"UID nulo\"))\r\n            val userWithId = user.copy(id = uid)\r\n\r\n            db.collection(\"usuarios\").document(uid).set(userWithId).await()\r\n            Result.success(userWithId)\r\n        } catch (e: Exception) {\r\n            Result.failure(e)\r\n        }\r\n    }\r\n\r\n\r\n    override suspend fun resetPassword(email: String): Result<Unit> = withContext(Dispatchers.IO) {\r\n        try {\r\n            auth.sendPasswordResetEmail(email).await()\r\n            Result.success(Unit)\r\n        } catch (e: Exception) {\r\n            Result.failure(e)\r\n            }\r\n    }\r\n    override suspend fun getUser(uid: String): Result<User> = withContext(Dispatchers.IO) {\r\n        try {\r\n            val doc = db.collection(\"usuarios\").document(uid).get().await()\r\n            val user = doc.toObject(UserDto::class.java)?.toDomain()\r\n                ?: return@withContext Result.failure(Exception(\"Usuario no encontrado\"))\r\n\r\n            Result.success(user)\r\n        } catch (e: Exception) {\r\n            Result.failure(e)\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRepositoryImpl.kt b/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRepositoryImpl.kt
+--- a/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRepositoryImpl.kt	(revision cfb96612ef0328525f4b6c990475dc19776182ea)
++++ b/app/src/main/java/com/tusalud/healthapp/domain/respository/UserRepositoryImpl.kt	(date 1746876746895)
+@@ -7,6 +7,7 @@
+ import kotlinx.coroutines.tasks.await
+ import kotlinx.coroutines.withContext
+ import com.tusalud.healthapp.domain.model.User
++
+ class UserRepositoryImpl(auth1: FirebaseAuth, firestore: FirebaseFirestore) : UserRepository {
+ 
+     private val auth = FirebaseAuth.getInstance()
+@@ -40,16 +41,16 @@
+         }
+     }
+ 
+-
+     override suspend fun resetPassword(email: String): Result<Unit> = withContext(Dispatchers.IO) {
+         try {
+             auth.sendPasswordResetEmail(email).await()
+             Result.success(Unit)
+         } catch (e: Exception) {
+             Result.failure(e)
+-            }
++        }
+     }
+-    override suspend fun getUser(uid: String): Result<User> = withContext(Dispatchers.IO) {
++
++    override suspend fun getUserById(uid: String): Result<User> = withContext(Dispatchers.IO) {
+         try {
+             val doc = db.collection("usuarios").document(uid).get().await()
+             val user = doc.toObject(UserDto::class.java)?.toDomain()
+Index: app/src/main/java/com/tusalud/healthapp/MainActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp\r\n\r\nimport android.os.Bundle\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport androidx.activity.enableEdgeToEdge\r\nimport androidx.navigation.compose.rememberNavController\r\nimport com.tusalud.healthapp.presentation.navigation.AppNavigation\r\nimport dagger.hilt.android.AndroidEntryPoint\r\n\r\n\r\n@AndroidEntryPoint\r\nclass MainActivity : ComponentActivity() {\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        enableEdgeToEdge()\r\n\r\n        setContent {\r\n            val navController = rememberNavController()\r\n            AppNavigation(navController = navController)\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/MainActivity.kt b/app/src/main/java/com/tusalud/healthapp/MainActivity.kt
+--- a/app/src/main/java/com/tusalud/healthapp/MainActivity.kt	(revision cfb96612ef0328525f4b6c990475dc19776182ea)
++++ b/app/src/main/java/com/tusalud/healthapp/MainActivity.kt	(date 1746872364514)
+@@ -6,6 +6,7 @@
+ import androidx.activity.enableEdgeToEdge
+ import androidx.navigation.compose.rememberNavController
+ import com.tusalud.healthapp.presentation.navigation.AppNavigation
++import com.tusalud.healthapp.ui.theme.AppTheme
+ import dagger.hilt.android.AndroidEntryPoint
+ 
+ 
+@@ -16,8 +17,11 @@
+         enableEdgeToEdge()
+ 
+         setContent {
+-            val navController = rememberNavController()
+-            AppNavigation(navController = navController)
++            AppTheme {
++
++                val navController = rememberNavController()
++                AppNavigation(navController = navController)
++            }
+         }
+     }
+ }
+\ No newline at end of file
+Index: app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tusalud.healthapp.presentation.navigation\r\n\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.NavHost\r\nimport androidx.navigation.compose.composable\r\nimport com.tusalud.healthapp.presentation.login.LoginScreen\r\nimport com.tusalud.healthapp.presentation.main.MainScreen\r\nimport com.tusalud.healthapp.presentation.menu.CalculadorasScreen\r\nimport com.tusalud.healthapp.presentation.menu.desafio.DesafioScreen\r\nimport com.tusalud.healthapp.presentation.menu.PerfilScreen\r\nimport com.tusalud.healthapp.presentation.menu.EditarPerfilScreen\r\nimport com.tusalud.healthapp.presentation.menu.RecordatoriosScreen\r\nimport com.tusalud.healthapp.presentation.menu.ConfiguracionScreen\r\nimport com.tusalud.healthapp.presentation.register.RegisterScreen\r\nimport com.tusalud.healthapp.presentation.reset.PasswordResetScreen\r\n\r\n\r\n\r\n@Composable\r\nfun AppNavigation(navController: NavHostController) {\r\n    NavHost(navController = navController, startDestination = \"login\") {\r\n\r\n        composable(\"login\") {\r\n            LoginScreen(navController)\r\n        }\r\n\r\n        composable(\"register\") {\r\n            RegisterScreen(navController)\r\n        }\r\n\r\n        composable(\"reset_password\") {\r\n            PasswordResetScreen(navController)\r\n        }\r\n\r\n        composable(\"main\") {\r\n            MainScreen(navController)\r\n        }\r\n\r\n        composable(NavigationRoutes.CALCULADORAS) {\r\n            CalculadorasScreen(navController)\r\n        }\r\n\r\n        composable(NavigationRoutes.PERFIL) {\r\n            PerfilScreen(navController)\r\n        }\r\n\r\n        composable(\"editarPerfil\") {  //pantalla de editar perfil\r\n            EditarPerfilScreen(navController)\r\n        }\r\n\r\n        composable(\"recordatorios\") {  //pantalla de recordatorios\r\n            RecordatoriosScreen(navController)\r\n        }\r\n\r\n        composable(\"configuracion\") {  //pantalla de configuracion\r\n            ConfiguracionScreen(navController)\r\n        }\r\n\r\n        composable(NavigationRoutes.DESAFIO) {\r\n            DesafioScreen(navController)\r\n        }\r\n\r\n\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt b/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt
+--- a/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt	(revision cfb96612ef0328525f4b6c990475dc19776182ea)
++++ b/app/src/main/java/com/tusalud/healthapp/presentation/navigation/AppNavigation.kt	(date 1746877885083)
+@@ -41,8 +41,8 @@
+             CalculadorasScreen(navController)
+         }
+ 
+-        composable(NavigationRoutes.PERFIL) {
+-            PerfilScreen(navController)
++        composable("perfil") {
++            PerfilScreen(navController = navController)
+         }
+ 
+         composable("editarPerfil") {  //pantalla de editar perfil
