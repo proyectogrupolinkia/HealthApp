@@ -29,6 +29,10 @@ class PerfilViewModel : ViewModel() {
 
     private val _showHelpDialog = MutableStateFlow(false)
     val showHelpDialog: StateFlow<Boolean> = _showHelpDialog
+    private val _showDeleteDialog = MutableStateFlow(false)
+    val showDeleteDialog: StateFlow<Boolean> = _showDeleteDialog
+
+
 
     init {
         cargarDatosUsuario()
@@ -59,10 +63,22 @@ class PerfilViewModel : ViewModel() {
     fun setShowHelpDialog(show: Boolean) {
         _showHelpDialog.value = show
     }
+    fun setShowDeleteDialog(show: Boolean) {
+        _showDeleteDialog.value = show
+    }
 
     fun logout(onLogoutComplete: () -> Unit) {
         auth.signOut()
         onLogoutComplete()
+    }
+    fun eliminarCuenta(onComplete: () -> Unit) {
+        val user = auth.currentUser ?: return
+        val uid = user.uid
+
+        firestore.collection("usuarios").document(uid).delete()
+        user.delete()
+            .addOnSuccessListener { onComplete() }
+            .addOnFailureListener { /* Manejo de error opcional */ }
     }
 }
 

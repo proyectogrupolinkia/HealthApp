@@ -32,6 +32,7 @@ fun PerfilScreen(
     val email by viewModel.email.collectAsState(initial = "")
     val showLogoutDialog by viewModel.showLogoutDialog.collectAsState(initial = false)
     val showHelpDialog by viewModel.showHelpDialog.collectAsState(initial = false)
+    val showDeleteDialog by viewModel.showDeleteDialog.collectAsState(initial = false)
 
     Scaffold(
         bottomBar = {
@@ -63,6 +64,31 @@ fun PerfilScreen(
                     },
                     dismissButton = {
                         TextButton(onClick = { viewModel.setShowLogoutDialog(false) }) {
+                            Text("Cancelar")
+                        }
+                    }
+                )
+            }
+
+            if (showDeleteDialog) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.setShowDeleteDialog(false) },
+                    title = { Text("Cancelar cuenta") },
+                    text = { Text("¿Estás seguro que deseas eliminar tu cuenta? Esta acción no se puede deshacer.") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            viewModel.setShowDeleteDialog(false)
+                            viewModel.eliminarCuenta {
+                                navController.navigate("login") {
+                                    popUpTo("perfil") { inclusive = true }
+                                }
+                            }
+                        }) {
+                            Text("Eliminar")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { viewModel.setShowDeleteDialog(false) }) {
                             Text("Cancelar")
                         }
                     }
@@ -143,6 +169,10 @@ fun PerfilScreen(
 
                         Divider(modifier = Modifier.padding(vertical = 8.dp))
 
+                        PerfilOptionItem(icon = Icons.Default.Delete, label = "Cancelar cuenta") {
+                            viewModel.setShowDeleteDialog(true)
+                        }
+
                         PerfilOptionItem(icon = Icons.Default.ExitToApp, label = "Cerrar sesión") {
                             viewModel.setShowLogoutDialog(true)
                         }
@@ -167,7 +197,3 @@ fun PerfilOptionItem(icon: ImageVector, label: String, onClick: () -> Unit) {
         Text(text = label, fontSize = 16.sp, color = Color.Black)
     }
 }
-
-
-
-
