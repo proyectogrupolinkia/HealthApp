@@ -7,8 +7,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
 import kotlinx.coroutines.launch
@@ -25,13 +25,15 @@ fun ActualizarPesoScreen(
     var nuevoPeso by remember { mutableStateOf("") }
     val snackbarActivo = viewModel.snackbarActivo
 
-    // Mostrar Snackbar cuando el peso se haya guardado
+    // Recargar datos al volver, para actualizar gráfico o vista principal
     LaunchedEffect(snackbarActivo) {
         if (snackbarActivo) {
             scope.launch {
                 snackbarHostState.showSnackbar("Peso guardado correctamente")
                 viewModel.resetSnackbar()
-                nuevoPeso = "" // limpiar campo tras guardar
+                nuevoPeso = ""
+                // Refrescar datos en el ViewModel
+                viewModel.cargarDatosUsuarioCompleto()
             }
         }
     }
@@ -48,7 +50,6 @@ fun ActualizarPesoScreen(
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-
     ) { padding ->
 
         Column(

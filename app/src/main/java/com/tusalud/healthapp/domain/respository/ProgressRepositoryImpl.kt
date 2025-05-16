@@ -16,13 +16,15 @@ class ProgressRepositoryImpl @Inject constructor() : ProgressRepository {
 
         val peso = snapshot.getDouble("peso")?.toFloat() ?: 0f
         val height = snapshot.getDouble("altura")?.toFloat() ?: 0f
-
+        val pesoObjetivo = snapshot.getDouble("pesoObjetivo")?.toFloat()
+        val altura = snapshot.getDouble("altura")?.toFloat() ?: 0f
         val bmi = if (height > 0) peso / ((height / 100) * (height / 100)) else 0f
 
         return Progress(
             peso = peso,
             heightCm = height,
-            bmi = bmi
+            bmi = bmi,
+            pesoObjetivo = snapshot.getDouble("pesoObjetivo")?.toFloat()
         )
     }
 }

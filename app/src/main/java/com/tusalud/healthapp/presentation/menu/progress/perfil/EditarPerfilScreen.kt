@@ -9,22 +9,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun EditarPerfilScreen(
     navController: NavHostController,
-    viewModel: EditarPerfilViewModel = hiltViewModel()
+    viewModel: ProgressViewModel = hiltViewModel()
 ) {
     val displayName by viewModel.displayName.collectAsState()
     val email by viewModel.email.collectAsState()
     val pesoInicio by viewModel.pesoInicio.collectAsState()
     val pesoObjetivo by viewModel.pesoObjetivo.collectAsState()
-
     val context = LocalContext.current
 
-
     LaunchedEffect(Unit) {
+        viewModel.cargarDatosUsuarioCompleto()
         viewModel.toastMessage.collectLatest { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
@@ -74,8 +74,9 @@ fun EditarPerfilScreen(
 
         Button(
             onClick = {
-                viewModel.updateProfile()
-                navController.popBackStack()
+                viewModel.updateProfile {
+                    navController.popBackStack()
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -83,11 +84,3 @@ fun EditarPerfilScreen(
         }
     }
 }
-
-
-
-
-
-
-
-

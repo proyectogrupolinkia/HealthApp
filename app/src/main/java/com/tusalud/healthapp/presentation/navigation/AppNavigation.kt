@@ -58,7 +58,7 @@ fun AppNavigation(navController: NavHostController) {
 
         composable("editar_perfil") {
             val viewModel: EditarPerfilViewModel = hiltViewModel()
-            EditarPerfilScreen(navController, viewModel)
+            EditarPerfilScreen(navController, progressViewModel)
         }
 
         composable("recordatorios") {

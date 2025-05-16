@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
 import me.bytebeats.views.charts.line.LineChart
 import me.bytebeats.views.charts.line.LineChartData
 import me.bytebeats.views.charts.line.LineChartData.Point
@@ -22,9 +23,13 @@ import me.bytebeats.views.charts.line.render.yaxis.SimpleYAxisDrawer
 @Composable
 fun EvolucionPesoScreen(
     navController: NavHostController,
-    viewModel: EvolucionPesoViewModel = hiltViewModel()
+    viewModel: ProgressViewModel = hiltViewModel()
 ) {
     val pesosConFechas by viewModel.pesosConFechas.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.cargarDatosUsuarioCompleto()
+    }
 
     Scaffold(
         topBar = {

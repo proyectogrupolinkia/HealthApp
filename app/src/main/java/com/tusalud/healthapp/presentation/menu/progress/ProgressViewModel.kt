@@ -12,7 +12,9 @@ import com.google.firebase.firestore.SetOptions
 import com.tusalud.healthapp.domain.model.Progress
 import com.tusalud.healthapp.domain.repository.ProgressRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -32,6 +34,21 @@ class ProgressViewModel @Inject constructor(
 
     private val _pesosConFechas = MutableStateFlow<List<Pair<Float, String>>>(emptyList())
     val pesosConFechas: StateFlow<List<Pair<Float, String>>> = _pesosConFechas
+
+    private val _displayName = MutableStateFlow("")
+    val displayName: StateFlow<String> = _displayName
+
+    private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
+
+    private val _pesoInicio = MutableStateFlow("")
+    val pesoInicio: StateFlow<String> = _pesoInicio
+
+    private val _pesoObjetivo = MutableStateFlow("")
+    val pesoObjetivo: StateFlow<String> = _pesoObjetivo
+
+    private val _toastMessage = MutableSharedFlow<String>()
+    val toastMessage: SharedFlow<String> = _toastMessage
 
     var snackbarActivo by mutableStateOf(false)
         private set
@@ -137,8 +154,114 @@ class ProgressViewModel @Inject constructor(
             println("Error al obtener documento del usuario: ${it.message}")
         }
     }
+    fun cargarDatosUsuarioCompleto() {
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+        val uid = user.uid
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("usuarios").document(uid).get()
+            .addOnSuccessListener { document ->
+                // Cargar peso actual
+                val peso = document.getDouble("peso")?.toFloat()
+                val altura = document.getDouble("altura")?.toFloat()
+                val bmi = if (peso != null && altura != null && altura > 0)
+                    peso / ((altura / 100) * (altura / 100)) else 0f
+
+                _progress.value = Progress(
+                    peso = peso ?: 0f,
+                    heightCm = altura ?: 0f,
+                    bmi = bmi,
+                    pesoObjetivo = document.getDouble("pesoObjetivo")?.toFloat()
+                )
+
+                // Cargar historial
+                val historialRaw = document.get("weightHistory") as? List<*>
+                val historial = historialRaw?.filterIsInstance<Map<String, Any>>() ?: emptyList()
+                val formato = SimpleDateFormat("dd MMM", Locale.getDefault())
+
+                _pesos.value = historial.mapNotNull { (it["peso"] as? Number)?.toFloat() }
+                _pesosConFechas.value = historial.mapNotNull { item ->
+                    val pesoItem = (item["peso"] as? Number)?.toFloat()
+                    val fecha = (item["timestamp"] as? Timestamp)?.toDate()
+                    if (pesoItem != null && fecha != null) pesoItem to formato.format(fecha) else null
+                }
+
+                // Cargar perfil
+                _pesoInicio.value = document.getDouble("pesoInicio")?.toString() ?: ""
+                _pesoObjetivo.value = document.getDouble("pesoObjetivo")?.toString() ?: ""
+                _displayName.value = document.getString("nombre") ?: ""
+                _email.value = user.email ?: ""
+
+                // Manejo más explícito de campos nuevos
+                if (document.contains("pesoInicio")) {
+                    _pesoInicio.value = document.getDouble("pesoInicio")?.toString() ?: ""
+                }
+
+                if (document.contains("pesoObjetivo")) {
+                    _pesoObjetivo.value = document.getDouble("pesoObjetivo")?.toString() ?: ""
+                }
+            }
+            .addOnFailureListener {
+                println("Error al cargar los datos del usuario: ${it.message}")
+            }
+    }
 
     fun resetSnackbar() {
         snackbarActivo = false
+    }
+    fun onDisplayNameChanged(newName: String) {
+        _displayName.value = newName
+    }
+    fun onEmailChanged(newEmail: String) {
+        _email.value = newEmail
+    }
+
+    fun onPesoInicioChanged(newPeso: String) {
+        _pesoInicio.value = newPeso
+    }
+
+    fun onPesoObjetivoChanged(newPeso: String) {
+        _pesoObjetivo.value = newPeso
+    }
+    fun updateProfile(onSuccess: () -> Unit = {}) {
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+        val newName = _displayName.value
+        val newEmail = _email.value
+        val pesoIni = _pesoInicio.value.toFloatOrNull()
+        val pesoObj = _pesoObjetivo.value.toFloatOrNull()
+
+        viewModelScope.launch {
+            if (newName != user.displayName) {
+                val profileUpdates = com.google.firebase.auth.ktx.userProfileChangeRequest {
+                    displayName = newName
+                }
+                user.updateProfile(profileUpdates)
+            }
+
+            if (newEmail != user.email) {
+                user.updateEmail(newEmail)
+            }
+
+            val datosPerfil = mutableMapOf<String, Any>(
+                "nombre" to newName,
+                "email" to newEmail
+            )
+            pesoIni?.let { datosPerfil["pesoInicio"] = it }
+            pesoObj?.let { datosPerfil["pesoObjetivo"] = it }
+
+            FirebaseFirestore.getInstance().collection("usuarios").document(user.uid)
+                .set(datosPerfil, SetOptions.merge())
+                .addOnSuccessListener {
+                    viewModelScope.launch {
+                        _toastMessage.emit("Perfil actualizado con éxito")
+                        onSuccess()  // Aquí se cierra la pantalla
+                    }
+                }
+                .addOnFailureListener {
+                    viewModelScope.launch {
+                        _toastMessage.emit("Error al guardar perfil")
+                    }
+                }
+        }
     }
 }
