@@ -59,7 +59,7 @@ class LoginViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             loading = true
-            val newUser = User("", nombre, correo, edad, peso, altura)
+            val newUser = User("", nombre, correo, edad, peso, peso, altura)
             val result = userRepository.register(newUser, password)
             loading = false
             result.onSuccess {

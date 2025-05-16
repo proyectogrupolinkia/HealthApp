@@ -114,8 +114,8 @@ fun PerfilScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(displayName, fontSize = 24.sp, color = Color.White)
-                    Text(email, fontSize = 16.sp, color = Color.White)
+                    Text(displayName.ifBlank { "Usuario" }, fontSize = 24.sp, color = Color.White)
+                    Text(email.ifBlank { "Sin correo" }, fontSize = 16.sp, color = Color.White)
 
                     Spacer(modifier = Modifier.height(32.dp))
 

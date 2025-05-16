@@ -6,7 +6,8 @@ data class UserDto(
     val correo: String = "",
     val edad: Int = 0,
     val peso: Float = 0f,
+    val pesoInicio: Float = 0f,
     val altura: Float = 0f
 ) {
-    fun toDomain() = User(id, nombre, correo, edad, peso, altura)
+    fun toDomain() = User(id, nombre, correo, edad, peso, pesoInicio, altura)
 }

@@ -6,5 +6,6 @@ data class User(
     val correo: String,
     val edad: Int,
     val peso: Float,
-    val altura:Float
+    val pesoInicio: Float,
+    val altura: Float
 )

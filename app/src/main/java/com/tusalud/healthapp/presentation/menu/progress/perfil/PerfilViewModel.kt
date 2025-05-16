@@ -20,7 +20,6 @@ class PerfilViewModel : ViewModel() {
     val email: StateFlow<String> = _email
 
     private val _pesoInicio = MutableStateFlow("")
-    val pesoInicio: StateFlow<String> = _pesoInicio
 
     private val _pesoObjetivo = MutableStateFlow("")
     val pesoObjetivo: StateFlow<String> = _pesoObjetivo
@@ -39,16 +38,16 @@ class PerfilViewModel : ViewModel() {
         val user = auth.currentUser ?: return
 
         viewModelScope.launch {
-            _displayName.value = user.displayName ?: "Usuario"
             _email.value = user.email ?: "sin correo"
         }
 
-        //cargar pesos desde Firestore
-        firestore.collection("users").document(user.uid).get()
+        // Obtener nombre y pesos desde Firestore (colección "usuarios")
+        firestore.collection("usuarios").document(user.uid).get()
             .addOnSuccessListener { doc ->
                 if (doc.exists()) {
-                    _pesoInicio.value = doc.getString("pesoInicio") ?: ""
-                    _pesoObjetivo.value = doc.getString("pesoObjetivo") ?: ""
+                    _displayName.value = doc.getString("nombre") ?: "Usuario"
+                    _pesoInicio.value = doc.get("pesoInicio")?.toString() ?: ""
+                    _pesoObjetivo.value = doc.get("pesoObjetivo")?.toString() ?: ""
                 }
             }
     }

@@ -34,7 +34,18 @@ class UserRepositoryImpl(auth1: FirebaseAuth, firestore: FirebaseFirestore) : Us
             val uid = result.user?.uid ?: return@withContext Result.failure(Exception("UID nulo"))
             val userWithId = user.copy(id = uid)
 
-            db.collection("usuarios").document(uid).set(userWithId).await()
+            db.collection("usuarios").document(uid).set(
+                hashMapOf(
+                    "id" to userWithId.id,
+                    "nombre" to userWithId.nombre,
+                    "correo" to userWithId.correo,
+                    "edad" to userWithId.edad,
+                    "peso" to userWithId.peso,
+                    "pesoInicio" to userWithId.pesoInicio,
+                    "altura" to userWithId.altura
+                )
+            ).await()
+
             Result.success(userWithId)
         } catch (e: Exception) {
             Result.failure(e)
