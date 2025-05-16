@@ -65,7 +65,7 @@ fun ProgressScreen(
             ) {
                 ProgressInfoCard(title = "Peso", value = "${progress.peso} kg")
                 ProgressInfoCard(title = "IMC", value = String.format("%.2f", progress.bmi))
-                ProgressInfoCard(title = "Peso objetivo", value = "${progress.pesoObjetivo ?: "--"} kg")
+               // ProgressInfoCard(title = "Peso objetivo", value = "${progress.pesoObjetivo ?: "--"} kg")
             }
 
             Spacer(modifier = Modifier.height(16.dp))

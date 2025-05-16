@@ -10,6 +10,7 @@ import com.tusalud.healthapp.presentation.login.LoginViewModel
 import com.tusalud.healthapp.presentation.register.RegisterScreen
 import com.tusalud.healthapp.presentation.reset.PasswordResetScreen
 import com.tusalud.healthapp.presentation.main.MainScreen
+import com.tusalud.healthapp.presentation.menu.Progress.ActualizarPesoScreen
 import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen
 import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasViewModel
 import com.tusalud.healthapp.presentation.menu.desafios.DesafiosScreen
@@ -24,10 +25,7 @@ import com.tusalud.healthapp.presentation.menu.progress.recordatorios.Recordator
 import com.tusalud.healthapp.presentation.menu.progress.recordatorios.RecordatoriosViewModel
 import com.tusalud.healthapp.presentation.menu.progress.configuracion.ConfiguracionScreen
 import com.tusalud.healthapp.presentation.menu.progress.configuracion.ConfiguracionViewModel
-import com.tusalud.healthapp.presentation.menu.progress.peso.ActualizarPesoScreen
-import com.tusalud.healthapp.presentation.menu.progress.peso.ActualizarPesoViewModel
 import com.tusalud.healthapp.presentation.menu.progress.peso.EvolucionPesoScreen
-import com.tusalud.healthapp.presentation.menu.progress.peso.EvolucionPesoViewModel
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -88,13 +86,11 @@ fun AppNavigation(navController: NavHostController) {
         }
 
         composable("actualizar_peso") {
-            val viewModel: ActualizarPesoViewModel = hiltViewModel()
-            ActualizarPesoScreen(navController, viewModel)
+            ActualizarPesoScreen(navController, progressViewModel)
         }
 
         composable("evolucion_peso") {
-            val viewModel: EvolucionPesoViewModel = hiltViewModel()
-            EvolucionPesoScreen(navController, viewModel)
+            EvolucionPesoScreen(navController)
         }
     }
 }

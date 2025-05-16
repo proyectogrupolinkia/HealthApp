@@ -1,30 +1,28 @@
-
 package com.tusalud.healthapp.presentation.menu.progress
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.tusalud.healthapp.domain.model.Progress
+import com.tusalud.healthapp.domain.repository.ProgressRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-//definicion interna de Progress
-data class Progress(
-    val peso: Float,
-    val bmi: Float,
-    val pesoObjetivo: Float? = null
-)
-
 @HiltViewModel
-class ProgressViewModel @Inject constructor() : ViewModel() {
+class ProgressViewModel @Inject constructor(
+    private val progressRepository: ProgressRepository
+) : ViewModel() {
 
     private val _progress = MutableStateFlow<Progress?>(null)
     val progress: StateFlow<Progress?> = _progress
@@ -74,27 +72,8 @@ class ProgressViewModel @Inject constructor() : ViewModel() {
     }
 
     fun loadProgress() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-        if (userId != null) {
-            val db = FirebaseFirestore.getInstance()
-            db.collection("usuarios").document(userId)
-                .get()
-                .addOnSuccessListener { document ->
-                    val peso = (document.get("peso") as? Number)?.toFloat() ?: 0f
-                    val pesoObjetivo = (document.get("pesoObjetivo") as? Number)?.toFloat()
-
-                    //calculamos el IMC (asumimos que la altura está en metros)
-                    val altura = (document.get("altura") as? Number)?.toFloat() ?: 1.70f
-                    val bmi = if (altura > 0) peso / (altura * altura) else 0f
-
-                    _progress.value = Progress(peso = peso, bmi = bmi, pesoObjetivo = pesoObjetivo)
-                }
-                .addOnFailureListener {
-                    _progress.value = Progress(peso = 0f, bmi = 0f)
-                }
-        } else {
-            _progress.value = Progress(peso = 0f, bmi = 0f)
+        viewModelScope.launch {
+            _progress.value = progressRepository.getProgress()
         }
     }
 
@@ -157,26 +136,6 @@ class ProgressViewModel @Inject constructor() : ViewModel() {
         }.addOnFailureListener {
             println("Error al obtener documento del usuario: ${it.message}")
         }
-    }
-
-    fun actualizarPesoObjetivo(pesoObjetivo: Float?) {
-        if (pesoObjetivo == null) return
-
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("usuarios").document(userId)
-
-        val nuevosDatos = mapOf("pesoObjetivo" to pesoObjetivo)
-
-        userRef.set(nuevosDatos, SetOptions.merge())
-            .addOnSuccessListener {
-                // Actualizamos el progreso en pantalla
-                _progress.value = _progress.value?.copy(pesoObjetivo = pesoObjetivo)
-                snackbarActivo = true
-            }
-            .addOnFailureListener {
-                println("Error al actualizar peso objetivo: ${it.message}")
-            }
     }
 
     fun resetSnackbar() {
