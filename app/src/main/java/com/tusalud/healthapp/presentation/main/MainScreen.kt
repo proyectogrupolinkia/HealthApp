@@ -15,19 +15,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.tusalud.healthapp.R
+import com.tusalud.healthapp.presentation.components.BottomNavigationBar
 import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen
 import com.tusalud.healthapp.presentation.menu.progress.perfil.PerfilScreen
 import com.tusalud.healthapp.presentation.menu.progress.ProgressScreen
 import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
-
+import com.tusalud.healthapp.presentation.navigation.AppNavigation
 
 @Composable
 fun MainScreen(
-    navController: NavHostController,
-    viewModel: ProgressViewModel = hiltViewModel()
+    navController: NavHostController
 ) {
     var selectedTab by remember { mutableStateOf(0) }
+    val viewModel: ProgressViewModel = hiltViewModel()
 
     Scaffold(
         bottomBar = {
@@ -38,68 +40,31 @@ fun MainScreen(
             )
         }
     ) { innerPadding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
         ) {
             when (selectedTab) {
-                0 -> ProgressScreen(navController, viewModel)
-                1 -> CalculadorasScreen(navController)
-                2 -> PerfilScreen(navController)
+                0 -> ProgressScreen(navController = navController, viewModel = viewModel)
+                1 -> CalculadorasScreen(navController = navController)
+                2 -> PerfilScreen(navController = navController)
             }
         }
     }
-
-}
-@Composable
-fun BottomNavigationBar(
-    selectedTab: Int,
-    onTabSelected: (Int) -> Unit,
-    navController: NavHostController
-) {
-    NavigationBar {
-        NavigationBarItem(
-            selected = selectedTab == 0,
-            onClick = {
-                onTabSelected(0)
-                navController.navigate("main") // O NavigationRoutes.MAIN
-            },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_progreso),
-                    contentDescription = "Progreso"
-                )
-            },
-            label = { Text("Progreso") }
-        )
-        NavigationBarItem(
-            selected = selectedTab == 1,
-            onClick = {
-                onTabSelected(1)
-                navController.navigate("calculadoras")
-            },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_calculadora),
-                    contentDescription = "Calculadoras"
-                )
-            },
-            label = { Text("Calculadoras") }
-        )
-        NavigationBarItem(
-            selected = selectedTab == 2,
-            onClick = {
-                onTabSelected(2)
-                navController.navigate("perfil")
-            },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_perfil),
-                    contentDescription = "Perfil"
-                )
-            },
-            label = { Text("Perfil") }
-        )
+    @Composable
+    fun ProgressInfoCard(title: String, value: String) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White.copy(alpha = 0.2f))
+                .padding(16.dp)
+        ) {
+            Text(text = title, color = Color.White, fontSize = 16.sp)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        }
     }
 }
 @Composable

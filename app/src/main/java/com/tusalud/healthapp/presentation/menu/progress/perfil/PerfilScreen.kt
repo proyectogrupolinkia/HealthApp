@@ -19,31 +19,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.tusalud.healthapp.presentation.components.BottomNavigationBar
 
 @Composable
 fun PerfilScreen(
     navController: NavHostController,
     viewModel: PerfilViewModel = hiltViewModel()
 ) {
-    val selectedTab = 2
-
     val displayName by viewModel.displayName.collectAsState(initial = "")
     val email by viewModel.email.collectAsState(initial = "")
     val showLogoutDialog by viewModel.showLogoutDialog.collectAsState(initial = false)
     val showHelpDialog by viewModel.showHelpDialog.collectAsState(initial = false)
     val showDeleteDialog by viewModel.showDeleteDialog.collectAsState(initial = false)
 
-    Scaffold(
-        bottomBar = {
-            BottomNavigationBar(
-                selectedTab = selectedTab,
-                onTabSelected = { /* actualizar si es necesario */ },
-                navController = navController
-            )
-        }
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+    Scaffold { innerPadding ->
+
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
 
             if (showLogoutDialog) {
                 AlertDialog(

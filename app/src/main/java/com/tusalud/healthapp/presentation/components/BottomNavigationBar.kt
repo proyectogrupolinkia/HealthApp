@@ -1,10 +1,12 @@
 package com.tusalud.healthapp.presentation.components
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
-import com.tusalud.healthapp.R
 
 @Composable
 fun BottomNavigationBar(
@@ -15,68 +17,20 @@ fun BottomNavigationBar(
     NavigationBar {
         NavigationBarItem(
             selected = selectedTab == 0,
-            onClick = {
-                if (selectedTab != 0) {
-                    onTabSelected(0)
-                    navController.navigate("main") {
-                        launchSingleTop = true
-                        restoreState = true
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                    }
-                }
-            },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_progreso),
-                    contentDescription = "Progreso"
-                )
-            },
+            onClick = { onTabSelected(0) },
+            icon = { Icon(Icons.Default.BarChart, contentDescription = "Progreso") },
             label = { Text("Progreso") }
         )
         NavigationBarItem(
             selected = selectedTab == 1,
-            onClick = {
-                if (selectedTab != 1) {
-                    onTabSelected(1)
-                    navController.navigate("calculadoras") {
-                        launchSingleTop = true
-                        restoreState = true
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                    }
-                }
-            },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_calculadora),
-                    contentDescription = "Calculadoras"
-                )
-            },
+            onClick = { onTabSelected(1) },
+            icon = { Icon(Icons.Default.Calculate, contentDescription = "Calculadoras") },
             label = { Text("Calculadoras") }
         )
         NavigationBarItem(
             selected = selectedTab == 2,
-            onClick = {
-                if (selectedTab != 2) {
-                    onTabSelected(2)
-                    navController.navigate("perfil") {
-                        launchSingleTop = true
-                        restoreState = true
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                    }
-                }
-            },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_perfil),
-                    contentDescription = "Perfil"
-                )
-            },
+            onClick = { onTabSelected(2) },
+            icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
             label = { Text("Perfil") }
         )
     }

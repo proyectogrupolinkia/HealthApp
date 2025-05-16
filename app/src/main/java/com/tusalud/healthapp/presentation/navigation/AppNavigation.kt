@@ -11,32 +11,30 @@ import com.tusalud.healthapp.presentation.register.RegisterScreen
 import com.tusalud.healthapp.presentation.reset.PasswordResetScreen
 import com.tusalud.healthapp.presentation.main.MainScreen
 import com.tusalud.healthapp.presentation.menu.Progress.ActualizarPesoScreen
-import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen
 import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasViewModel
 import com.tusalud.healthapp.presentation.menu.desafios.DesafiosScreen
 import com.tusalud.healthapp.presentation.menu.desafios.DesafiosViewModel
-import com.tusalud.healthapp.presentation.menu.progress.ProgressScreen
 import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
-import com.tusalud.healthapp.presentation.menu.progress.perfil.PerfilScreen
-import com.tusalud.healthapp.presentation.menu.progress.perfil.PerfilViewModel
+import com.tusalud.healthapp.presentation.menu.progress.configuracion.ConfiguracionScreen
+import com.tusalud.healthapp.presentation.menu.progress.configuracion.ConfiguracionViewModel
+import com.tusalud.healthapp.presentation.menu.progress.peso.EvolucionPesoScreen
 import com.tusalud.healthapp.presentation.menu.progress.perfil.EditarPerfilScreen
 import com.tusalud.healthapp.presentation.menu.progress.perfil.EditarPerfilViewModel
 import com.tusalud.healthapp.presentation.menu.progress.recordatorios.RecordatoriosScreen
 import com.tusalud.healthapp.presentation.menu.progress.recordatorios.RecordatoriosViewModel
-import com.tusalud.healthapp.presentation.menu.progress.configuracion.ConfiguracionScreen
-import com.tusalud.healthapp.presentation.menu.progress.configuracion.ConfiguracionViewModel
-import com.tusalud.healthapp.presentation.menu.progress.peso.EvolucionPesoScreen
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
 
+    // ViewModels compartidos
     val progressViewModel: ProgressViewModel = hiltViewModel()
 
     NavHost(navController = navController, startDestination = "login") {
 
+        // Flujo de autenticación
         composable("login") {
-            val viewModel: LoginViewModel = hiltViewModel()
-            LoginScreen(navController, viewModel)
+            val loginViewModel: LoginViewModel = hiltViewModel()
+            LoginScreen(navController, loginViewModel)
         }
 
         composable("register") {
@@ -47,42 +45,36 @@ fun AppNavigation(navController: NavHostController) {
             PasswordResetScreen(navController)
         }
 
+        // Contenedor principal con BottomNavigationBar
         composable("main") {
             MainScreen(navController)
         }
 
-        composable("perfil") {
-            val viewModel: PerfilViewModel = hiltViewModel()
-            PerfilScreen(navController, viewModel)
-        }
-
+        // Pantallas fuera del bottom bar (accedidas desde botones internos)
         composable("editar_perfil") {
-            val viewModel: EditarPerfilViewModel = hiltViewModel()
+            val editarPerfilViewModel: EditarPerfilViewModel = hiltViewModel()
             EditarPerfilScreen(navController, progressViewModel)
         }
 
         composable("recordatorios") {
-            val viewModel: RecordatoriosViewModel = hiltViewModel()
-            RecordatoriosScreen(navController, viewModel)
+            val recordatoriosViewModel: RecordatoriosViewModel = hiltViewModel()
+            RecordatoriosScreen(navController, recordatoriosViewModel)
         }
 
         composable("configuracion") {
-            val viewModel: ConfiguracionViewModel = hiltViewModel()
-            ConfiguracionScreen(navController, viewModel)
+            val configuracionViewModel: ConfiguracionViewModel = hiltViewModel()
+            ConfiguracionScreen(navController, configuracionViewModel)
         }
 
         composable("desafio") {
-            val viewModel: DesafiosViewModel = hiltViewModel()
-            DesafiosScreen(navController, viewModel)
+            val desafioViewModel: DesafiosViewModel = hiltViewModel()
+            DesafiosScreen(navController, desafioViewModel)
         }
 
         composable("calculadoras") {
-            val viewModel: CalculadorasViewModel = hiltViewModel()
-            CalculadorasScreen(navController, viewModel)
-        }
-
-        composable("progress") {
-            ProgressScreen(navController, progressViewModel)
+            val calculadorasViewModel: CalculadorasViewModel = hiltViewModel()
+            // Nota: si CalculadorasScreen necesita el viewModel, asegúrate que el parámetro está en la función
+            // CalculadorasScreen(navController, calculadorasViewModel)
         }
 
         composable("actualizar_peso") {

@@ -166,4 +166,28 @@ fun ProgressScreen(
             }
         }
     }
+    @Composable
+    fun ProgressInfoCard(
+        pesoActual: Float,
+        pesoObjetivo: Float
+    ) {
+        val progreso = (pesoActual / pesoObjetivo).coerceIn(0f, 1f)
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text("Progreso", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                LinearProgressIndicator(progress = progreso)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Peso actual: ${pesoActual} kg")
+                Text("Objetivo: ${pesoObjetivo} kg")
+            }
+        }
+    }
 }

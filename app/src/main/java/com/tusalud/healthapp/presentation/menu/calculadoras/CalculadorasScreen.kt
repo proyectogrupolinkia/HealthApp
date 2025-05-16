@@ -17,13 +17,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.tusalud.healthapp.R
-import com.tusalud.healthapp.presentation.components.BottomNavigationBar
 import kotlinx.coroutines.launch
 
 @Composable
 fun CalculadorasScreen(navController: NavHostController, viewModel: CalculadorasViewModel = viewModel()) {
 
-    var selectedTab by remember { mutableStateOf(1) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
@@ -32,13 +30,6 @@ fun CalculadorasScreen(navController: NavHostController, viewModel: Calculadoras
 
     Scaffold(
         containerColor = backgroundColor,
-        bottomBar = {
-            BottomNavigationBar(
-                selectedTab = selectedTab,
-                onTabSelected = { selectedTab = it },
-                navController = navController
-            )
-        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
 
@@ -48,7 +39,6 @@ fun CalculadorasScreen(navController: NavHostController, viewModel: Calculadoras
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            // Scroll con formulario y botones arriba
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -171,7 +161,6 @@ fun CalculadorasScreen(navController: NavHostController, viewModel: Calculadoras
                 }
             }
 
-            // Resultados abajo a la izquierda
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -194,7 +183,6 @@ fun CalculadorasScreen(navController: NavHostController, viewModel: Calculadoras
                 }
             }
 
-            // Imagen abajo a la derecha, un poco más grande
             Image(
                 painter = painterResource(id = R.drawable.hombre_pesandose),
                 contentDescription = "Hombre pesándose",
@@ -206,8 +194,3 @@ fun CalculadorasScreen(navController: NavHostController, viewModel: Calculadoras
         }
     }
 }
-
-
-
-
-
