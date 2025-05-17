@@ -125,6 +125,24 @@ fun ProgressScreen(
                     )
                 }
             }
+            Button(
+                onClick = { navController.navigate("meditacion") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.LightGray,
+                    contentColor = Color.Black
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = "Ejercicios de Relajación",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
 
             // Usamos weight en lugar de height fijo para que la imagen ocupe el espacio disponible
             Spacer(modifier = Modifier.height(24.dp))
