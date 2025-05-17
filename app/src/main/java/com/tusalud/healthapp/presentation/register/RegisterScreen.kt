@@ -45,14 +45,18 @@ fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel =
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
+                .padding(16.dp),
+
+            contentAlignment = Alignment.Center // Centra el contenido hijo
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Crear Cuenta", style = MaterialTheme.typography.headlineMedium)
+                Text("Crear Cuenta",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color(0xFF006400))
 
                 OutlinedTextField(
                     singleLine = true,

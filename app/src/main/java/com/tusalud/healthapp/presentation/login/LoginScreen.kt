@@ -1,6 +1,5 @@
 package com.tusalud.healthapp.presentation.login
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
@@ -17,12 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
+import com.tusalud.healthapp.R
 
 @Composable
 fun AnimatedGradientBackground(content: @Composable BoxScope.() -> Unit) {
@@ -63,6 +69,22 @@ fun LoginScreen(
             visible = visible,
             enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 })
         ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center // Centra el contenido
+            ){
+                // Spinner grande arriba del título
+                if (viewModel.loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .padding(bottom = 24.dp),
+                        //color = Color(0xFF00C6A7),
+                        color = Color(0xFF006400),
+                        strokeWidth = 4.dp
+                    )
+                }
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -70,31 +92,41 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(48.dp))
 
-                // Spinner grande arriba del título
-                if (viewModel.loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .padding(bottom = 24.dp),
-                        color = Color(0xFF00C6A7),
-                        strokeWidth = 4.dp
-                    )
-                }
-
+               // Spacer(modifier = Modifier.height(28.dp))
                 Text(
                     "Bienvenido",
-                    fontSize = 32.sp,
-                    color = Color.Black,
-                    modifier = Modifier.padding(bottom = 32.dp)
+                    fontWeight = FontWeight.ExtraBold,//Negrita
+                    fontSize = 32.sp,//Tamaño
+                    color = Color(0xFF006400),
+                    modifier = Modifier
+                        .fillMaxWidth(),//Ocupar-ancho-total
+                       // .padding(bottom = 32.dp),
+                    textAlign = TextAlign.Center//Alineacion centrada
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.inicio_alex),
+                    contentDescription = "Personas activas inicio",
+                    modifier = Modifier
+                        .size(282.dp)
+                    //.padding(16.dp)
+                )
+
+
+
 
                 OutlinedTextField(
                     value = viewModel.email,
                     onValueChange = { viewModel.email = it },
                     label = { Text("Correo electrónico") },
                     modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Blue, //Azul al estar activo
+                        unfocusedBorderColor = Color.Gray, //Gris al no estar activo
+                        focusedTextColor = Color(0xFF006400), //Texto en VERDE oSCURO
+                    ),
                     enabled = !viewModel.loading
                 )
 
@@ -107,6 +139,11 @@ fun LoginScreen(
                     onValueChange = { viewModel.password = it },
                     label = { Text("Contraseña") },
                     modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Blue, //Azul al estar activo
+                        unfocusedBorderColor = Color.Gray, //Gris al no estar activo
+                        focusedTextColor = Color(0xFF006400), //Texto en VERDE oSCURO
+                    ),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     enabled = !viewModel.loading,
                     trailingIcon = {
