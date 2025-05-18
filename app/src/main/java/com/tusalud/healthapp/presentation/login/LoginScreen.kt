@@ -213,7 +213,7 @@ fun LoginScreen(
                         Text("¿No tienes cuenta? Regístrate",
                             fontSize = 16.sp,
                             color = Color.Blue,
-                            )
+                        )
 
                     }
 
@@ -221,7 +221,7 @@ fun LoginScreen(
                         Text("¿Olvidaste tu contraseña?",
                             fontSize = 16.sp,
                             color = Color.Blue,
-                            )
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

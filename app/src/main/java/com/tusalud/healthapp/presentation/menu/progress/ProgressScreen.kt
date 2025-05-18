@@ -125,8 +125,11 @@ fun ProgressScreen(
                     )
                 }
             }
+
+
+
             Button(
-                onClick = { navController.navigate("meditacion") },
+               onClick = { navController.navigate("meditacion") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
@@ -142,10 +145,6 @@ fun ProgressScreen(
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
-
-
-            // Usamos weight en lugar de height fijo para que la imagen ocupe el espacio disponible
-            Spacer(modifier = Modifier.height(24.dp))
 
             //imagen de la bascula con tamaño más grande
             Box(
