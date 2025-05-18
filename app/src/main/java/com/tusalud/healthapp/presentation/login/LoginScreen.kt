@@ -166,6 +166,6 @@ fun LoginScreen(
                     Text(text = it, color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
                 }
             }
-            }
         }
+    }
 }

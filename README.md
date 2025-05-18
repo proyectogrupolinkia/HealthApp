@@ -14,6 +14,7 @@ Este proyecto fue desarrollado como parte del **proyecto final** del ciclo de **
 - Notificaciones para recordatorios diarios
 - Diseño moderno y adaptado a Material Design
 - Almacenamiento seguro de datos del usuario
+- Sugerencias básicas para empezar a practicar la medicación e intentar reducir los niveles de estrés.
 
 ---
 

@@ -10,10 +10,12 @@ import com.tusalud.healthapp.presentation.login.LoginViewModel
 import com.tusalud.healthapp.presentation.register.RegisterScreen
 import com.tusalud.healthapp.presentation.reset.PasswordResetScreen
 import com.tusalud.healthapp.presentation.main.MainScreen
-import com.tusalud.healthapp.presentation.menu.Progress.ActualizarPesoScreen
+import com.tusalud.healthapp.presentation.menu.Progress.peso.ActualizarPesoScreen
 import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasViewModel
 import com.tusalud.healthapp.presentation.menu.desafios.DesafiosScreen
 import com.tusalud.healthapp.presentation.menu.desafios.DesafiosViewModel
+import com.tusalud.healthapp.presentation.menu.meditacion.MeditacionScreen
+import com.tusalud.healthapp.presentation.menu.meditacion.MeditacionViewModel
 import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
 import com.tusalud.healthapp.presentation.menu.progress.configuracion.ConfiguracionScreen
 import com.tusalud.healthapp.presentation.menu.progress.configuracion.ConfiguracionViewModel
@@ -84,5 +86,11 @@ fun AppNavigation(navController: NavHostController) {
         composable("evolucion_peso") {
             EvolucionPesoScreen(navController)
         }
+        composable("meditacion") {
+            val meditacionViewModel: MeditacionViewModel = hiltViewModel()
+            MeditacionScreen(navController, meditacionViewModel)
+        }
+
     }
 }
+
