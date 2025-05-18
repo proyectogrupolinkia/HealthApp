@@ -10,7 +10,7 @@ import com.tusalud.healthapp.presentation.login.LoginViewModel
 import com.tusalud.healthapp.presentation.register.RegisterScreen
 import com.tusalud.healthapp.presentation.reset.PasswordResetScreen
 import com.tusalud.healthapp.presentation.main.MainScreen
-import com.tusalud.healthapp.presentation.menu.Progress.ActualizarPesoScreen
+import com.tusalud.healthapp.presentation.menu.Progress.peso.ActualizarPesoScreen
 import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasViewModel
 import com.tusalud.healthapp.presentation.menu.desafios.DesafiosScreen
 import com.tusalud.healthapp.presentation.menu.desafios.DesafiosViewModel
