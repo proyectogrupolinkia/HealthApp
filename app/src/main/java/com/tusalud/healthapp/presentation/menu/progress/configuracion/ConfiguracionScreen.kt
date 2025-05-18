@@ -31,14 +31,21 @@ fun ConfiguracionScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
+        Button(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier.align(Alignment.Start)
+        ) {
+            Text("Volver")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             "Configuración",
-            fontSize = 24.sp,
+            fontSize = 28.sp,
             color = Color(0xFF00C6A7),
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -47,7 +54,7 @@ fun ConfiguracionScreen(
             Text("Cambiar contraseña")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -61,7 +68,7 @@ fun ConfiguracionScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         Button(onClick = {
             viewModel.logout {
@@ -74,6 +81,9 @@ fun ConfiguracionScreen(
         }
     }
 }
+
+
+
 
 
 

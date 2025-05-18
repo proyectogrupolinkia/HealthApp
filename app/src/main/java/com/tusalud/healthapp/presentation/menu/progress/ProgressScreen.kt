@@ -1,4 +1,3 @@
-
 package com.tusalud.healthapp.presentation.menu.progress
 
 import androidx.compose.foundation.Image
@@ -50,6 +49,7 @@ fun ProgressScreen(
                 .background(Color(0xFF00BCD4))
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
+
             Spacer(modifier = Modifier.height(32.dp))
             Text(
                 text = "Progreso",
@@ -129,7 +129,7 @@ fun ProgressScreen(
 
 
             Button(
-               onClick = { navController.navigate("meditacion") },
+                onClick = { navController.navigate("meditacion") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),

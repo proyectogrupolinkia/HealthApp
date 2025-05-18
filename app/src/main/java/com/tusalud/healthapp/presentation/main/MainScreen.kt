@@ -9,20 +9,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.tusalud.healthapp.R
 import com.tusalud.healthapp.presentation.components.BottomNavigationBar
 import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen
 import com.tusalud.healthapp.presentation.menu.progress.perfil.PerfilScreen
 import com.tusalud.healthapp.presentation.menu.progress.ProgressScreen
 import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
-import com.tusalud.healthapp.presentation.navigation.AppNavigation
 
 @Composable
 fun MainScreen(
@@ -81,3 +77,5 @@ fun ProgressInfoCard(title: String, value: String) {
         Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
     }
 }
+
+

@@ -1,4 +1,4 @@
-package com.tusalud.healthapp.presentation.menu.Progress.peso
+package com.tusalud.healthapp.presentation.menu.progress.peso
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
