@@ -9,13 +9,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
+import com.tusalud.healthapp.presentation.main.MainViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun EditarPerfilScreen(
     navController: NavHostController,
-    viewModel: ProgressViewModel = hiltViewModel()
+    editarPerfilViewModel: EditarPerfilViewModel,
+    viewModel: MainViewModel = hiltViewModel()
 ) {
     val displayName by viewModel.displayName.collectAsState()
     val email by viewModel.email.collectAsState()

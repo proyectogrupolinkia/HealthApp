@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.tusalud.healthapp.R
+import com.tusalud.healthapp.presentation.main.MainViewModel
 import com.tusalud.healthapp.presentation.main.ProgressInfoCard
 import me.bytebeats.views.charts.line.LineChart
 import me.bytebeats.views.charts.line.LineChartData
@@ -32,7 +33,7 @@ import me.bytebeats.views.charts.line.render.yaxis.SimpleYAxisDrawer
 @Composable
 fun ProgressScreen(
     navController: NavHostController,
-    viewModel: ProgressViewModel = hiltViewModel()
+    viewModel: MainViewModel = hiltViewModel()
 ){
     val progressState by viewModel.progress.collectAsState()
     val pesos by viewModel.pesos.collectAsState()

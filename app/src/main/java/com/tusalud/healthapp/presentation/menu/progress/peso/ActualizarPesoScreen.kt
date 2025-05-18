@@ -10,14 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
+import com.tusalud.healthapp.presentation.main.MainViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActualizarPesoScreen(
     navController: NavHostController,
-    viewModel: ProgressViewModel
+    viewModel: MainViewModel
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()

@@ -22,7 +22,6 @@ class PerfilViewModel : ViewModel() {
     private val _pesoInicio = MutableStateFlow("")
 
     private val _pesoObjetivo = MutableStateFlow("")
-    val pesoObjetivo: StateFlow<String> = _pesoObjetivo
 
     private val _showLogoutDialog = MutableStateFlow(false)
     val showLogoutDialog: StateFlow<Boolean> = _showLogoutDialog
@@ -38,7 +37,7 @@ class PerfilViewModel : ViewModel() {
         cargarDatosUsuario()
     }
 
-    private fun cargarDatosUsuario() {
+    internal fun cargarDatosUsuario() {
         val user = auth.currentUser ?: return
 
         viewModelScope.launch {

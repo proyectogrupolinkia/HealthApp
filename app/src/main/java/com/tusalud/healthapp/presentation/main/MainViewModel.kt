@@ -1,4 +1,4 @@
-package com.tusalud.healthapp.presentation.menu.progress
+package com.tusalud.healthapp.presentation.main
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.tusalud.healthapp.domain.model.Progress
@@ -18,11 +20,13 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 import javax.inject.Inject
 
+
 @HiltViewModel
-class ProgressViewModel @Inject constructor(
+class MainViewModel @Inject constructor(
     private val progressRepository: ProgressRepository
 ) : ViewModel() {
 
@@ -120,7 +124,7 @@ class ProgressViewModel @Inject constructor(
                 if (esHoy) {
                     listaActualizada[i] = mapOf(
                         "peso" to nuevoPeso,
-                        "timestamp" to Timestamp.now()
+                        "timestamp" to Timestamp.Companion.now()
                     )
                     actualizado = true
                     break
@@ -131,7 +135,7 @@ class ProgressViewModel @Inject constructor(
                 listaActualizada.add(
                     mapOf(
                         "peso" to nuevoPeso,
-                        "timestamp" to Timestamp.now()
+                        "timestamp" to Timestamp.Companion.now()
                     )
                 )
             }
@@ -232,7 +236,7 @@ class ProgressViewModel @Inject constructor(
 
         viewModelScope.launch {
             if (newName != user.displayName) {
-                val profileUpdates = com.google.firebase.auth.ktx.userProfileChangeRequest {
+                val profileUpdates = userProfileChangeRequest {
                     displayName = newName
                 }
                 user.updateProfile(profileUpdates)

@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,12 +20,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.tusalud.healthapp.presentation.main.MainViewModel
 
 @Composable
 fun PerfilScreen(
     navController: NavHostController,
-    viewModel: PerfilViewModel = hiltViewModel()
-) {
+    viewModel: PerfilViewModel = hiltViewModel(),
+
+
+    )  {
+    LaunchedEffect(Unit) {
+        viewModel.cargarDatosUsuario()
+    }
+
     val displayName by viewModel.displayName.collectAsState(initial = "")
     val email by viewModel.email.collectAsState(initial = "")
     val showLogoutDialog by viewModel.showLogoutDialog.collectAsState(initial = false)
