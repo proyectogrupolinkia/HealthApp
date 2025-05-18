@@ -39,13 +39,10 @@ fun EditarPerfilScreen(
     ) {
         Button(
             onClick = {
-                navController.navigate("perfil") {
-
-                    popUpTo("progreso") { inclusive = true }
-                    launchSingleTop = true
+                navController.navigate("main?tab=2") {
+                    popUpTo("main") { inclusive = true }
                 }
-            },
-            modifier = Modifier.align(Alignment.Start)
+            }
         ) {
             Text("Volver")
         }
@@ -90,7 +87,9 @@ fun EditarPerfilScreen(
         Button(
             onClick = {
                 viewModel.updateProfile {
-                    navController.navigate("perfil")
+                    navController.navigate("main?tab=2") {
+                        popUpTo("main") { inclusive = true }
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -99,7 +98,3 @@ fun EditarPerfilScreen(
         }
     }
 }
-
-
-
-

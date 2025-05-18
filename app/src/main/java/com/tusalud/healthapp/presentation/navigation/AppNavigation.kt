@@ -56,6 +56,11 @@ fun AppNavigation(navController: NavHostController) {
             MainScreen(navController)
         }
 
+        composable("main?tab={tab}") { backStackEntry ->
+            val tabIndex = backStackEntry.arguments?.getString("tab")?.toIntOrNull() ?: 0
+            MainScreen(navController, startTab = tabIndex)
+        }
+
         // Pantallas fuera del bottom bar (accedidas desde botones internos)
 
         composable("progreso") {

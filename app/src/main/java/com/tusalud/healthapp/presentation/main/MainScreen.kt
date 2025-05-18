@@ -22,10 +22,14 @@ import com.tusalud.healthapp.presentation.menu.progress.ProgressViewModel
 
 @Composable
 fun MainScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    startTab: Int = 0, // Nuevo parámetro para seleccionar el tab inicial
+    viewModel: ProgressViewModel = hiltViewModel()
 ) {
-    var selectedTab by remember { mutableStateOf(0) }
-    val viewModel: ProgressViewModel = hiltViewModel()
+    // Leer la ruta actual para obtener el parámetro "tab" si existe
+    val currentEntry = navController.currentBackStackEntryAsState().value
+    val tabArg = currentEntry?.arguments?.getString("tab")?.toIntOrNull()
+    var selectedTab by remember { mutableStateOf(tabArg ?: startTab) }
 
     Scaffold(
         bottomBar = {
@@ -46,20 +50,6 @@ fun MainScreen(
                 1 -> CalculadorasScreen(navController = navController)
                 2 -> PerfilScreen(navController = navController)
             }
-        }
-    }
-    @Composable
-    fun ProgressInfoCard(title: String, value: String) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.White.copy(alpha = 0.2f))
-                .padding(16.dp)
-        ) {
-            Text(text = title, color = Color.White, fontSize = 16.sp)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
