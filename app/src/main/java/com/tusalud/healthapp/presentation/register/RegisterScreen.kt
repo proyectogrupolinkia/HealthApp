@@ -17,13 +17,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +44,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -44,6 +56,7 @@ import com.tusalud.healthapp.presentation.login.LoginViewModel
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
     var nombre by remember { mutableStateOf("") }
@@ -53,13 +66,29 @@ fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel =
     var altura by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    val isCorreoValido = viewModel.isEmailValid(correo)
+    val isPasswordValido = viewModel.isPasswordValid(password)
+    val isFormValid = viewModel.isRegisterFormValid(nombre, correo, edad, peso, altura, password)
+    var passwordVisible by remember { mutableStateOf(false) }
 
-            Scaffold { padding ->
-                AnimatedGradientBackground {
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 })
-                    ){
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Crear Cuenta") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        AnimatedGradientBackground {
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 })
+            ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -71,77 +100,87 @@ fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel =
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Crear Cuenta", style = MaterialTheme.typography.headlineMedium)
-
                         OutlinedTextField(
-                            singleLine = true,
-                            isError = nombre.isBlank(),
                             value = nombre,
                             onValueChange = { nombre = it },
                             label = { Text("Nombre") },
+                            singleLine = true,
+                            isError = nombre.isBlank(),
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
-                            singleLine = true,
-                            isError = correo.isBlank(),
                             value = correo,
                             onValueChange = { correo = it },
                             label = { Text("Correo") },
+                            singleLine = true,
+                            isError = correo.isNotBlank() && !viewModel.isEmailValid(correo),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                             modifier = Modifier.fillMaxWidth()
                         )
+                        if (!viewModel.isEmailValid(correo) && correo.isNotEmpty()) {
+                            Text("Correo no válido", color = Color.Red, fontSize = 12.sp)
+                        }
 
                         OutlinedTextField(
-                            singleLine = true,
-                            isError = edad.toIntOrNull() == null,
                             value = edad,
                             onValueChange = { edad = it },
                             label = { Text("Edad") },
+                            singleLine = true,
+                            isError = edad.isNotBlank() && !viewModel.isEdadValid(edad),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
+                        if (!viewModel.isEdadValid(edad) && edad.isNotEmpty()) {
+                            Text("Edad no válida (máx. 120)", color = Color.Red, fontSize = 12.sp)
+                        }
 
                         OutlinedTextField(
-                            singleLine = true,
-                            isError = peso.toFloatOrNull() == null,
                             value = peso,
                             onValueChange = { peso = it },
                             label = { Text("Peso (kg)") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            isError = peso.isNotBlank() && !viewModel.isPesoValid(peso),
                             modifier = Modifier.fillMaxWidth()
                         )
-
+                        if (!viewModel.isPesoValid(peso) && peso.isNotEmpty()) {
+                            Text("Peso no válido (máx 500 kg)", color = Color.Red, fontSize = 12.sp)
+                        }
                         OutlinedTextField(
-                            singleLine = true,
-                            isError = altura.toFloatOrNull() == null,
                             value = altura,
                             onValueChange = { altura = it },
                             label = { Text("Altura (cm)") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            isError = altura.isNotBlank() && !viewModel.isAlturaValid(altura),
                             modifier = Modifier.fillMaxWidth()
                         )
+                        if (!viewModel.isAlturaValid(altura) && altura.isNotEmpty()) {
+                            Text("Altura no válida (máx 250 cm)", color = Color.Red, fontSize = 12.sp)
+                        }
 
                         OutlinedTextField(
-                            singleLine = true,
-                            isError = password.length < 6,
                             value = password,
                             onValueChange = { password = it },
                             label = { Text("Contraseña") },
+                            singleLine = true,
+                            isError = password.isNotBlank() && !viewModel.isPasswordValid(password),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                val icon = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                                val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                    Icon(imageVector = icon, contentDescription = description)
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
+                        if (!viewModel.isPasswordValid(password) && password.isNotEmpty()) {
+                            Text("La contraseña debe tener al menos 6 caracteres", color = Color.Red, fontSize=12.sp)
+                        }
 
-                        val isFormValid = nombre.isNotBlank() &&
-                                correo.isNotBlank() &&
-                                edad.toIntOrNull() != null &&
-                                peso.toFloatOrNull() != null &&
-                                altura.toFloatOrNull() != null &&
-                                password.length >= 6
 
                         Button(
-                            enabled = isFormValid,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C6A7)),
                             onClick = {
                                 viewModel.register(
                                     nombre,
@@ -156,6 +195,8 @@ fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel =
                                     }
                                 }
                             },
+                            enabled = isFormValid,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00C6A7)),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("Registrarse", color = Color.White)
@@ -173,26 +214,4 @@ fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel =
             }
         }
     }
-}
-
-@Composable
-fun AnimatedGradientBackground(content: @Composable BoxScope.() -> Unit) {
-    val progress by animateFloatAsState(
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            tween(15000, easing = LinearEasing),
-            RepeatMode.Reverse
-        )
-    )
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(
-                Brush.linearGradient(
-                    listOf(Color.White, Color(0xFF6BC800), Color.White),
-                    start = Offset(progress * 1500f, 0f),
-                    end = Offset(0f, progress * 1500f)
-                )
-            ), content = content
-    )
 }

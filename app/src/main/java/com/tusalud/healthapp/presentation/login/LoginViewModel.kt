@@ -33,6 +33,17 @@ class LoginViewModel @Inject constructor(
     val isFormValid: Boolean
         get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length >= 6
 
+    fun isEdadValid(input: String): Boolean {
+        return input.toIntOrNull()?.let { it in 1..120 } ?: false
+    }
+
+    fun isPesoValid(input: String): Boolean {
+        return input.toFloatOrNull()?.let { it in 1f..500f } ?: false
+    }
+
+    fun isAlturaValid(input: String): Boolean {
+        return input.toFloatOrNull()?.let { it in 1f..250f } ?: false
+    }
 
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
@@ -47,6 +58,36 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    fun isEmailValid(input: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
+    }
+
+    fun isPasswordValid(input: String): Boolean {
+        return input.length >= 6
+    }
+
+    fun isRegisterFormValid(
+        nombre: String,
+        correo: String,
+        edad: String,
+        peso: String,
+        altura: String,
+        password: String
+    ): Boolean {
+        val edadInt = edad.toIntOrNull()
+        val pesoFloat = peso.toFloatOrNull()
+        val alturaFloat = altura.toFloatOrNull()
+
+        return nombre.isNotBlank() &&
+                isEmailValid(correo) &&
+                isPasswordValid(password) &&
+                edadInt != null && edadInt in 1..120 &&
+                pesoFloat != null && pesoFloat in 1f..500f &&
+                alturaFloat != null && alturaFloat in 1f..250f
+    }
+
+
 
     fun register(
         nombre: String,
