@@ -10,7 +10,6 @@ import com.tusalud.healthapp.presentation.login.LoginViewModel
 import com.tusalud.healthapp.presentation.register.RegisterScreen
 import com.tusalud.healthapp.presentation.reset.PasswordResetScreen
 import com.tusalud.healthapp.presentation.main.MainScreen
-import com.tusalud.healthapp.presentation.menu.Progress.peso.ActualizarPesoScreen
 
 import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasScreen
 import com.tusalud.healthapp.presentation.menu.calculadoras.CalculadorasViewModel
@@ -24,6 +23,7 @@ import com.tusalud.healthapp.presentation.menu.progress.configuracion.Configurac
 import com.tusalud.healthapp.presentation.menu.progress.peso.EvolucionPesoScreen
 import com.tusalud.healthapp.presentation.menu.progress.perfil.EditarPerfilScreen
 import com.tusalud.healthapp.presentation.menu.progress.perfil.EditarPerfilViewModel
+import com.tusalud.healthapp.presentation.menu.progress.peso.ActualizarPesoScreen
 import com.tusalud.healthapp.presentation.menu.progress.recordatorios.RecordatoriosScreen
 import com.tusalud.healthapp.presentation.menu.progress.recordatorios.RecordatoriosViewModel
 
@@ -55,7 +55,11 @@ fun AppNavigation(navController: NavHostController) {
         }
 
         composable("main") {
-            MainScreen(navController, mainViewModel)
+            MainScreen(navController)
+        }
+        composable("main?tab={tab}") { backStackEntry ->
+            val tabIndex = backStackEntry.arguments?.getString("tab")?.toIntOrNull() ?: 0
+            MainScreen(navController, startTab = tabIndex)
         }
 
         composable("editar_perfil") {
