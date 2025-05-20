@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -44,29 +46,32 @@ fun PasswordResetScreen(navController: NavHostController, viewModel: LoginViewMo
             visible = true,
             enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 })
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
+            Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center // Centra el contenido
-            ) {
+            ){
                 Column(Modifier.padding(16.dp)) {
                     Text("Recuperar Contraseña", style = MaterialTheme.typography.titleLarge)
-                    TextField(
+                    OutlinedTextField(
                         value = viewModel.email,
                         onValueChange = { viewModel.email = it },
-                        label = { Text("Correo") })
+                        label = { Text("Correo electrónico") },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !viewModel.loading
+                    )
                     if (!viewModel.isEmailValid(viewModel.email) && viewModel.email.isNotEmpty()) {
-                        Text("Correo no válido", color = Color.Red, fontSize = 12.sp)
+                        Text("Correo no válido", color = Color.Red, fontSize=12.sp)
                     }
 
-
-                    Button(onClick = {
-                        viewModel.resetPassword(correo) {
-                            navController.popBackStack()
-                        }
-                    }) {
+                    Button(
+                        onClick = {
+                            viewModel.resetPassword(viewModel.email) {
+                                navController.popBackStack()
+                            }
+                        },
+                        enabled = viewModel.isEmailValid(viewModel.email)
+                    ) {
                         Text("Enviar Correo")
                     }
-
                     viewModel.error?.let {
                         Text(text = it, color = Color.Red)
                     }
@@ -74,5 +79,26 @@ fun PasswordResetScreen(navController: NavHostController, viewModel: LoginViewMo
             }
         }
     }
-}
 
+    @Composable
+    fun AnimatedGradientBackground(content: @Composable BoxScope.() -> Unit) {
+        val progress by animateFloatAsState(
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                tween(15000, easing = LinearEasing),
+                RepeatMode.Reverse
+            )
+        )
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.linearGradient(
+                        listOf(Color.White, Color(0xFF6BC800), Color.White),
+                        start = Offset(progress * 1500f, 0f),
+                        end = Offset(0f, progress * 1500f)
+                    )
+                ), content = content
+        )
+    }
+}
