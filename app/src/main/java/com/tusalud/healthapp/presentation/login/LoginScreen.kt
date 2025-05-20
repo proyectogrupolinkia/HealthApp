@@ -97,6 +97,9 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !viewModel.loading
                 )
+                if (!viewModel.isEmailValid(viewModel.email) && viewModel.email.isNotEmpty()) {
+                    Text("Correo no válido", color = Color.Red, fontSize=12.sp)
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -122,6 +125,9 @@ fun LoginScreen(
                         }
                     }
                 )
+                if (!viewModel.isPasswordValid(viewModel.password) && viewModel.password.isNotEmpty()) {
+                    Text("La contraseña debe tener al menos 6 caracteres", color = Color.Red, fontSize=12.sp)
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
