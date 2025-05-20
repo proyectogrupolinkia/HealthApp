@@ -41,7 +41,7 @@ class CalculadorasViewModel : ViewModel() {
         if (a == null || a <= 0f || c == null || cu == null) return null
         if (!esHombre && (ca == null || ca <= 0f)) return null
 
-        // Comprobar que las medidas tengan sentido para evitar errores en log10
+        //comprobar que las medidas tengan sentido para evitar errores en log10
         if (c <= cu) return null
         if (!esHombre && ca != null && (c + ca) <= cu) return null
 

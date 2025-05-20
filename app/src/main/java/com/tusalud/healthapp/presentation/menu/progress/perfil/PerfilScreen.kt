@@ -14,6 +14,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -40,12 +42,77 @@ fun PerfilScreen(
     val showDeleteDialog by viewModel.showDeleteDialog.collectAsState(initial = false)
 
     Scaffold { innerPadding ->
-
         Box(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color(0xFF00C6A7), Color(0xFF007C91))
+                    )
+                )
+                .padding(24.dp)
         ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Box(
+                    modifier = Modifier
+                        .size(110.dp)
+                        .background(Color.White, CircleShape)
+                        .shadow(4.dp, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Perfil",
+                        tint = Color(0xFF00C6A7),
+                        modifier = Modifier.size(64.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(displayName.ifBlank { "Usuario" }, fontSize = 24.sp, color = Color.White)
+                Text(email.ifBlank { "Sin correo" }, fontSize = 16.sp, color = Color.White.copy(alpha = 0.85f))
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                        PerfilOptionItem(icon = Icons.Default.Edit, label = "Editar perfil") {
+                            navController.navigate("editar_perfil")
+                        }
+
+                        PerfilOptionItem(icon = Icons.Default.Notifications, label = "Recordatorios") {
+                            navController.navigate("recordatorios")
+                        }
+
+                        PerfilOptionItem(icon = Icons.Default.Settings, label = "Configuración") {
+                            navController.navigate("configuracion")
+                        }
+
+                        PerfilOptionItem(icon = Icons.Filled.Help, label = "Ayuda") {
+                            viewModel.setShowHelpDialog(true)
+                        }
+
+                        Divider(modifier = Modifier.padding(vertical = 8.dp))
+
+                        PerfilOptionItem(icon = Icons.Default.Delete, label = "Cancelar cuenta") {
+                            viewModel.setShowDeleteDialog(true)
+                        }
+
+                        PerfilOptionItem(icon = Icons.Default.ExitToApp, label = "Cerrar sesión") {
+                            viewModel.setShowLogoutDialog(true)
+                        }
+                    }
+                }
+            }
 
             if (showLogoutDialog) {
                 AlertDialog(
@@ -113,74 +180,6 @@ fun PerfilScreen(
                     }
                 )
             }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFF00C6A7))
-                    .padding(24.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Spacer(modifier = Modifier.height(40.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .background(Color.White, CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Perfil",
-                            tint = Color(0xFF00C6A7),
-                            modifier = Modifier.size(60.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(displayName.ifBlank { "Usuario" }, fontSize = 24.sp, color = Color.White)
-                    Text(email.ifBlank { "Sin correo" }, fontSize = 16.sp, color = Color.White)
-
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White, RoundedCornerShape(12.dp))
-                            .padding(8.dp)
-                    ) {
-                        PerfilOptionItem(icon = Icons.Default.Edit, label = "Editar perfil") {
-                            navController.navigate("editar_perfil")
-                        }
-
-                        PerfilOptionItem(icon = Icons.Default.Notifications, label = "Recordatorios") {
-                            navController.navigate("recordatorios")
-                        }
-
-                        PerfilOptionItem(icon = Icons.Default.Settings, label = "Configuración") {
-                            navController.navigate("configuracion")
-                        }
-
-                        PerfilOptionItem(icon = Icons.Filled.Help, label = "Ayuda") {
-                            viewModel.setShowHelpDialog(true)
-                        }
-
-                        Divider(modifier = Modifier.padding(vertical = 8.dp))
-
-                        PerfilOptionItem(icon = Icons.Default.Delete, label = "Cancelar cuenta") {
-                            viewModel.setShowDeleteDialog(true)
-                        }
-
-                        PerfilOptionItem(icon = Icons.Default.ExitToApp, label = "Cerrar sesión") {
-                            viewModel.setShowLogoutDialog(true)
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -192,10 +191,11 @@ fun PerfilOptionItem(icon: ImageVector, label: String, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(vertical = 12.dp, horizontal = 16.dp)
+            .padding(vertical = 14.dp, horizontal = 20.dp)
     ) {
-        Icon(imageVector = icon, contentDescription = label, tint = Color(0xFF00C6A7))
-        Spacer(modifier = Modifier.width(16.dp))
+        Icon(imageVector = icon, contentDescription = label, tint = Color(0xFF00C6A7), modifier = Modifier.size(24.dp))
+        Spacer(modifier = Modifier.width(20.dp))
         Text(text = label, fontSize = 16.sp, color = Color.Black)
     }
 }
+

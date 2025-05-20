@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -34,10 +35,21 @@ fun EditarPerfilScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(horizontal = 24.dp, vertical = 40.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
+        Button(
+            onClick = {
+                navController.navigate("main?tab=2") {
+                    popUpTo("main") { inclusive = true }
+                }
+            }
+        ) {
+            Text("Volver")
+        }
+
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text("Editar perfil", style = MaterialTheme.typography.headlineMedium)
 
@@ -76,7 +88,9 @@ fun EditarPerfilScreen(
         Button(
             onClick = {
                 viewModel.updateProfile {
-                    navController.popBackStack()
+                    navController.navigate("main?tab=2") {
+                        popUpTo("main") { inclusive = true }
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()

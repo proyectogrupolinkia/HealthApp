@@ -26,14 +26,21 @@ fun RecordatoriosScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 40.dp), // espacio para evitar cámara
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
+        Button(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier.align(Alignment.Start)
+        ) {
+            Text("Volver")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             "Recordatorios",
-            fontSize = 24.sp,
+            fontSize = 28.sp,
             color = Color(0xFF00C6A7),
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -89,6 +96,9 @@ fun RecordatoriosScreen(
         }
     }
 }
+
+
+
 
 
 
