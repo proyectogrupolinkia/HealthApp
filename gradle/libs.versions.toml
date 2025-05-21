@@ -42,6 +42,7 @@ firebase-auth = {module = "com.google.firebase:firebase-auth-ktx" }
 
 androidx-navigation-compose = {module = "androidx.navigation:navigation-compose" , version.ref = "navigationCompose"}
 androidx-navigation-runtime-android = { group = "androidx.navigation", name = "navigation-runtime-android", version.ref = "navigationRuntimeAndroid" }
+mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version = "v3.1.0" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -23,7 +22,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
-
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -55,6 +53,9 @@ class MainViewModel @Inject constructor(
     val toastMessage: SharedFlow<String> = _toastMessage
 
     var snackbarActivo by mutableStateOf(false)
+        private set
+
+    var snackbarMensaje by mutableStateOf("")
         private set
 
     init {
@@ -124,7 +125,7 @@ class MainViewModel @Inject constructor(
                 if (esHoy) {
                     listaActualizada[i] = mapOf(
                         "peso" to nuevoPeso,
-                        "timestamp" to Timestamp.Companion.now()
+                        "timestamp" to Timestamp.now()
                     )
                     actualizado = true
                     break
@@ -135,7 +136,7 @@ class MainViewModel @Inject constructor(
                 listaActualizada.add(
                     mapOf(
                         "peso" to nuevoPeso,
-                        "timestamp" to Timestamp.Companion.now()
+                        "timestamp" to Timestamp.now()
                     )
                 )
             }
@@ -147,6 +148,13 @@ class MainViewModel @Inject constructor(
 
             userRef.set(nuevosDatos, SetOptions.merge())
                 .addOnSuccessListener {
+                    val formato = SimpleDateFormat("dd MMM", Locale.getDefault())
+                    val fechaHoyFormateada = formato.format(Timestamp.now().toDate())
+                    snackbarMensaje = if (actualizado) {
+                        "Actualizamos peso de hoy - $fechaHoyFormateada"
+                    } else {
+                        "Peso guardado correctamente - $fechaHoyFormateada"
+                    }
                     snackbarActivo = true
                     loadProgress()
                     cargarPesosDesdeFirebase()
@@ -158,6 +166,7 @@ class MainViewModel @Inject constructor(
             println("Error al obtener documento del usuario: ${it.message}")
         }
     }
+
     fun cargarDatosUsuarioCompleto() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val uid = user.uid
@@ -165,7 +174,6 @@ class MainViewModel @Inject constructor(
 
         db.collection("usuarios").document(uid).get()
             .addOnSuccessListener { document ->
-                // Cargar peso actual
                 val peso = document.getDouble("peso")?.toFloat()
                 val altura = document.getDouble("altura")?.toFloat()
                 val bmi = if (peso != null && altura != null && altura > 0)
@@ -178,7 +186,6 @@ class MainViewModel @Inject constructor(
                     pesoObjetivo = document.getDouble("pesoObjetivo")?.toFloat()
                 )
 
-                // Cargar historial
                 val historialRaw = document.get("weightHistory") as? List<*>
                 val historial = historialRaw?.filterIsInstance<Map<String, Any>>() ?: emptyList()
                 val formato = SimpleDateFormat("dd MMM", Locale.getDefault())
@@ -190,20 +197,10 @@ class MainViewModel @Inject constructor(
                     if (pesoItem != null && fecha != null) pesoItem to formato.format(fecha) else null
                 }
 
-                // Cargar perfil
                 _pesoInicio.value = document.getDouble("pesoInicio")?.toString() ?: ""
                 _pesoObjetivo.value = document.getDouble("pesoObjetivo")?.toString() ?: ""
                 _displayName.value = document.getString("nombre") ?: ""
                 _email.value = user.email ?: ""
-
-                // Manejo más explícito de campos nuevos
-                if (document.contains("pesoInicio")) {
-                    _pesoInicio.value = document.getDouble("pesoInicio")?.toString() ?: ""
-                }
-
-                if (document.contains("pesoObjetivo")) {
-                    _pesoObjetivo.value = document.getDouble("pesoObjetivo")?.toString() ?: ""
-                }
             }
             .addOnFailureListener {
                 println("Error al cargar los datos del usuario: ${it.message}")
@@ -213,9 +210,11 @@ class MainViewModel @Inject constructor(
     fun resetSnackbar() {
         snackbarActivo = false
     }
+
     fun onDisplayNameChanged(newName: String) {
         _displayName.value = newName
     }
+
     fun onEmailChanged(newEmail: String) {
         _email.value = newEmail
     }
@@ -227,6 +226,7 @@ class MainViewModel @Inject constructor(
     fun onPesoObjetivoChanged(newPeso: String) {
         _pesoObjetivo.value = newPeso
     }
+
     fun updateProfile(onSuccess: () -> Unit = {}) {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val newName = _displayName.value
@@ -258,7 +258,7 @@ class MainViewModel @Inject constructor(
                 .addOnSuccessListener {
                     viewModelScope.launch {
                         _toastMessage.emit("Perfil actualizado con éxito")
-                        onSuccess()  // Aquí se cierra la pantalla
+                        onSuccess()
                     }
                 }
                 .addOnFailureListener {

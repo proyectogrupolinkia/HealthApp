@@ -25,14 +25,13 @@ fun ActualizarPesoScreen(
     var nuevoPeso by remember { mutableStateOf("") }
     val snackbarActivo = viewModel.snackbarActivo
 
-    // Recargar datos al volver, para actualizar gráfico o vista principal
+    // ✅ Mostrar Snackbar con mensaje dinámico (con fecha)
     LaunchedEffect(snackbarActivo) {
         if (snackbarActivo) {
             scope.launch {
-                snackbarHostState.showSnackbar("Peso guardado correctamente")
+                snackbarHostState.showSnackbar(viewModel.snackbarMensaje)
                 viewModel.resetSnackbar()
                 nuevoPeso = ""
-                // Refrescar datos en el ViewModel
                 viewModel.cargarDatosUsuarioCompleto()
             }
         }
