@@ -38,7 +38,7 @@ fun ProgressScreen(
     val pesos by viewModel.pesos.collectAsState()
 
     //garantiza que se recargue al entrar a esta pantalla
-    LaunchedEffect(navController.currentBackStackEntry) {
+    LaunchedEffect(Unit) {
         viewModel.loadProgress()
         viewModel.cargarPesosDesdeFirebase()
     }
@@ -93,8 +93,14 @@ fun ProgressScreen(
                             .padding(8.dp),
                         pointDrawer = FilledCircularPointDrawer(color = Color.White),
                         lineDrawer = SolidLineDrawer(color = Color.White),
-                        xAxisDrawer = SimpleXAxisDrawer(axisLineColor = Color.White),
-                        yAxisDrawer = SimpleYAxisDrawer(axisLineColor = Color.White)
+                        xAxisDrawer = SimpleXAxisDrawer(
+                            axisLineColor = Color.White,
+                            labelTextColor = Color.Transparent // ✅ Oculta solo las etiquetas del eje X
+                        ),
+                        yAxisDrawer = SimpleYAxisDrawer(
+                            axisLineColor = Color.White,
+                            labelTextColor = Color.Transparent // ✅ Oculta solo las etiquetas del eje Y
+                        )
                     )
                 } else {
                     Text("Gráfico de evolución", color = Color.White)
