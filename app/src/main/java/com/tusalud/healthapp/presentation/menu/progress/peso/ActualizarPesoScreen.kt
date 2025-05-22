@@ -21,7 +21,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.compose.ui.platform.LocalContext
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActualizarPesoScreen(
@@ -29,28 +28,11 @@ fun ActualizarPesoScreen(
     viewModel: MainViewModel
 ) {
     val context = LocalContext.current
-    val activity = context as? Activity
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val notificacionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { /* manejar si se niega o acepta, opcional */ }
-    )
-
-    // 🔐 Solicitar permiso al iniciar si necesario
-    LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val permiso = ActivityCompat.checkSelfPermission(
-                context, Manifest.permission.POST_NOTIFICATIONS
-            )
-            if (permiso != PackageManager.PERMISSION_GRANTED) {
-                notificacionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
-    }
-
     var nuevoPeso by remember { mutableStateOf("") }
+    var pesoValido by remember { mutableStateOf(false) }
     val snackbarActivo = viewModel.snackbarActivo
 
     LaunchedEffect(snackbarActivo) {
@@ -60,8 +42,16 @@ fun ActualizarPesoScreen(
                 viewModel.resetSnackbar()
                 nuevoPeso = ""
                 viewModel.cargarDatosUsuarioCompleto()
+                pesoValido = false
             }
         }
+    }
+
+    fun validarPeso(input: String): Boolean {
+        val regex = Regex("^\\d{1,3}(\\.\\d{0,2})?$")
+        if (!regex.matches(input)) return false
+        val valor = input.toFloatOrNull() ?: return false
+        return valor in 20f..500f
     }
 
     Scaffold(
@@ -75,27 +65,52 @@ fun ActualizarPesoScreen(
                 }
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { padding ->
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(16.dp)
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.Top
         ) {
+            Spacer(modifier = Modifier.height(40.dp))
+
             OutlinedTextField(
                 value = nuevoPeso,
-                onValueChange = { nuevoPeso = it },
+                onValueChange = {
+                    if (it.isEmpty()) {
+                        nuevoPeso = ""
+                        pesoValido = false
+                    } else if (validarPeso(it)) {
+                        nuevoPeso = it
+                        pesoValido = true
+                    } else if (it.matches(Regex("^\\d{1,3}(\\.\\d{0,2})?$"))) {
+                        nuevoPeso = it
+                        pesoValido = validarPeso(it)
+                    }
+                },
                 label = { Text("Nuevo peso (kg)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                isError = nuevoPeso.isNotEmpty() && !pesoValido,
                 modifier = Modifier.fillMaxWidth()
             )
+            if (nuevoPeso.isNotEmpty() && !pesoValido) {
+                Text(
+                    text = "Ingrese un peso válido entre 20 y 500 kg (máx 2 decimales)",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
                     viewModel.actualizarPeso(context, nuevoPeso.toFloatOrNull())
                 },
+                enabled = pesoValido,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Guardar")
@@ -103,3 +118,5 @@ fun ActualizarPesoScreen(
         }
     }
 }
+
+

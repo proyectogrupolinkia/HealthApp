@@ -42,11 +42,12 @@ import androidx.navigation.NavHostController
 import com.tusalud.healthapp.presentation.login.AnimatedGradientBackground
 import com.tusalud.healthapp.presentation.login.LoginViewModel
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
+fun RegisterScreen(
+    navController: NavHostController,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
     var nombre by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var edad by remember { mutableStateOf("") }
@@ -54,11 +55,65 @@ fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel =
     var altura by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    var edadValida by remember { mutableStateOf(false) }
+    var pesoValido by remember { mutableStateOf(false) }
+
     val isCorreoValido = viewModel.isEmailValid(correo)
     val isPasswordValido = viewModel.isPasswordValid(password)
-    val isFormValid = viewModel.isRegisterFormValid(nombre, correo, edad, peso, altura, password)
-    var passwordVisible by remember { mutableStateOf(false) }
 
+    // Funcion para validar edad: solo numeros enteros entre 1 y 120
+    fun validarEdad(input: String): Boolean {
+        val regex = Regex("^\\d{1,3}$")
+        if (!regex.matches(input)) return false
+        val valor = input.toIntOrNull() ?: return false
+        return valor in 1..120
+    }
+
+    // Funcion para validar peso: numeros con punto decimal opcional, maximo 2 decimales, entre 20 y 500
+    fun validarPeso(input: String): Boolean {
+        val regex = Regex("^\\d{1,3}(\\.\\d{0,2})?$")
+        if (!regex.matches(input)) return false
+        val valor = input.toFloatOrNull() ?: return false
+        return valor in 20f..500f
+    }
+
+    // Controla la entrada de edad: solo digitos, actualiza estado y validez
+    fun onEdadChange(newValue: String) {
+        if (newValue.isEmpty()) {
+            edad = ""
+            edadValida = false
+        } else if (validarEdad(newValue)) {
+            edad = newValue
+            edadValida = true
+        } else if (newValue.matches(Regex("^\\d{0,3}$"))) {
+            edad = newValue
+            edadValida = validarEdad(newValue)
+        }
+    }
+
+    // Controla la entrada de peso: permite numeros con punto decimal, maximo 2 decimales
+    fun onPesoChange(newValue: String) {
+        if (newValue.isEmpty()) {
+            peso = ""
+            pesoValido = false
+        } else if (validarPeso(newValue)) {
+            peso = newValue
+            pesoValido = true
+        } else if (newValue.matches(Regex("^\\d{0,3}(\\.\\d{0,2})?$"))) {
+            peso = newValue
+            pesoValido = validarPeso(newValue)
+        }
+    }
+
+    // Validacion general del formulario
+    val isFormValid = nombre.isNotBlank() &&
+            isCorreoValido &&
+            edadValida &&
+            pesoValido &&
+            viewModel.isAlturaValid(altura) &&
+            isPasswordValido
+
+    var passwordVisible by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -102,48 +157,49 @@ fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel =
                             onValueChange = { correo = it },
                             label = { Text("Correo") },
                             singleLine = true,
-                            isError = correo.isNotBlank() && !viewModel.isEmailValid(correo),
+                            isError = correo.isNotBlank() && !isCorreoValido,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                             modifier = Modifier.fillMaxWidth()
                         )
-                        if (!viewModel.isEmailValid(correo) && correo.isNotEmpty()) {
+                        if (!isCorreoValido && correo.isNotEmpty()) {
                             Text("Correo no válido", color = Color.Red, fontSize = 12.sp)
                         }
 
                         OutlinedTextField(
                             value = edad,
-                            onValueChange = { edad = it },
+                            onValueChange = { onEdadChange(it) },
                             label = { Text("Edad") },
                             singleLine = true,
-                            isError = edad.isNotBlank() && !viewModel.isEdadValid(edad),
+                            isError = edad.isNotBlank() && !edadValida,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
                         )
-                        if (!viewModel.isEdadValid(edad) && edad.isNotEmpty()) {
-                            Text("Edad no válida (máx. 120)", color = Color.Red, fontSize = 12.sp)
+                        if (!edadValida && edad.isNotEmpty()) {
+                            Text("Edad no válida (1 a 120)", color = Color.Red, fontSize = 12.sp)
                         }
 
                         OutlinedTextField(
                             value = peso,
-                            onValueChange = { peso = it },
+                            onValueChange = { onPesoChange(it) },
                             label = { Text("Peso (kg)") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            isError = peso.isNotBlank() && !viewModel.isPesoValid(peso),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            isError = peso.isNotBlank() && !pesoValido,
                             modifier = Modifier.fillMaxWidth()
                         )
-                        if (!viewModel.isPesoValid(peso) && peso.isNotEmpty()) {
-                            Text("Peso no válido (máx 500 kg)", color = Color.Red, fontSize = 12.sp)
+                        if (!pesoValido && peso.isNotEmpty()) {
+                            Text("Peso no válido (20 a 500 kg, max 2 decimales)", color = Color.Red, fontSize = 12.sp)
                         }
+
                         OutlinedTextField(
                             value = altura,
                             onValueChange = { altura = it },
-                            label = { Text("Altura (cm)") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            label = { Text("Altura (m)") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             isError = altura.isNotBlank() && !viewModel.isAlturaValid(altura),
                             modifier = Modifier.fillMaxWidth()
                         )
                         if (!viewModel.isAlturaValid(altura) && altura.isNotEmpty()) {
-                            Text("Altura no válida (máx 250 cm)", color = Color.Red, fontSize = 12.sp)
+                            Text("Altura no válida (0.5 a 2.5 m)", color = Color.Red, fontSize = 12.sp)
                         }
 
                         OutlinedTextField(
@@ -151,7 +207,7 @@ fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel =
                             onValueChange = { password = it },
                             label = { Text("Contraseña") },
                             singleLine = true,
-                            isError = password.isNotBlank() && !viewModel.isPasswordValid(password),
+                            isError = password.isNotBlank() && !isPasswordValido,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                             trailingIcon = {
@@ -163,10 +219,13 @@ fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel =
                             },
                             modifier = Modifier.fillMaxWidth()
                         )
-                        if (!viewModel.isPasswordValid(password) && password.isNotEmpty()) {
-                            Text("La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo", color = Color.Red, fontSize=12.sp)
+                        if (!isPasswordValido && password.isNotEmpty()) {
+                            Text(
+                                "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo",
+                                color = Color.Red,
+                                fontSize = 12.sp
+                            )
                         }
-
 
                         Button(
                             onClick = {
@@ -203,3 +262,4 @@ fun RegisterScreen(navController: NavHostController, viewModel: LoginViewModel =
         }
     }
 }
+
