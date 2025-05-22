@@ -42,8 +42,9 @@ class LoginViewModel @Inject constructor(
     }
 
     fun isAlturaValid(input: String): Boolean {
-        return input.toFloatOrNull()?.let { it in 1f..250f } ?: false
+        return input.toFloatOrNull()?.let { it in 50f..250f } ?: false
     }
+
 
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
