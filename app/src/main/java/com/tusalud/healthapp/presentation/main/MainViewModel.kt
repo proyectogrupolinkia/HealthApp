@@ -1,5 +1,6 @@
 package com.tusalud.healthapp.presentation.main
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,15 +13,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.tusalud.healthapp.domain.model.Progress
 import com.tusalud.healthapp.domain.repository.ProgressRepository
+import com.tusalud.healthapp.utils.NotificationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -99,7 +97,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun actualizarPeso(nuevoPeso: Float?) {
+    fun actualizarPeso(context: Context, nuevoPeso: Float?) {
         if (nuevoPeso == null) return
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -158,6 +156,13 @@ class MainViewModel @Inject constructor(
                     snackbarActivo = true
                     loadProgress()
                     cargarPesosDesdeFirebase()
+
+                    val objetivo = doc.getDouble("pesoObjetivo")?.toFloat()
+
+                    if (objetivo != null && nuevoPeso <= objetivo) {
+                        NotificationHelper.mostrarNotificacionObjetivo(context)
+                    }
+
                 }
                 .addOnFailureListener {
                     println("Error al actualizar peso: ${it.message}")
@@ -269,3 +274,4 @@ class MainViewModel @Inject constructor(
         }
     }
 }
+//

@@ -12,6 +12,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.tusalud.healthapp.presentation.main.MainViewModel
 import kotlinx.coroutines.launch
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.compose.ui.platform.LocalContext
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,12 +28,30 @@ fun ActualizarPesoScreen(
     navController: NavHostController,
     viewModel: MainViewModel
 ) {
+    val context = LocalContext.current
+    val activity = context as? Activity
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    val notificacionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { /* manejar si se niega o acepta, opcional */ }
+    )
+
+    // 🔐 Solicitar permiso al iniciar si necesario
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permiso = ActivityCompat.checkSelfPermission(
+                context, Manifest.permission.POST_NOTIFICATIONS
+            )
+            if (permiso != PackageManager.PERMISSION_GRANTED) {
+                notificacionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
     var nuevoPeso by remember { mutableStateOf("") }
     val snackbarActivo = viewModel.snackbarActivo
-
 
     LaunchedEffect(snackbarActivo) {
         if (snackbarActivo) {
@@ -50,7 +77,6 @@ fun ActualizarPesoScreen(
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
-
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -68,7 +94,7 @@ fun ActualizarPesoScreen(
 
             Button(
                 onClick = {
-                    viewModel.actualizarPeso(nuevoPeso.toFloatOrNull())
+                    viewModel.actualizarPeso(context, nuevoPeso.toFloatOrNull())
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
