@@ -15,13 +15,12 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun EditarPerfilScreen(
     navController: NavHostController,
-    editarPerfilViewModel: EditarPerfilViewModel,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val displayName by viewModel.displayName.collectAsState()
     val pesoInicio by viewModel.pesoInicio.collectAsState()
     val pesoObjetivo by viewModel.pesoObjetivo.collectAsState()
-    val edad by editarPerfilViewModel.edad.collectAsState()
+    val edad by viewModel.edad.collectAsState()
 
     val context = LocalContext.current
 
@@ -32,9 +31,9 @@ fun EditarPerfilScreen(
         }
     }
 
-    val edadError = !editarPerfilViewModel.isEdadValida()
-    val pesoInicioError = !editarPerfilViewModel.isPesoValido(pesoInicio)
-    val pesoObjetivoError = !editarPerfilViewModel.isPesoValido(pesoObjetivo)
+    val edadError = !viewModel.isEdadValida()
+    val pesoInicioError = !viewModel.isPesoValido(pesoInicio)
+    val pesoObjetivoError = !viewModel.isPesoValido(pesoObjetivo)
 
     Column(
         modifier = Modifier
@@ -65,7 +64,7 @@ fun EditarPerfilScreen(
 
         OutlinedTextField(
             value = edad,
-            onValueChange = { editarPerfilViewModel.onEdadChanged(it) },
+            onValueChange = { viewModel.onEdadChanged(it) },
             label = { Text("Edad") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
@@ -89,7 +88,7 @@ fun EditarPerfilScreen(
         )
         if (pesoInicioError) {
             Text(
-                text = "Peso válido entre 20.0 y 500.0 (usar punto)",
+                text = "Peso válido entre 1 y 500",
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall
             )
@@ -105,7 +104,7 @@ fun EditarPerfilScreen(
         )
         if (pesoObjetivoError) {
             Text(
-                text = "Peso válido entre 20.0 y 500.0 (usar punto)",
+                text = "Peso válido entre 1 y 500",
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall
             )
@@ -116,18 +115,14 @@ fun EditarPerfilScreen(
         Button(
             onClick = {
                 viewModel.updateProfile {
-                    editarPerfilViewModel.updateProfile()
                     navController.navigate("main?tab=2") {
                         popUpTo("main") { inclusive = true }
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = editarPerfilViewModel.isFormValid(pesoInicio, pesoObjetivo)
+            enabled = !edadError && !pesoInicioError && !pesoObjetivoError
         ) {
             Text("Guardar cambios")
         }
     }
 }
-
-

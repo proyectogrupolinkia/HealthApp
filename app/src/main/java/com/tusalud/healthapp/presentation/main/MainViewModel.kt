@@ -47,6 +47,10 @@ class MainViewModel @Inject constructor(
     private val _pesoObjetivo = MutableStateFlow("")
     val pesoObjetivo: StateFlow<String> = _pesoObjetivo
 
+    private val _edad = MutableStateFlow("")
+    val edad: StateFlow<String> = _edad
+
+
     private val _toastMessage = MutableSharedFlow<String>()
     val toastMessage: SharedFlow<String> = _toastMessage
 
@@ -206,6 +210,8 @@ class MainViewModel @Inject constructor(
                 _pesoObjetivo.value = document.getDouble("pesoObjetivo")?.toString() ?: ""
                 _displayName.value = document.getString("nombre") ?: ""
                 _email.value = user.email ?: ""
+                _edad.value = document.getLong("edad")?.toString() ?: ""
+
             }
             .addOnFailureListener {
                 println("Error al cargar los datos del usuario: ${it.message}")
@@ -232,6 +238,19 @@ class MainViewModel @Inject constructor(
         _pesoObjetivo.value = newPeso
     }
 
+
+    fun onEdadChanged(nuevaEdad: String) {
+        _edad.value = nuevaEdad
+    }
+
+    fun isEdadValida(): Boolean {
+        return _edad.value.toIntOrNull()?.let { it in 1..120 } ?: false
+    }
+    fun isPesoValido(peso: String): Boolean {
+        return peso.toFloatOrNull()?.let { it in 1f..500f } ?: false
+    }
+
+
     fun updateProfile(onSuccess: () -> Unit = {}) {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val newName = _displayName.value
@@ -257,6 +276,8 @@ class MainViewModel @Inject constructor(
             )
             pesoIni?.let { datosPerfil["pesoInicio"] = it }
             pesoObj?.let { datosPerfil["pesoObjetivo"] = it }
+            val edadInt = _edad.value.toIntOrNull()
+            edadInt?.let { datosPerfil["edad"] = it }
 
             FirebaseFirestore.getInstance().collection("usuarios").document(user.uid)
                 .set(datosPerfil, SetOptions.merge())

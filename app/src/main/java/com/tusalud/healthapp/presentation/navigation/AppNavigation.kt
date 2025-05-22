@@ -62,7 +62,7 @@ fun AppNavigation(navController: NavHostController) {
         }
 
         composable("editar_perfil") {
-            EditarPerfilScreen(navController, editarPerfilViewModel)
+            EditarPerfilScreen(navController, mainViewModel)
         }
 
         composable("recordatorios") {
