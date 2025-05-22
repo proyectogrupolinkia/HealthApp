@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -20,9 +19,10 @@ fun EditarPerfilScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val displayName by viewModel.displayName.collectAsState()
-    val email by viewModel.email.collectAsState()
     val pesoInicio by viewModel.pesoInicio.collectAsState()
     val pesoObjetivo by viewModel.pesoObjetivo.collectAsState()
+    val edad by editarPerfilViewModel.edad.collectAsState()
+
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -31,6 +31,10 @@ fun EditarPerfilScreen(
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
+
+    val edadError = !editarPerfilViewModel.isEdadValida()
+    val pesoInicioError = !editarPerfilViewModel.isPesoValido(pesoInicio)
+    val pesoObjetivoError = !editarPerfilViewModel.isPesoValido(pesoObjetivo)
 
     Column(
         modifier = Modifier
@@ -48,7 +52,6 @@ fun EditarPerfilScreen(
             Text("Volver")
         }
 
-
         Spacer(modifier = Modifier.height(16.dp))
 
         Text("Editar perfil", style = MaterialTheme.typography.headlineMedium)
@@ -61,41 +64,70 @@ fun EditarPerfilScreen(
         )
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { viewModel.onEmailChanged(it) },
-            label = { Text("Correo electrónico") },
-            modifier = Modifier.fillMaxWidth()
+            value = edad,
+            onValueChange = { editarPerfilViewModel.onEdadChanged(it) },
+            label = { Text("Edad") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            isError = edadError
         )
+        if (edadError) {
+            Text(
+                text = "Edad válida entre 1 y 120",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
 
         OutlinedTextField(
             value = pesoInicio,
             onValueChange = { viewModel.onPesoInicioChanged(it) },
             label = { Text("Peso de inicio (kg)") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            isError = pesoInicioError
         )
+        if (pesoInicioError) {
+            Text(
+                text = "Peso válido entre 20.0 y 500.0 (usar punto)",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
 
         OutlinedTextField(
             value = pesoObjetivo,
             onValueChange = { viewModel.onPesoObjetivoChanged(it) },
             label = { Text("Peso objetivo (kg)") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            isError = pesoObjetivoError
         )
+        if (pesoObjetivoError) {
+            Text(
+                text = "Peso válido entre 20.0 y 500.0 (usar punto)",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = {
                 viewModel.updateProfile {
+                    editarPerfilViewModel.updateProfile()
                     navController.navigate("main?tab=2") {
                         popUpTo("main") { inclusive = true }
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = editarPerfilViewModel.isFormValid(pesoInicio, pesoObjetivo)
         ) {
             Text("Guardar cambios")
         }
     }
 }
+
+

@@ -27,7 +27,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.tusalud.healthapp.presentation.main.MainViewModel
 import androidx.compose.ui.viewinterop.AndroidView
 
-// Puedes mover este color a Color.kt si lo quieres reutilizar
+
 val LightGreenBackground = Color(0xFFDFF5E3)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -125,7 +125,7 @@ fun EvolucionPesoScreen(
 
                             Log.d("EvolucionPesoScreen", "Datos válidos: ${entries.size} / ${pesosConFechas.size}")
 
-                            // Ajustar eje Y para incluir la línea del peso objetivo
+
                             val pesosSolo = entries.map { it.y }
                             val yMin = minOf(pesosSolo.minOrNull() ?: 0f, pesoObjetivoFloat)
                             val yMax = maxOf(pesosSolo.maxOrNull() ?: 0f, pesoObjetivoFloat)

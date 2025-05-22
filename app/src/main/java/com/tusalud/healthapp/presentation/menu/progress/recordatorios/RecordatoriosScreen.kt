@@ -26,7 +26,7 @@ fun RecordatoriosScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 40.dp), // espacio para evitar cámara
+            .padding(horizontal = 16.dp, vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(

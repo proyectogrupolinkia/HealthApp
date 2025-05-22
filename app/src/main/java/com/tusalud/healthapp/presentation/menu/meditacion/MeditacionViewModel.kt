@@ -22,7 +22,6 @@ class MeditacionViewModel : ViewModel(){
 
     /** Función que muestra un pequeño delay para acto seguido, cargar un conjunto de
      * ejercicios predefinidos por el usuario.
-     * @author Alejandro
      * */
      fun cargarEjercicios() {
         viewModelScope.launch {

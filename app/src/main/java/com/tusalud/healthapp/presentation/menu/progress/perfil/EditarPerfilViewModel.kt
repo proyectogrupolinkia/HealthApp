@@ -3,7 +3,6 @@ package com.tusalud.healthapp.presentation.menu.progress.perfil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,11 +18,8 @@ class EditarPerfilViewModel @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : ViewModel() {
 
-    private val _displayName = MutableStateFlow(auth.currentUser?.displayName ?: "")
-    val displayName: StateFlow<String> = _displayName
-
-    private val _email = MutableStateFlow(auth.currentUser?.email ?: "")
-    val email: StateFlow<String> = _email
+    private val _edad = MutableStateFlow("")
+    val edad: StateFlow<String> = _edad
 
     private val _pesoInicio = MutableStateFlow("")
     val pesoInicio: StateFlow<String> = _pesoInicio
@@ -35,26 +31,23 @@ class EditarPerfilViewModel @Inject constructor(
     val toastMessage: SharedFlow<String> = _toastMessage
 
     init {
-        cargarPesos()
+        cargarDatos()
     }
 
-    private fun cargarPesos() {
+    private fun cargarDatos() {
         val user = auth.currentUser ?: return
         firestore.collection("users").document(user.uid).get()
             .addOnSuccessListener { doc ->
                 if (doc.exists()) {
+                    _edad.value = doc.getString("edad") ?: ""
                     _pesoInicio.value = doc.getString("pesoInicio") ?: ""
                     _pesoObjetivo.value = doc.getString("pesoObjetivo") ?: ""
                 }
             }
     }
 
-    fun onDisplayNameChanged(newName: String) {
-        _displayName.value = newName
-    }
-
-    fun onEmailChanged(newEmail: String) {
-        _email.value = newEmail
+    fun onEdadChanged(newEdad: String) {
+        _edad.value = newEdad
     }
 
     fun onPesoInicioChanged(newPeso: String) {
@@ -65,55 +58,39 @@ class EditarPerfilViewModel @Inject constructor(
         _pesoObjetivo.value = newPeso
     }
 
+    fun isEdadValida(): Boolean {
+        return _edad.value.matches(Regex("^\\d{1,3}\$")) &&
+                (_edad.value.toIntOrNull() in 1..120)
+    }
+
+    fun isPesoValido(peso: String): Boolean {
+        val pesoFloat = peso.toFloatOrNull()
+        return peso.matches(Regex("^\\d{1,3}(\\.\\d{1,2})?\$")) &&
+                pesoFloat != null &&
+                pesoFloat in 20.0..500.0
+    }
+
+    fun isFormValid(pesoInicio: String, pesoObjetivo: String): Boolean {
+        return isEdadValida() &&
+                isPesoValido(pesoInicio) &&
+                isPesoValido(pesoObjetivo)
+    }
+
     fun updateProfile() {
-        val user = auth.currentUser
-        val newName = _displayName.value
-        val newEmail = _email.value
+        val user = auth.currentUser ?: return
+        val edadValue = _edad.value
         val pesoIni = _pesoInicio.value
         val pesoObj = _pesoObjetivo.value
 
         viewModelScope.launch {
-            if (user == null) {
-                emitToast("Usuario no encontrado")
-                return@launch
-            }
-
-            if (newName != user.displayName) {
-                val profileUpdates = userProfileChangeRequest {
-                    displayName = newName
-                }
-                user.updateProfile(profileUpdates).addOnCompleteListener { task ->
-                    viewModelScope.launch {
-                        if (task.isSuccessful) {
-                            emitToast("Nombre de usuario actualizado correctamente")
-                        } else {
-                            emitToast("Error al actualizar nombre de usuario")
-                        }
-                    }
-                }
-            }
-
-            if (newEmail != user.email) {
-                user.updateEmail(newEmail).addOnCompleteListener { task ->
-                    viewModelScope.launch {
-                        if (task.isSuccessful) {
-                            emitToast("Correo electrónico actualizado correctamente")
-                        } else {
-                            emitToast("Error al actualizar correo electrónico")
-                        }
-                    }
-                }
-            }
-
             val userProfileData = mapOf(
-                "displayName" to newName,
-                "email" to newEmail,
+                "edad" to edadValue,
                 "pesoInicio" to pesoIni,
                 "pesoObjetivo" to pesoObj
             )
 
             firestore.collection("users").document(user.uid)
-                .set(userProfileData)
+                .update(userProfileData)
                 .addOnSuccessListener {
                     viewModelScope.launch {
                         emitToast("Perfil actualizado con éxito")
@@ -131,6 +108,9 @@ class EditarPerfilViewModel @Inject constructor(
         _toastMessage.emit(message)
     }
 }
+
+
+
 
 
 

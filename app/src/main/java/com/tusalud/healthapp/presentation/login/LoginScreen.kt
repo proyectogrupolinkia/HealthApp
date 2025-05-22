@@ -1,6 +1,5 @@
 package com.tusalud.healthapp.presentation.login
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically

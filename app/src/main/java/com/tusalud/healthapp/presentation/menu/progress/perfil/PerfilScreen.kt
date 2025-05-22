@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.tusalud.healthapp.presentation.main.MainViewModel
 
 @Composable
 fun PerfilScreen(

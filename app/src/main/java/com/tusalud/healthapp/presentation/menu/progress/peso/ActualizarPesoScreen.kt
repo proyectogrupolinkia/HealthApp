@@ -25,7 +25,7 @@ fun ActualizarPesoScreen(
     var nuevoPeso by remember { mutableStateOf("") }
     val snackbarActivo = viewModel.snackbarActivo
 
-    // ✅ Mostrar Snackbar con mensaje dinámico (con fecha)
+
     LaunchedEffect(snackbarActivo) {
         if (snackbarActivo) {
             scope.launch {
