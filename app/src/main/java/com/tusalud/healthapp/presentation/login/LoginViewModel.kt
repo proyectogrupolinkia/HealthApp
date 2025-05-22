@@ -31,7 +31,7 @@ class LoginViewModel @Inject constructor(
     val emailUsuario: StateFlow<String> = _emailUsuario
 
     val isFormValid: Boolean
-        get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length >= 6
+        get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && isPasswordValid(password)
 
     fun isEdadValid(input: String): Boolean {
         return input.toIntOrNull()?.let { it in 1..120 } ?: false
@@ -63,8 +63,10 @@ class LoginViewModel @Inject constructor(
         return android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
     }
 
-    fun isPasswordValid(input: String): Boolean {
-        return input.length >= 6
+    fun isPasswordValid(password: String): Boolean {
+        // Requiere mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo
+        val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
+        return passwordRegex.matches(password)
     }
 
     fun isRegisterFormValid(
@@ -86,8 +88,6 @@ class LoginViewModel @Inject constructor(
                 pesoFloat != null && pesoFloat in 1f..500f &&
                 alturaFloat != null && alturaFloat in 1f..250f
     }
-
-
 
     fun register(
         nombre: String,

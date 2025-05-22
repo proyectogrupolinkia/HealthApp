@@ -126,7 +126,7 @@ fun LoginScreen(
                     }
                 )
                 if (!viewModel.isPasswordValid(viewModel.password) && viewModel.password.isNotEmpty()) {
-                    Text("La contraseña debe tener al menos 6 caracteres", color = Color.Red, fontSize=12.sp)
+                    Text("La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo", color = Color.Red, fontSize=12.sp)
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
