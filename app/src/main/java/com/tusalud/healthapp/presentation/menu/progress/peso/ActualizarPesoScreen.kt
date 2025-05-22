@@ -1,5 +1,11 @@
 package com.tusalud.healthapp.presentation.menu.progress.peso
 
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -7,19 +13,13 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavHostController
 import com.tusalud.healthapp.presentation.main.MainViewModel
 import kotlinx.coroutines.launch
-import android.Manifest
-import android.app.Activity
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +34,24 @@ fun ActualizarPesoScreen(
     var nuevoPeso by remember { mutableStateOf("") }
     var pesoValido by remember { mutableStateOf(false) }
     val snackbarActivo = viewModel.snackbarActivo
+
+    // ✅ Solicitar permiso de notificación (solo Android 13+)
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { /* puedes manejarlo si quieres */ }
+    )
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
 
     LaunchedEffect(snackbarActivo) {
         if (snackbarActivo) {
@@ -95,6 +113,7 @@ fun ActualizarPesoScreen(
                 isError = nuevoPeso.isNotEmpty() && !pesoValido,
                 modifier = Modifier.fillMaxWidth()
             )
+
             if (nuevoPeso.isNotEmpty() && !pesoValido) {
                 Text(
                     text = "Ingrese un peso válido entre 20 y 500 kg (máx 2 decimales)",
@@ -118,5 +137,3 @@ fun ActualizarPesoScreen(
         }
     }
 }
-
-
