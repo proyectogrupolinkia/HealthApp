@@ -1,3 +1,4 @@
+
 package com.tusalud.healthapp.presentation.main
 
 import androidx.compose.foundation.background
@@ -5,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,13 +25,12 @@ import com.tusalud.healthapp.presentation.menu.progress.ProgressScreen
 @Composable
 fun MainScreen(
     navController: NavHostController,
-    startTab: Int = 0, // Nuevo parámetro para seleccionar el tab inicial
+    startTab: Int = 0,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    // Leer la ruta actual para obtener el parámetro "tab" si existe
     val currentEntry = navController.currentBackStackEntryAsState().value
     val tabArg = currentEntry?.arguments?.getString("tab")?.toIntOrNull()
-    var selectedTab by remember { mutableStateOf(tabArg ?: startTab) }
+    var selectedTab by rememberSaveable { mutableStateOf(tabArg ?: startTab) }
 
     Scaffold(
         bottomBar = {
@@ -53,6 +54,7 @@ fun MainScreen(
         }
     }
 }
+
 @Composable
 fun ProgressInfoCard(title: String, value: String) {
     Column(
