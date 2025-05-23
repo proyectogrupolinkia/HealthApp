@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -83,6 +84,14 @@ fun PasswordResetScreen(navController: NavHostController, viewModel: LoginViewMo
                         ) {
                             Text("Enviar Correo")
                         }
+                        Text(
+                            text = "⚠ La nueva contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo.",
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+
 
                         viewModel.error?.let {
                             Text(text = it, color = Color.Red, modifier = Modifier.padding(top = 8.dp))

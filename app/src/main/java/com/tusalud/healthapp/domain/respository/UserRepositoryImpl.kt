@@ -1,3 +1,4 @@
+
 package com.tusalud.healthapp.domain.respository
 
 import com.google.firebase.auth.FirebaseAuth
@@ -60,6 +61,8 @@ class UserRepositoryImpl(auth1: FirebaseAuth, firestore: FirebaseFirestore) : Us
             Result.failure(e)
         }
     }
+
+
 
     override suspend fun getUserById(uid: String): Result<User> = withContext(Dispatchers.IO) {
         try {

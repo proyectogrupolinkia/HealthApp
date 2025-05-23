@@ -1,3 +1,4 @@
+
 package com.tusalud.healthapp.presentation.login
 
 import androidx.compose.animation.AnimatedVisibility
@@ -6,6 +7,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -57,6 +60,8 @@ fun LoginScreen(
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
+    val scrollState = rememberScrollState()
+
     AnimatedGradientBackground {
         AnimatedVisibility(
             visible = visible,
@@ -65,13 +70,13 @@ fun LoginScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
+                    .padding(24.dp)
+                    .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(48.dp))
 
-                // Spinner grande arriba del título
                 if (viewModel.loading) {
                     CircularProgressIndicator(
                         modifier = Modifier
@@ -97,7 +102,7 @@ fun LoginScreen(
                     enabled = !viewModel.loading
                 )
                 if (!viewModel.isEmailValid(viewModel.email) && viewModel.email.isNotEmpty()) {
-                    Text("Correo no válido", color = Color.Red, fontSize=12.sp)
+                    Text("Correo no válido", color = Color.Red, fontSize = 12.sp)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -125,7 +130,11 @@ fun LoginScreen(
                     }
                 )
                 if (!viewModel.isPasswordValid(viewModel.password) && viewModel.password.isNotEmpty()) {
-                    Text("La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo", color = Color.Red, fontSize=12.sp)
+                    Text(
+                        "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo",
+                        color = Color.Red,
+                        fontSize = 12.sp
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
