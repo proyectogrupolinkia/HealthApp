@@ -193,13 +193,13 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = altura,
                             onValueChange = { altura = it },
-                            label = { Text("Altura (m)") },
+                            label = { Text("Altura (cm)") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             isError = altura.isNotBlank() && !viewModel.isAlturaValid(altura),
                             modifier = Modifier.fillMaxWidth()
                         )
                         if (!viewModel.isAlturaValid(altura) && altura.isNotEmpty()) {
-                            Text("Altura no válida (0.5 a 2.5 m)", color = Color.Red, fontSize = 12.sp)
+                            Text("Altura no válida (50 a 250 cms)", color = Color.Red, fontSize = 12.sp)
                         }
 
                         OutlinedTextField(
@@ -263,3 +263,4 @@ fun RegisterScreen(
     }
 }
 
+//
