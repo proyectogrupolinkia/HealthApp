@@ -61,6 +61,13 @@ fun EditarPerfilScreen(
             label = { Text("Nombre") },
             modifier = Modifier.fillMaxWidth()
         )
+        if(displayName.isBlank()){
+            Text(
+                text = "Nombre no válido",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
 
         OutlinedTextField(
             value = edad,
