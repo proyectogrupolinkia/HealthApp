@@ -1,7 +1,7 @@
+
 package com.tusalud.healthapp.presentation.menu.progress.peso
 
 import android.Manifest
-import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -17,15 +17,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.tusalud.healthapp.presentation.main.MainViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActualizarPesoScreen(
     navController: NavHostController,
-    viewModel: MainViewModel
+    viewModel: ActualizarPesoViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -33,12 +33,13 @@ fun ActualizarPesoScreen(
 
     var nuevoPeso by remember { mutableStateOf("") }
     var pesoValido by remember { mutableStateOf(false) }
-    val snackbarActivo = viewModel.snackbarActivo
 
-    // ✅ Solicitar permiso de notificación (solo Android 13+)
+    val snackbarActivo by viewModel.snackbarActivo.collectAsState()
+    val snackbarMensaje by viewModel.snackbarMensaje.collectAsState()
+
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
-        onResult = { /* puedes manejarlo si quieres */ }
+        onResult = { /* resultado del permiso */ }
     )
 
     LaunchedEffect(Unit) {
@@ -56,21 +57,14 @@ fun ActualizarPesoScreen(
     LaunchedEffect(snackbarActivo) {
         if (snackbarActivo) {
             scope.launch {
-                snackbarHostState.showSnackbar(viewModel.snackbarMensaje)
+                snackbarHostState.showSnackbar(snackbarMensaje)
                 viewModel.resetSnackbar()
                 nuevoPeso = ""
-                viewModel.cargarDatosUsuarioCompleto()
                 pesoValido = false
             }
         }
     }
 
-    fun validarPeso(input: String): Boolean {
-        val regex = Regex("^\\d{1,3}(\\.\\d{0,2})?$")
-        if (!regex.matches(input)) return false
-        val valor = input.toFloatOrNull() ?: return false
-        return valor in 20f..500f
-    }
 
     Scaffold(
         topBar = {
@@ -100,12 +94,12 @@ fun ActualizarPesoScreen(
                     if (it.isEmpty()) {
                         nuevoPeso = ""
                         pesoValido = false
-                    } else if (validarPeso(it)) {
+                    } else if (viewModel.validarPeso(it)) {
                         nuevoPeso = it
                         pesoValido = true
                     } else if (it.matches(Regex("^\\d{1,3}(\\.\\d{0,2})?$"))) {
                         nuevoPeso = it
-                        pesoValido = validarPeso(it)
+                        pesoValido = viewModel.validarPeso(it)
                     }
                 },
                 label = { Text("Nuevo peso (kg)") },
@@ -113,6 +107,7 @@ fun ActualizarPesoScreen(
                 isError = nuevoPeso.isNotEmpty() && !pesoValido,
                 modifier = Modifier.fillMaxWidth()
             )
+
 
             if (nuevoPeso.isNotEmpty() && !pesoValido) {
                 Text(

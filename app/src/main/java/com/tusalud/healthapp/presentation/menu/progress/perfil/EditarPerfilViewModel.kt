@@ -1,25 +1,25 @@
-package com.tusalud.healthapp.presentation.menu.progress.perfil
+package com.tusalud.healthapp.presentation.perfil
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.tusalud.healthapp.domain.use_case.GetUserProfileUseCase
+import com.tusalud.healthapp.domain.use_case.UpdateUserProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class EditarPerfilViewModel @Inject constructor(
-    private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val getUserProfileUseCase: GetUserProfileUseCase,
+    private val updateUserProfileUseCase: UpdateUserProfileUseCase
 ) : ViewModel() {
 
-    private val _edad = MutableStateFlow("")
-    val edad: StateFlow<String> = _edad
+    private val _displayName = MutableStateFlow("")
+    val displayName: StateFlow<String> = _displayName
+
+    private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
 
     private val _pesoInicio = MutableStateFlow("")
     val pesoInicio: StateFlow<String> = _pesoInicio
@@ -27,27 +27,18 @@ class EditarPerfilViewModel @Inject constructor(
     private val _pesoObjetivo = MutableStateFlow("")
     val pesoObjetivo: StateFlow<String> = _pesoObjetivo
 
+    private val _edad = MutableStateFlow("")
+    val edad: StateFlow<String> = _edad
+
     private val _toastMessage = MutableSharedFlow<String>()
     val toastMessage: SharedFlow<String> = _toastMessage
 
-    init {
-        cargarDatos()
+    fun onDisplayNameChanged(newName: String) {
+        _displayName.value = newName
     }
 
-    private fun cargarDatos() {
-        val user = auth.currentUser ?: return
-        firestore.collection("users").document(user.uid).get()
-            .addOnSuccessListener { doc ->
-                if (doc.exists()) {
-                    _edad.value = doc.getString("edad") ?: ""
-                    _pesoInicio.value = doc.getString("pesoInicio") ?: ""
-                    _pesoObjetivo.value = doc.getString("pesoObjetivo") ?: ""
-                }
-            }
-    }
-
-    fun onEdadChanged(newEdad: String) {
-        _edad.value = newEdad
+    fun onEmailChanged(newEmail: String) {
+        _email.value = newEmail
     }
 
     fun onPesoInicioChanged(newPeso: String) {
@@ -58,61 +49,49 @@ class EditarPerfilViewModel @Inject constructor(
         _pesoObjetivo.value = newPeso
     }
 
+    fun onEdadChanged(nuevaEdad: String) {
+        _edad.value = nuevaEdad
+    }
+
     fun isEdadValida(): Boolean {
-        return _edad.value.matches(Regex("^\\d{1,3}\$")) &&
-                (_edad.value.toIntOrNull() in 1..120)
+        return _edad.value.toIntOrNull()?.let { it in 1..120 } ?: false
     }
 
     fun isPesoValido(peso: String): Boolean {
-        val pesoFloat = peso.toFloatOrNull()
-        return peso.matches(Regex("^\\d{1,3}(\\.\\d{1,2})?\$")) &&
-                pesoFloat != null &&
-                pesoFloat in 20.0..500.0
+        return peso.toFloatOrNull()?.let { it in 1f..500f } ?: false
     }
 
-    fun isFormValid(pesoInicio: String, pesoObjetivo: String): Boolean {
-        return isEdadValida() &&
-                isPesoValido(pesoInicio) &&
-                isPesoValido(pesoObjetivo)
-    }
-
-    fun updateProfile() {
-        val user = auth.currentUser ?: return
-        val edadValue = _edad.value
-        val pesoIni = _pesoInicio.value
-        val pesoObj = _pesoObjetivo.value
-
+    fun updateProfile(onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
-            val userProfileData = mapOf(
-                "edad" to edadValue,
-                "pesoInicio" to pesoIni,
-                "pesoObjetivo" to pesoObj
+            val result = updateUserProfileUseCase(
+                nombre = _displayName.value,
+                email = _email.value,
+                pesoInicio = _pesoInicio.value,
+                pesoObjetivo = _pesoObjetivo.value,
+                edad = _edad.value
             )
 
-            firestore.collection("users").document(user.uid)
-                .update(userProfileData)
-                .addOnSuccessListener {
-                    viewModelScope.launch {
-                        emitToast("Perfil actualizado con éxito")
-                    }
-                }
-                .addOnFailureListener {
-                    viewModelScope.launch {
-                        emitToast("Error al guardar perfil")
-                    }
-                }
+            result.onSuccess {
+                _toastMessage.emit("Perfil actualizado con éxito")
+                onSuccess()
+            }.onFailure {
+                _toastMessage.emit("Error al guardar perfil")
+            }
+        }
+    }
+    fun cargarDatosUsuario() {
+        viewModelScope.launch {
+            val result = getUserProfileUseCase()
+            result.onSuccess { perfil ->
+                _displayName.value = perfil.nombre
+                _email.value = perfil.correo
+                _pesoInicio.value = perfil.pesoInicio
+                _pesoObjetivo.value = perfil.pesoObjetivo
+                _edad.value = perfil.edad
+            }.onFailure {
+                _toastMessage.emit("Error al cargar los datos del perfil")
+            }
         }
     }
 
-    private suspend fun emitToast(message: String) {
-        _toastMessage.emit(message)
-    }
 }
-
-
-
-
-
-
-
-
