@@ -21,6 +21,10 @@ class LoginViewModel @Inject constructor(
 
     var email by mutableStateOf("")
     var password by mutableStateOf("")
+    var nombre by mutableStateOf("")
+    var edad by mutableStateOf("")
+    var peso by mutableStateOf("")
+    var altura by mutableStateOf("")
     var user by mutableStateOf<User?>(null)
     var error by mutableStateOf<String?>(null)
     var loading by mutableStateOf(false)
@@ -32,19 +36,24 @@ class LoginViewModel @Inject constructor(
     val emailUsuario: StateFlow<String> = _emailUsuario
 
     val isFormValid: Boolean
-        get() = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && isPasswordValid(password)
+        get() = isEmailValid(email) && isPasswordValid(password)
 
-    fun isEdadValid(input: String): Boolean {
-        return input.toIntOrNull()?.let { it in 1..120 } ?: false
-    }
+    val edadValida: Boolean
+        get() = isEdadValid(edad)
 
-    fun isPesoValid(input: String): Boolean {
-        return input.toFloatOrNull()?.let { it in 1f..500f } ?: false
-    }
+    val pesoValido: Boolean
+        get() = isPesoValid(peso)
 
-    fun isAlturaValid(input: String): Boolean {
-        return input.toFloatOrNull()?.let { it in 50f..250f } ?: false
-    }
+    val alturaValida: Boolean
+        get() = isAlturaValid(altura)
+
+    val isRegisterFormValid: Boolean
+        get() = nombre.isNotBlank() &&
+                isEmailValid(email) &&
+                isPasswordValid(password) &&
+                edadValida &&
+                pesoValido &&
+                alturaValida
 
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
@@ -69,42 +78,26 @@ class LoginViewModel @Inject constructor(
         return passwordRegex.matches(password)
     }
 
-    fun isRegisterFormValid(
-        nombre: String,
-        correo: String,
-        edad: String,
-        peso: String,
-        altura: String,
-        password: String
-    ): Boolean {
-        val edadInt = edad.toIntOrNull()
-        val pesoFloat = peso.toFloatOrNull()
-        val alturaFloat = altura.toFloatOrNull()
-
-        return nombre.isNotBlank() &&
-                isEmailValid(correo) &&
-                isPasswordValid(password) &&
-                edadInt != null && edadInt in 1..120 &&
-                pesoFloat != null && pesoFloat in 1f..500f &&
-                alturaFloat != null && alturaFloat in 1f..250f
+    fun isEdadValid(input: String): Boolean {
+        return input.toIntOrNull()?.let { it in 1..120 } ?: false
     }
 
-    fun register(
-        nombre: String,
-        correo: String,
-        edad: Int,
-        peso: Float,
-        altura: Float,
-        password: String,
-        onSuccess: () -> Unit
-    ) {
+    fun isPesoValid(input: String): Boolean {
+        return input.toFloatOrNull()?.let { it in 1f..500f } ?: false
+    }
+
+    fun isAlturaValid(input: String): Boolean {
+        return input.toFloatOrNull()?.let { it in 50f..250f } ?: false
+    }
+
+    fun register(onSuccess: () -> Unit) {
         viewModelScope.launch {
             loading = true
-            val newUser = User("", nombre, correo, edad, peso, peso, altura)
+            val newUser = User("", nombre, email, edad.toInt(), peso.toFloat(), peso.toFloat(), altura.toFloat())
             val result = authUseCases.register(newUser, password)
             loading = false
             result.onSuccess {
-                this@LoginViewModel.user = it
+                user = it
                 onSuccess()
             }.onFailure {
                 error = it.message
@@ -132,8 +125,6 @@ class LoginViewModel @Inject constructor(
             result.onSuccess { user ->
                 _nombreUsuario.value = user.nombre
                 _emailUsuario.value = user.correo
-            }.onFailure {
-                // Manejo de error opcional
             }
         }
     }
