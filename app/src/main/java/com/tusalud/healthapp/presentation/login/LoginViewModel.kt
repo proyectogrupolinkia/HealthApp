@@ -1,3 +1,4 @@
+
 package com.tusalud.healthapp.presentation.login
 
 import androidx.compose.runtime.getValue
@@ -6,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tusalud.healthapp.domain.model.User
-import com.tusalud.healthapp.domain.respository.UserRepository
+import com.tusalud.healthapp.domain.use_case.AuthUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val authUseCases: AuthUseCases
 ) : ViewModel() {
 
     var email by mutableStateOf("")
@@ -45,11 +46,10 @@ class LoginViewModel @Inject constructor(
         return input.toFloatOrNull()?.let { it in 50f..250f } ?: false
     }
 
-
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
             loading = true
-            val result = userRepository.login(email, password)
+            val result = authUseCases.login(email, password)
             loading = false
             result.onSuccess {
                 user = it
@@ -65,7 +65,6 @@ class LoginViewModel @Inject constructor(
     }
 
     fun isPasswordValid(password: String): Boolean {
-        // Requiere mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo
         val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
         return passwordRegex.matches(password)
     }
@@ -102,7 +101,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             loading = true
             val newUser = User("", nombre, correo, edad, peso, peso, altura)
-            val result = userRepository.register(newUser, password)
+            val result = authUseCases.register(newUser, password)
             loading = false
             result.onSuccess {
                 this@LoginViewModel.user = it
@@ -116,7 +115,7 @@ class LoginViewModel @Inject constructor(
     fun resetPassword(correo: String, onSent: () -> Unit) {
         viewModelScope.launch {
             loading = true
-            val result = userRepository.resetPassword(correo)
+            val result = authUseCases.resetPassword(correo)
             loading = false
             result.onSuccess {
                 error = "Correo enviado para recuperar contraseña"
@@ -129,7 +128,7 @@ class LoginViewModel @Inject constructor(
 
     fun cargarNombreUsuario(uid: String) {
         viewModelScope.launch {
-            val result = userRepository.getUserById(uid)
+            val result = authUseCases.getUserById(uid)
             result.onSuccess { user ->
                 _nombreUsuario.value = user.nombre
                 _emailUsuario.value = user.correo
