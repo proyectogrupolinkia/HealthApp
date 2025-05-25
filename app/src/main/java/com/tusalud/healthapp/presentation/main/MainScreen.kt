@@ -24,10 +24,15 @@ import com.tusalud.healthapp.presentation.menu.progress.ProgressScreen
 @Composable
 fun MainScreen(
     navController: NavHostController,
-    startTab: Int = 0,
+    startTab: Int = 0, // Índice de la pestaña por defecto (0: Progreso)
 ) {
+
+    //revisa el parametro tab
     val currentEntry = navController.currentBackStackEntryAsState().value
     val tabArg = currentEntry?.arguments?.getString("tab")?.toIntOrNull()
+
+    // Estado para controlar la pestaña seleccionada
+
     var selectedTab by rememberSaveable { mutableStateOf(tabArg ?: startTab) }
 
     Scaffold(
@@ -44,6 +49,9 @@ fun MainScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
+            // Muestra una de las tres pantallas según la pestaña seleccionada
+
+
             when (selectedTab) {
                 0 -> ProgressScreen(navController = navController)
                 1 -> CalculadorasScreen(navController = navController)

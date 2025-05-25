@@ -1,3 +1,5 @@
+//Aqui se define cómo se proporcionan las dependencias globales
+
 package com.tusalud.healthapp.di
 
 import com.tusalud.healthapp.domain.use_case.GetProgressUseCase
@@ -22,14 +24,18 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
+    // Proporciona una instancia única de FirebaseAuth
     @Provides
     @Singleton
     fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 
+    // Proporciona una instancia única de Firestore
+
     @Provides
     @Singleton
     fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    // Proporciona el repositorio de usuario, implementado con FirebaseAuth y Firestore
 
     @Provides
     @Singleton
@@ -38,6 +44,9 @@ object AppModule {
         firestore: FirebaseFirestore
     ): UserRepository = UserRepositoryImpl(auth, firestore)
 
+    // Proporciona el repositorio de progreso, también implementado con Firebase
+
+    // Casos de uso para la capa de dominio:
     @Provides
     @Singleton
     fun provideProgressRepository(

@@ -1,3 +1,4 @@
+// Modelo de dominio que representa el progreso actual del usuario
 package com.tusalud.healthapp.domain.model
 
 data class Progress(

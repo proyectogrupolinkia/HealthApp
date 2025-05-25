@@ -1,3 +1,5 @@
+//Caso de uso encargado de cerrar la sesión del usuario.
+
 package com.tusalud.healthapp.domain.use_case
 
 import com.tusalud.healthapp.domain.repository.UserRepository

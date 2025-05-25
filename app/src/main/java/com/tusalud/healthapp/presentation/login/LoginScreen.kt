@@ -26,6 +26,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 
+
+// Fondo animado con degradado
+
 @Composable
 fun AnimatedGradientBackground(content: @Composable BoxScope.() -> Unit) {
     val infiniteTransition = rememberInfiniteTransition(label = "gradient")
@@ -57,10 +60,13 @@ fun LoginScreen(
     navController: NavHostController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    // Controla si se muestra la animación inicial
+
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
     val scrollState = rememberScrollState()
+    // Indicador de carga mientras se realiza login
 
     AnimatedGradientBackground {
         AnimatedVisibility(
@@ -76,6 +82,7 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(48.dp))
+                // Indicador de carga mientras se realiza login
 
                 if (viewModel.loading) {
                     CircularProgressIndicator(
@@ -86,6 +93,7 @@ fun LoginScreen(
                         strokeWidth = 4.dp
                     )
                 }
+                // Título principal
 
                 Text(
                     "Bienvenido",
@@ -165,16 +173,20 @@ fun LoginScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+                // Navegación a registro
 
                 TextButton(onClick = { navController.navigate("register") }) {
                     Text("¿No tienes cuenta? Regístrate", fontSize = 16.sp, color = Color.Black)
                 }
+                // Navegación a restablecer contraseña
 
                 TextButton(onClick = { navController.navigate("reset") }) {
                     Text("¿Olvidaste tu contraseña?", fontSize = 16.sp, color = Color.Black)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Mostrar mensaje de error en caso de fallo en login
 
                 viewModel.error?.let {
                     Text(text = it, color = MaterialTheme.colorScheme.error, fontSize = 14.sp)

@@ -31,6 +31,9 @@ fun DesafiosScreen(
     viewModel: DesafiosViewModel = viewModel()
 ) {
     val context = LocalContext.current
+
+    // Reinicia automáticamente los desafíos diarios al entrar en la pantalla
+
     LaunchedEffect(Unit) {
         viewModel.resetearDesafiosDiarios(context)
     }
@@ -54,6 +57,8 @@ fun DesafiosScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Botón para volver atrás
+
             Button(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier.align(Alignment.Start)
@@ -62,6 +67,7 @@ fun DesafiosScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+            // Imagen
 
             Image(
                 painter = painterResource(id = R.drawable.meditation),
@@ -78,6 +84,7 @@ fun DesafiosScreen(
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
+            // Muestra cada desafío en una tarjeta
 
             desafios.forEach { desafio ->
                 DesafioCard(desafio = desafio, onCompletar = {

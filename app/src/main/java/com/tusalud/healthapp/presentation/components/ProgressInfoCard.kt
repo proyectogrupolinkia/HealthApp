@@ -1,3 +1,11 @@
+/**
+ * Componente visual reutilizable que muestra una tarjeta pequeña con:
+ * - Un título (por ejemplo: "IMC")
+ * - Un valor numérico o textual (por ejemplo: "23.4")
+ *
+ * Este componente se usa en pantallas como ProgressScreen para presentar
+ * información clave de manera visual y compacta.
+ */
 package com.tusalud.healthapp.presentation.components
 
 import androidx.compose.foundation.background
@@ -34,6 +42,8 @@ fun ProgressInfoCard(
             color = Color.White
         )
         Spacer(modifier = Modifier.height(4.dp))
+
+        // Valor principal, con fuente más grande y en negrita
         Text(
             text = value,
             fontSize = 18.sp,

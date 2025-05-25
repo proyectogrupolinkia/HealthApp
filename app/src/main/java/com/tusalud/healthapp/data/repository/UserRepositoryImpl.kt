@@ -1,3 +1,7 @@
+
+//Esta clase gestiona toda la lógica de autenticación y perfil del usuario con Firebase.
+
+
 package com.tusalud.healthapp.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
@@ -18,6 +22,10 @@ class UserRepositoryImpl @Inject constructor(
     private val db: FirebaseFirestore
 ) : UserRepository {
 
+    /**
+     * Inicia sesión con correo y contraseña, y obtiene los datos del usuario desde Firestore.
+     */
+
     override suspend fun login(email: String, password: String): Result<User> =
         withContext(Dispatchers.IO) {
             try {
@@ -32,7 +40,9 @@ class UserRepositoryImpl @Inject constructor(
                 Result.failure(e)
             }
         }
-
+    /**
+     * Registra un nuevo usuario en Firebase Auth y guarda sus datos en Firestore.
+     */
     override suspend fun register(user: User, password: String): Result<User> =
         withContext(Dispatchers.IO) {
             try {
@@ -58,7 +68,9 @@ class UserRepositoryImpl @Inject constructor(
                 Result.failure(e)
             }
         }
-
+    /**
+     * Envía un correo de restablecimiento de contraseña.
+     */
     override suspend fun resetPassword(email: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             auth.sendPasswordResetEmail(email).await()
@@ -67,7 +79,9 @@ class UserRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
-
+    /**
+     * Recupera los datos de un usuario por su UID.
+     */
     override suspend fun getUserById(uid: String): Result<User> = withContext(Dispatchers.IO) {
         try {
             val doc = db.collection("usuarios").document(uid).get().await()
@@ -78,6 +92,9 @@ class UserRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+    /**
+     * Obtiene los datos del perfil del usuario autenticado.
+     */
 
     override suspend fun getUserProfile(): Result<UserProfileData> = withContext(Dispatchers.IO) {
         val user = auth.currentUser ?: return@withContext Result.failure(Exception("Usuario no autenticado"))
@@ -95,6 +112,9 @@ class UserRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+    /**
+     * Elimina la cuenta del usuario actual tanto de Firestore como de FirebaseAuth.
+     */
     override suspend fun deleteUserAccount(): Result<Unit> = withContext(Dispatchers.IO) {
         val user = auth.currentUser ?: return@withContext Result.failure(Exception("Usuario no autenticado"))
 
@@ -111,9 +131,17 @@ class UserRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    /**
+     * Cierra la sesión del usuario actual.
+     */
     override fun logout() {
         auth.signOut()
     }
+
+    /**
+     * Actualiza el perfil del usuario autenticado (nombre, correo, peso, edad, etc.).
+     */
     override suspend fun updateUserProfile(
         nombre: String,
         email: String,
@@ -143,6 +171,8 @@ class UserRepositoryImpl @Inject constructor(
             pesoInicio.toFloatOrNull()?.let { datosPerfil["pesoInicio"] = it }
             pesoObjetivo.toFloatOrNull()?.let { datosPerfil["pesoObjetivo"] = it }
             edad.toIntOrNull()?.let { datosPerfil["edad"] = it }
+
+            // Realiza la actualización en Firestore
 
             db.collection("usuarios")
                 .document(user.uid)

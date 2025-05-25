@@ -1,3 +1,6 @@
+//
+// Clase contenedora que agrupa todos los casos de uso relacionados con autenticación.
+
 package com.tusalud.healthapp.domain.use_case
 
 import javax.inject.Inject

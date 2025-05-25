@@ -1,3 +1,6 @@
+//Implementación de ProgressRepository que se comunica con Firebase Auth y Firestore
+//  para obtener y actualizar los datos de progreso del usuario (peso, altura, historial).
+
 package com.tusalud.healthapp.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
@@ -19,6 +22,10 @@ class ProgressRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore
 ) : ProgressRepository {
+    /**
+     * Obtiene los datos actuales de progreso del usuario.
+     * Incluye peso, altura, IMC calculado y peso objetivo (si existe).
+     */
 
     override suspend fun getProgress(): Result<Progress> {
         val user = auth.currentUser ?: return Result.failure(Exception("Usuario no autenticado"))
@@ -36,6 +43,12 @@ class ProgressRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+    /**
+     * Recupera el historial de peso del usuario.
+     * Devuelve:
+     * - Lista de pesos (Float)
+     * - Lista de pares peso-fecha (Float, String) para el gráfico
+     */
     override suspend fun getWeightHistory(): Result<Pair<List<Float>, List<Pair<Float, String>>>> {
         val user = auth.currentUser ?: return Result.failure(Exception("Usuario no autenticado"))
 
@@ -60,6 +73,15 @@ class ProgressRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    /**
+     * Guarda un nuevo peso en Firestore.
+     * Si ya se registró un peso hoy, lo actualiza.
+     * También:
+     * - Calcula si se alcanzó el peso objetivo.
+     * - Retorna un mensaje para mostrar en Snackbar.
+     * - Indica si se debe mostrar una notificación.
+     */
     override suspend fun updateWeight(nuevoPeso: Float): Result<UpdateWeightResult> {
         val user = auth.currentUser ?: return Result.failure(Exception("Usuario no autenticado"))
         val userRef = firestore.collection("usuarios").document(user.uid)
@@ -72,6 +94,8 @@ class ProgressRepositoryImpl @Inject constructor(
             val hoy = Calendar.getInstance()
             val listaActualizada = historial.toMutableList()
             var actualizado = false
+
+            // Verifica si ya hay un registro para hoy
 
             for (i in historial.indices) {
                 val item = historial[i]
@@ -88,6 +112,7 @@ class ProgressRepositoryImpl @Inject constructor(
                     break
                 }
             }
+            // Si no hay registro hoy, se agrega uno nuevo
 
             if (!actualizado) {
                 listaActualizada.add(
@@ -97,6 +122,7 @@ class ProgressRepositoryImpl @Inject constructor(
                     )
                 )
             }
+            // Actualiza Firestore
 
             val nuevosDatos = mapOf(
                 "peso" to nuevoPeso,

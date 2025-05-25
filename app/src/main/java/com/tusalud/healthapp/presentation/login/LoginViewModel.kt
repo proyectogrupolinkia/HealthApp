@@ -14,12 +14,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
+ //inyectoa ala vez todos los caso de uso de login
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authUseCases: AuthUseCases
 ) : ViewModel() {
 
-    var email by mutableStateOf("")
+     // Variables del formulario
+
+     var email by mutableStateOf("")
     var password by mutableStateOf("")
     var nombre by mutableStateOf("")
     var edad by mutableStateOf("")
@@ -34,9 +37,11 @@ class LoginViewModel @Inject constructor(
 
     private val _emailUsuario = MutableStateFlow("")
     val emailUsuario: StateFlow<String> = _emailUsuario
+     // Validación del formulario de login
 
     val isFormValid: Boolean
         get() = isEmailValid(email) && isPasswordValid(password)
+     // Validaciones individuales para cada campo de registro
 
     val edadValida: Boolean
         get() = isEdadValid(edad)
@@ -46,6 +51,7 @@ class LoginViewModel @Inject constructor(
 
     val alturaValida: Boolean
         get() = isAlturaValid(altura)
+     // Validación global del formulario de registro
 
     val isRegisterFormValid: Boolean
         get() = nombre.isNotBlank() &&
@@ -54,6 +60,10 @@ class LoginViewModel @Inject constructor(
                 edadValida &&
                 pesoValido &&
                 alturaValida
+//      Inicia sesión con email y contraseña.
+//
+//      Si es correcto, llama a `onSuccess`.
+
 
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
@@ -68,10 +78,11 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
-
+//Valida si  email
     fun isEmailValid(input: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
     }
+//Valida contraseña
 
     fun isPasswordValid(password: String): Boolean {
         val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
@@ -89,7 +100,10 @@ class LoginViewModel @Inject constructor(
     fun isAlturaValid(input: String): Boolean {
         return input.toFloatOrNull()?.let { it in 50f..250f } ?: false
     }
-
+//
+//       Registra un nuevo usuario en Firebase.
+//       Usa la clase `User` con pesoInicial = pesoActual.
+//
     fun register(onSuccess: () -> Unit) {
         viewModelScope.launch {
             loading = true
@@ -104,6 +118,7 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+     // Envía un correo para restablecer contraseña.
 
     fun resetPassword(correo: String, onSent: () -> Unit) {
         viewModelScope.launch {
@@ -119,13 +134,5 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun cargarNombreUsuario(uid: String) {
-        viewModelScope.launch {
-            val result = authUseCases.getUserById(uid)
-            result.onSuccess { user ->
-                _nombreUsuario.value = user.nombre
-                _emailUsuario.value = user.correo
-            }
-        }
-    }
+
 }

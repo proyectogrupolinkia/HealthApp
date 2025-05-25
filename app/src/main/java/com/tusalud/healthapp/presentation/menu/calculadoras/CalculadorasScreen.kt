@@ -26,9 +26,13 @@ import androidx.compose.ui.draw.clip
 @Composable
 fun CalculadorasScreen(navController: NavHostController, viewModel: CalculadorasViewModel = viewModel()) {
 
+    // Estado para mostrar mensajes informativos
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    // Scroll para contenido desbordado
+
     val scrollState = rememberScrollState()
+    // Color de fondo principal
 
     val backgroundColor = Color(0xFFFFE0B2)
 
@@ -45,7 +49,7 @@ fun CalculadorasScreen(navController: NavHostController, viewModel: Calculadoras
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            //barra drag
+            // Barra decorativa superior
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -103,7 +107,7 @@ fun CalculadorasScreen(navController: NavHostController, viewModel: Calculadoras
                         )
                     }
 
-                    // campo cadera animado
+                    // Campo cadera: solo visible para mujeres
                     AnimatedVisibility(visible = !viewModel.esHombre) {
                         OutlinedTextField(
                             value = viewModel.cadera,

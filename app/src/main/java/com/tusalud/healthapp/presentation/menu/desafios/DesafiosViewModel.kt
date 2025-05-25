@@ -1,3 +1,7 @@
+
+// ViewModel que gestiona la lógica de los desafíos activos.
+// Maneja el progreso, reinicios diarios y recordatorios personalizados.
+
 package com.tusalud.healthapp.presentation.menu.desafios
 
 import android.content.Context
@@ -48,6 +52,11 @@ class DesafiosViewModel : ViewModel() {
 
     val desafios: StateFlow<List<Desafio>> = _desafios
 
+    /**
+     * Marca un desafío como realizado, incrementando el progreso en 1.
+     * Solo se actualiza si aún no se alcanzó el objetivo.
+     */
+
     fun marcarDesafioComoRealizado(id: Int) {
         _desafios.update { lista ->
             lista.map { desafio ->
@@ -57,7 +66,10 @@ class DesafiosViewModel : ViewModel() {
             }
         }
     }
-
+    /**
+     * Reinicia el progreso de los desafíos diarios (ej. agua, piernas).
+     * Solo se reinicia si no se ha hecho aún en el día actual.
+     */
     fun resetearDesafiosDiarios(context: Context) {
         viewModelScope.launch {
             if (DesafiosPreferences.shouldResetDesafios(context)) {
@@ -75,14 +87,7 @@ class DesafiosViewModel : ViewModel() {
         }
     }
 
-    fun agregarRecordatorioADesafio(id: Int, texto: String) {
-        _desafios.update { lista ->
-            lista.map { desafio ->
-                if (desafio.id == id) desafio.copy(recordatorio = texto)
-                else desafio
-            }
-        }
-    }
+
 }
 
 

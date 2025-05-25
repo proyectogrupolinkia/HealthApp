@@ -1,5 +1,9 @@
 package com.tusalud.healthapp.domain.model
-
+/**
+ * Modelo que representa a un usuario en el dominio de la aplicación.
+ * Contiene toda la información necesaria para el registro, inicio de sesión
+ * y seguimiento del progreso personal.
+ */
 data class User(
     val id: String = "",
     val nombre: String = "",
