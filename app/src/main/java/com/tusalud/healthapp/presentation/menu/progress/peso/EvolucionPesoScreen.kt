@@ -24,9 +24,7 @@ import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import com.tusalud.healthapp.presentation.main.MainViewModel
 import androidx.compose.ui.viewinterop.AndroidView
-
 
 val LightGreenBackground = Color(0xFFDFF5E3)
 
@@ -34,18 +32,17 @@ val LightGreenBackground = Color(0xFFDFF5E3)
 @Composable
 fun EvolucionPesoScreen(
     navController: NavHostController,
-    viewModel: MainViewModel = hiltViewModel()
+    viewModel: EvolucionPesoViewModel = hiltViewModel()
 ) {
     val pesosConFechas by viewModel.pesosConFechas.collectAsState()
     val pesoObjetivo by viewModel.pesoObjetivo.collectAsState()
     val context = LocalContext.current
 
-    // Cargar datos del usuario
-    LaunchedEffect(Unit) {
-        viewModel.cargarDatosUsuarioCompleto()
+    // 🔄 Recargar SIEMPRE al entrar
+    LaunchedEffect(true) {
+        viewModel.cargarDatosEvolucion()
     }
 
-    // Convertir el peso objetivo de forma segura
     val pesoObjetivoFloat: Float? = when (pesoObjetivo) {
         is Float -> pesoObjetivo
         is Double -> pesoObjetivo.toFloat()
@@ -122,9 +119,6 @@ fun EvolucionPesoScreen(
                                     null
                                 }
                             }
-
-                            Log.d("EvolucionPesoScreen", "Datos válidos: ${entries.size} / ${pesosConFechas.size}")
-
 
                             val pesosSolo = entries.map { it.y }
                             val yMin = minOf(pesosSolo.minOrNull() ?: 0f, pesoObjetivoFloat)

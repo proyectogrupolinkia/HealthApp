@@ -1,25 +1,24 @@
-package com.tusalud.healthapp.presentation.menu.progress.perfil
+package com.tusalud.healthapp.presentation.perfil
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class EditarPerfilViewModel @Inject constructor(
-    private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
-) : ViewModel() {
+class EditarPerfilViewModel @Inject constructor() : ViewModel() {
 
-    private val _edad = MutableStateFlow("")
-    val edad: StateFlow<String> = _edad
+    private val _displayName = MutableStateFlow("")
+    val displayName: StateFlow<String> = _displayName
+
+    private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
 
     private val _pesoInicio = MutableStateFlow("")
     val pesoInicio: StateFlow<String> = _pesoInicio
@@ -27,27 +26,32 @@ class EditarPerfilViewModel @Inject constructor(
     private val _pesoObjetivo = MutableStateFlow("")
     val pesoObjetivo: StateFlow<String> = _pesoObjetivo
 
+    private val _edad = MutableStateFlow("")
+    val edad: StateFlow<String> = _edad
+
     private val _toastMessage = MutableSharedFlow<String>()
     val toastMessage: SharedFlow<String> = _toastMessage
 
-    init {
-        cargarDatos()
+    fun cargarDatosUsuario() {
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+        val uid = user.uid
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("usuarios").document(uid).get().addOnSuccessListener { document ->
+            _displayName.value = document.getString("nombre") ?: ""
+            _email.value = user.email ?: ""
+            _pesoInicio.value = document.getDouble("pesoInicio")?.toString() ?: ""
+            _pesoObjetivo.value = document.getDouble("pesoObjetivo")?.toString() ?: ""
+            _edad.value = document.getLong("edad")?.toString() ?: ""
+        }
     }
 
-    private fun cargarDatos() {
-        val user = auth.currentUser ?: return
-        firestore.collection("users").document(user.uid).get()
-            .addOnSuccessListener { doc ->
-                if (doc.exists()) {
-                    _edad.value = doc.getString("edad") ?: ""
-                    _pesoInicio.value = doc.getString("pesoInicio") ?: ""
-                    _pesoObjetivo.value = doc.getString("pesoObjetivo") ?: ""
-                }
-            }
+    fun onDisplayNameChanged(newName: String) {
+        _displayName.value = newName
     }
 
-    fun onEdadChanged(newEdad: String) {
-        _edad.value = newEdad
+    fun onEmailChanged(newEmail: String) {
+        _email.value = newEmail
     }
 
     fun onPesoInicioChanged(newPeso: String) {
@@ -58,61 +62,59 @@ class EditarPerfilViewModel @Inject constructor(
         _pesoObjetivo.value = newPeso
     }
 
+    fun onEdadChanged(nuevaEdad: String) {
+        _edad.value = nuevaEdad
+    }
+
     fun isEdadValida(): Boolean {
-        return _edad.value.matches(Regex("^\\d{1,3}\$")) &&
-                (_edad.value.toIntOrNull() in 1..120)
+        return _edad.value.toIntOrNull()?.let { it in 1..120 } ?: false
     }
 
     fun isPesoValido(peso: String): Boolean {
-        val pesoFloat = peso.toFloatOrNull()
-        return peso.matches(Regex("^\\d{1,3}(\\.\\d{1,2})?\$")) &&
-                pesoFloat != null &&
-                pesoFloat in 20.0..500.0
+        return peso.toFloatOrNull()?.let { it in 1f..500f } ?: false
     }
 
-    fun isFormValid(pesoInicio: String, pesoObjetivo: String): Boolean {
-        return isEdadValida() &&
-                isPesoValido(pesoInicio) &&
-                isPesoValido(pesoObjetivo)
-    }
-
-    fun updateProfile() {
-        val user = auth.currentUser ?: return
-        val edadValue = _edad.value
-        val pesoIni = _pesoInicio.value
-        val pesoObj = _pesoObjetivo.value
+    fun updateProfile(onSuccess: () -> Unit = {}) {
+        val user = FirebaseAuth.getInstance().currentUser ?: return
+        val newName = _displayName.value
+        val newEmail = _email.value
+        val pesoIni = _pesoInicio.value.toFloatOrNull()
+        val pesoObj = _pesoObjetivo.value.toFloatOrNull()
 
         viewModelScope.launch {
-            val userProfileData = mapOf(
-                "edad" to edadValue,
-                "pesoInicio" to pesoIni,
-                "pesoObjetivo" to pesoObj
-            )
+            if (newName != user.displayName) {
+                val profileUpdates = userProfileChangeRequest {
+                    displayName = newName
+                }
+                user.updateProfile(profileUpdates)
+            }
 
-            firestore.collection("users").document(user.uid)
-                .update(userProfileData)
+            if (newEmail != user.email) {
+                user.updateEmail(newEmail)
+            }
+
+            val datosPerfil = mutableMapOf<String, Any>(
+                "nombre" to newName,
+                "email" to newEmail
+            )
+            pesoIni?.let { datosPerfil["pesoInicio"] = it }
+            pesoObj?.let { datosPerfil["pesoObjetivo"] = it }
+            val edadInt = _edad.value.toIntOrNull()
+            edadInt?.let { datosPerfil["edad"] = it }
+
+            FirebaseFirestore.getInstance().collection("usuarios").document(user.uid)
+                .set(datosPerfil, SetOptions.merge())
                 .addOnSuccessListener {
                     viewModelScope.launch {
-                        emitToast("Perfil actualizado con éxito")
+                        _toastMessage.emit("Perfil actualizado con éxito")
+                        onSuccess()
                     }
                 }
                 .addOnFailureListener {
                     viewModelScope.launch {
-                        emitToast("Error al guardar perfil")
+                        _toastMessage.emit("Error al guardar perfil")
                     }
                 }
         }
     }
-
-    private suspend fun emitToast(message: String) {
-        _toastMessage.emit(message)
-    }
 }
-
-
-
-
-
-
-
-
