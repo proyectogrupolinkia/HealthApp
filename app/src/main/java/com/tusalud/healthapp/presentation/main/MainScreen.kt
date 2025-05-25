@@ -1,4 +1,3 @@
-
 package com.tusalud.healthapp.presentation.main
 
 import androidx.compose.foundation.background
@@ -26,7 +25,6 @@ import com.tusalud.healthapp.presentation.menu.progress.ProgressScreen
 fun MainScreen(
     navController: NavHostController,
     startTab: Int = 0,
-    viewModel: MainViewModel = hiltViewModel()
 ) {
     val currentEntry = navController.currentBackStackEntryAsState().value
     val tabArg = currentEntry?.arguments?.getString("tab")?.toIntOrNull()
@@ -47,25 +45,10 @@ fun MainScreen(
                 .fillMaxSize()
         ) {
             when (selectedTab) {
-                0 -> ProgressScreen(navController = navController, viewModel = viewModel)
+                0 -> ProgressScreen(navController = navController)
                 1 -> CalculadorasScreen(navController = navController)
                 2 -> PerfilScreen(navController = navController)
             }
         }
-    }
-}
-
-@Composable
-fun ProgressInfoCard(title: String, value: String) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White.copy(alpha = 0.2f))
-            .padding(16.dp)
-    ) {
-        Text(text = title, color = Color.White, fontSize = 16.sp)
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
     }
 }
