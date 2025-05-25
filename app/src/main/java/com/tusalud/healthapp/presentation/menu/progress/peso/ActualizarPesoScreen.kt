@@ -65,12 +65,6 @@ fun ActualizarPesoScreen(
         }
     }
 
-    fun validarPeso(input: String): Boolean {
-        val regex = Regex("^\\d{1,3}(\\.\\d{0,2})?$")
-        if (!regex.matches(input)) return false
-        val valor = input.toFloatOrNull() ?: return false
-        return valor in 20f..500f
-    }
 
     Scaffold(
         topBar = {
@@ -100,12 +94,12 @@ fun ActualizarPesoScreen(
                     if (it.isEmpty()) {
                         nuevoPeso = ""
                         pesoValido = false
-                    } else if (validarPeso(it)) {
+                    } else if (viewModel.validarPeso(it)) {
                         nuevoPeso = it
                         pesoValido = true
                     } else if (it.matches(Regex("^\\d{1,3}(\\.\\d{0,2})?$"))) {
                         nuevoPeso = it
-                        pesoValido = validarPeso(it)
+                        pesoValido = viewModel.validarPeso(it)
                     }
                 },
                 label = { Text("Nuevo peso (kg)") },
@@ -113,6 +107,7 @@ fun ActualizarPesoScreen(
                 isError = nuevoPeso.isNotEmpty() && !pesoValido,
                 modifier = Modifier.fillMaxWidth()
             )
+
 
             if (nuevoPeso.isNotEmpty() && !pesoValido) {
                 Text(

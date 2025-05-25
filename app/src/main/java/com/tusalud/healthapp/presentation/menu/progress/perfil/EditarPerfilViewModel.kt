@@ -2,17 +2,18 @@ package com.tusalud.healthapp.presentation.perfil
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.userProfileChangeRequest
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
+import com.tusalud.healthapp.domain.use_case.GetUserProfileUseCase
+import com.tusalud.healthapp.domain.use_case.UpdateUserProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class EditarPerfilViewModel @Inject constructor() : ViewModel() {
+class EditarPerfilViewModel @Inject constructor(
+    private val getUserProfileUseCase: GetUserProfileUseCase,
+    private val updateUserProfileUseCase: UpdateUserProfileUseCase
+) : ViewModel() {
 
     private val _displayName = MutableStateFlow("")
     val displayName: StateFlow<String> = _displayName
@@ -31,20 +32,6 @@ class EditarPerfilViewModel @Inject constructor() : ViewModel() {
 
     private val _toastMessage = MutableSharedFlow<String>()
     val toastMessage: SharedFlow<String> = _toastMessage
-
-    fun cargarDatosUsuario() {
-        val user = FirebaseAuth.getInstance().currentUser ?: return
-        val uid = user.uid
-        val db = FirebaseFirestore.getInstance()
-
-        db.collection("usuarios").document(uid).get().addOnSuccessListener { document ->
-            _displayName.value = document.getString("nombre") ?: ""
-            _email.value = user.email ?: ""
-            _pesoInicio.value = document.getDouble("pesoInicio")?.toString() ?: ""
-            _pesoObjetivo.value = document.getDouble("pesoObjetivo")?.toString() ?: ""
-            _edad.value = document.getLong("edad")?.toString() ?: ""
-        }
-    }
 
     fun onDisplayNameChanged(newName: String) {
         _displayName.value = newName
@@ -75,46 +62,36 @@ class EditarPerfilViewModel @Inject constructor() : ViewModel() {
     }
 
     fun updateProfile(onSuccess: () -> Unit = {}) {
-        val user = FirebaseAuth.getInstance().currentUser ?: return
-        val newName = _displayName.value
-        val newEmail = _email.value
-        val pesoIni = _pesoInicio.value.toFloatOrNull()
-        val pesoObj = _pesoObjetivo.value.toFloatOrNull()
-
         viewModelScope.launch {
-            if (newName != user.displayName) {
-                val profileUpdates = userProfileChangeRequest {
-                    displayName = newName
-                }
-                user.updateProfile(profileUpdates)
-            }
-
-            if (newEmail != user.email) {
-                user.updateEmail(newEmail)
-            }
-
-            val datosPerfil = mutableMapOf<String, Any>(
-                "nombre" to newName,
-                "email" to newEmail
+            val result = updateUserProfileUseCase(
+                nombre = _displayName.value,
+                email = _email.value,
+                pesoInicio = _pesoInicio.value,
+                pesoObjetivo = _pesoObjetivo.value,
+                edad = _edad.value
             )
-            pesoIni?.let { datosPerfil["pesoInicio"] = it }
-            pesoObj?.let { datosPerfil["pesoObjetivo"] = it }
-            val edadInt = _edad.value.toIntOrNull()
-            edadInt?.let { datosPerfil["edad"] = it }
 
-            FirebaseFirestore.getInstance().collection("usuarios").document(user.uid)
-                .set(datosPerfil, SetOptions.merge())
-                .addOnSuccessListener {
-                    viewModelScope.launch {
-                        _toastMessage.emit("Perfil actualizado con éxito")
-                        onSuccess()
-                    }
-                }
-                .addOnFailureListener {
-                    viewModelScope.launch {
-                        _toastMessage.emit("Error al guardar perfil")
-                    }
-                }
+            result.onSuccess {
+                _toastMessage.emit("Perfil actualizado con éxito")
+                onSuccess()
+            }.onFailure {
+                _toastMessage.emit("Error al guardar perfil")
+            }
         }
     }
+    fun cargarDatosUsuario() {
+        viewModelScope.launch {
+            val result = getUserProfileUseCase()
+            result.onSuccess { perfil ->
+                _displayName.value = perfil.nombre
+                _email.value = perfil.correo
+                _pesoInicio.value = perfil.pesoInicio
+                _pesoObjetivo.value = perfil.pesoObjetivo
+                _edad.value = perfil.edad
+            }.onFailure {
+                _toastMessage.emit("Error al cargar los datos del perfil")
+            }
+        }
+    }
+
 }

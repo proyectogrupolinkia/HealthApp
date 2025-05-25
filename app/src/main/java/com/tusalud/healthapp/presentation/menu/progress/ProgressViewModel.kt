@@ -1,4 +1,3 @@
-
 package com.tusalud.healthapp.presentation.progress
 
 import android.content.Context
@@ -9,6 +8,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.tusalud.healthapp.domain.model.Progress
+import com.tusalud.healthapp.domain.use_case.GetProgressUseCase
+import com.tusalud.healthapp.domain.use_case.GetWeightHistoryUseCase
 import com.tusalud.healthapp.utils.NotificationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,10 @@ import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class ProgressViewModel @Inject constructor() : ViewModel() {
+class ProgressViewModel @Inject constructor(
+    private val getProgressUseCase: GetProgressUseCase,
+    private val getWeightHistoryUseCase: GetWeightHistoryUseCase
+) : ViewModel() {
 
     private val _progress = MutableStateFlow<Progress?>(null)
     val progress: StateFlow<Progress?> = _progress
@@ -39,46 +43,24 @@ class ProgressViewModel @Inject constructor() : ViewModel() {
     }
 
     fun loadProgress() {
-        val user = FirebaseAuth.getInstance().currentUser ?: return
-        val uid = user.uid
-        val db = FirebaseFirestore.getInstance()
-
-        db.collection("usuarios").document(uid).get().addOnSuccessListener { document ->
-            val peso = document.getDouble("peso")?.toFloat()
-            val altura = document.getDouble("altura")?.toFloat()
-            val bmi = if (peso != null && altura != null && altura > 0) {
-                peso / ((altura / 100) * (altura / 100))
-            } else {
-                0f
+        viewModelScope.launch {
+            val result = getProgressUseCase()
+            result.onSuccess {
+                _progress.value = it
             }
-
-            _progress.value = Progress(
-                peso = peso ?: 0f,
-                heightCm = altura ?: 0f,
-                bmi = bmi,
-                pesoObjetivo = document.getDouble("pesoObjetivo")?.toFloat()
-            )
         }
     }
 
     fun cargarPesosDesdeFirebase() {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val db = FirebaseFirestore.getInstance()
-        db.collection("usuarios").document(uid).get()
-            .addOnSuccessListener { document ->
-                val listaRaw = document.get("weightHistory") as? List<*>
-                val lista = listaRaw?.filterIsInstance<Map<String, Any>>()
-                lista?.let {
-                    _pesos.value = it.mapNotNull { item -> (item["peso"] as? Number)?.toFloat() }
-                    val formato = SimpleDateFormat("dd MMM", Locale.getDefault())
-                    _pesosConFechas.value = it.mapNotNull { item ->
-                        val peso = (item["peso"] as? Number)?.toFloat()
-                        val fecha = (item["timestamp"] as? Timestamp)?.toDate()
-                        if (peso != null && fecha != null) peso to formato.format(fecha) else null
-                    }
-                }
+        viewModelScope.launch {
+            val result = getWeightHistoryUseCase()
+            result.onSuccess { (listaPesos, listaPesosConFechas) ->
+                _pesos.value = listaPesos
+                _pesosConFechas.value = listaPesosConFechas
             }
+        }
     }
+
 
     fun actualizarPeso(context: Context, nuevoPeso: Float?) {
         if (nuevoPeso == null) return

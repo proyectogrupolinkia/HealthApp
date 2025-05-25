@@ -56,22 +56,7 @@ class CalculadorasViewModel : ViewModel() {
         return resultado
     }
 
-    fun guardarDatosSiValidos() {
-        val imcVal = imc
-        val grasaVal = grasaCorporal
-        if (imcVal != null && grasaVal != null) {
-            val user = FirebaseAuth.getInstance().currentUser
-            val db = FirebaseFirestore.getInstance()
 
-            user?.let {
-                val datos = hashMapOf(
-                    "imc" to imcVal,
-                    "grasaCorporal" to grasaVal
-                )
-                db.collection("usuarios").document(user.uid).set(datos)
-            }
-        }
-    }
 }
 
 

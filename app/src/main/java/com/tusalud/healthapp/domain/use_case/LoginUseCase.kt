@@ -1,7 +1,7 @@
 package com.tusalud.healthapp.domain.use_case
 
 import com.tusalud.healthapp.domain.model.User
-import com.tusalud.healthapp.domain.respository.UserRepository
+import com.tusalud.healthapp.domain.repository.UserRepository
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(
