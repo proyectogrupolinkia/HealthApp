@@ -1,3 +1,8 @@
+/**
+ * ViewModel para la pantalla de edición del perfil.
+ * Maneja los campos editables del usuario y su persistencia en Firestore.
+ */
+
 package com.tusalud.healthapp.presentation.perfil
 
 import androidx.lifecycle.ViewModel
@@ -8,6 +13,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+
+//Inyecta 2 casos de uso: GetUserProfileUseCase y UpdateUserProfileUseCase
+
 
 @HiltViewModel
 class EditarPerfilViewModel @Inject constructor(
@@ -29,6 +38,8 @@ class EditarPerfilViewModel @Inject constructor(
 
     private val _edad = MutableStateFlow("")
     val edad: StateFlow<String> = _edad
+
+    // Mesnaje  Toast
 
     private val _toastMessage = MutableSharedFlow<String>()
     val toastMessage: SharedFlow<String> = _toastMessage
@@ -52,10 +63,12 @@ class EditarPerfilViewModel @Inject constructor(
     fun onEdadChanged(nuevaEdad: String) {
         _edad.value = nuevaEdad
     }
+    // Validación de edad (1 a 120 años)
 
     fun isEdadValida(): Boolean {
         return _edad.value.toIntOrNull()?.let { it in 1..120 } ?: false
     }
+    // Validación de peso (1 a 500 kg)
 
     fun isPesoValido(peso: String): Boolean {
         return peso.toFloatOrNull()?.let { it in 1f..500f } ?: false

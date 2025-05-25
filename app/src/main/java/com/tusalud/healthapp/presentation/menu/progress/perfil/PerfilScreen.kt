@@ -1,3 +1,7 @@
+//Muestra la información del usuario (nombre, correo).
+//Permite navegar a otras secciones relacionadas con el perfil.
+//Ofrece accesos directos a funcionalidades sensibles como cerrar sesión o eliminar cuenta, con protección mediante diálogos de confirmación.
+
 package com.tusalud.healthapp.presentation.menu.progress.perfil
 
 import androidx.compose.foundation.background
@@ -27,9 +31,13 @@ fun PerfilScreen(
     navController: NavHostController,
     viewModel: PerfilViewModel = hiltViewModel()
 ) {
+    // Se ejecuta al iniciar la pantalla para cargar los datos del usuario
+
     LaunchedEffect(Unit) {
         viewModel.cargarDatosUsuario()
     }
+
+    // Estados observables del ViewModel
 
     val displayName by viewModel.displayName.collectAsState(initial = "")
     val email by viewModel.email.collectAsState(initial = "")
@@ -74,10 +82,15 @@ fun PerfilScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Nombre y correo del usuario
+
                 Text(displayName.ifBlank { "Usuario" }, fontSize = 24.sp, color = Color.White)
                 Text(email.ifBlank { "Sin correo" }, fontSize = 16.sp, color = Color.White.copy(alpha = 0.85f))
 
                 Spacer(modifier = Modifier.height(32.dp))
+
+                // Tarjeta con opciones del perfil
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -103,6 +116,7 @@ fun PerfilScreen(
                         }
 
                         Divider(modifier = Modifier.padding(vertical = 8.dp))
+                        // Eliminar cuenta, cerrar sesión
 
                         PerfilOptionItem(icon = Icons.Default.Delete, label = "Cancelar cuenta") {
                             viewModel.setShowDeleteDialog(true)

@@ -1,3 +1,8 @@
+/**
+ * ViewModel encargado de proporcionar los datos necesarios
+ * para la pantalla de evolución del peso del usuario.
+ */
+
 package com.tusalud.healthapp.presentation.menu.progress.peso
 
 import androidx.lifecycle.ViewModel
@@ -11,17 +16,25 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-
+//Inyectamos caso de Uso getWeightHistoryUseCase
 @HiltViewModel
 class EvolucionPesoViewModel @Inject constructor(
     private val getWeightHistoryUseCase: GetWeightHistoryUseCase
 ) : ViewModel() {
 
+    // Lista de pesos junto con la fecha, usada para graficar la evolución
+
     private val _pesosConFechas = MutableStateFlow<List<Pair<Float, String>>>(emptyList())
     val pesosConFechas: StateFlow<List<Pair<Float, String>>> = _pesosConFechas
 
+    // Peso objetivo extraído de Firestore, para mostrar como referencia en el gráfico
+
     private val _pesoObjetivo = MutableStateFlow("")
     val pesoObjetivo: StateFlow<String> = _pesoObjetivo
+
+    /**
+     * Carga el historial de pesos y el peso objetivo desde Firebase.
+     */
 
     fun cargarDatosEvolucion() {
         _pesosConFechas.value = emptyList()

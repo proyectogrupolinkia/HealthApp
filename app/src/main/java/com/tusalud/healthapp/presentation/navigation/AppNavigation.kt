@@ -1,4 +1,8 @@
 
+// Define la navegación principal de la app usando Jetpack Navigation Compose.
+// Crea un NavHost con una lista de rutas y pantallas correspondientes.
+
+
 package com.tusalud.healthapp.presentation.navigation
 
 import androidx.compose.runtime.Composable
@@ -28,8 +32,11 @@ import com.tusalud.healthapp.presentation.menu.progress.recordatorios.Recordator
 import com.tusalud.healthapp.presentation.menu.progress.recordatorios.RecordatoriosViewModel
 import com.tusalud.healthapp.presentation.perfil.EditarPerfilViewModel
 
+
 @Composable
 fun AppNavigation(navController: NavHostController) {
+
+    // ViewModels inyectados de maqnera centralizada
 
     val loginViewModel: LoginViewModel = hiltViewModel()
     val editarPerfilViewModel: EditarPerfilViewModel = hiltViewModel()
@@ -58,6 +65,8 @@ fun AppNavigation(navController: NavHostController) {
         composable("main") {
             MainScreen(navController)
         }
+
+        // Navegación con parámetro para que se abra la pestaña correspondiente
 
         composable("main?tab={tab}") { backStackEntry ->
             val tabIndex = backStackEntry.arguments?.getString("tab")?.toIntOrNull() ?: 0

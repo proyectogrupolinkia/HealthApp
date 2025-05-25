@@ -17,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Habilita el diseño edge-to-edge
+        // Habilita el diseño edge-to-edge ( ocupa toda la pantalla)
         enableEdgeToEdge()
 
         setContent {

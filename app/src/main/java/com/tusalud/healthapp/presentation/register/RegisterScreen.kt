@@ -27,12 +27,18 @@ import androidx.navigation.NavHostController
 import com.tusalud.healthapp.presentation.login.AnimatedGradientBackground
 import com.tusalud.healthapp.presentation.login.LoginViewModel
 
+/**
+ * Pantalla de registro de usuario.
+ */
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     navController: NavHostController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    // Asociaciones de variables del ViewModel a los campos de entrada
     val nombre by remember { viewModel::nombre }
     val correo by remember { viewModel::email }
     val edad by remember { viewModel::edad }
@@ -44,6 +50,8 @@ fun RegisterScreen(
     val pesoValido = viewModel.pesoValido
     val alturaValida = viewModel.alturaValida
     val isFormValid = viewModel.isRegisterFormValid
+
+    // Visibilidad de contraseña y scroll
 
     var passwordVisible by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
@@ -123,7 +131,7 @@ fun RegisterScreen(
                         if (!pesoValido && peso.isNotEmpty()) {
                             Text("Peso no válido (1 a 500 kg)", color = Color.Red, fontSize = 12.sp)
                         }
-
+                        //Altura
                         OutlinedTextField(
                             value = altura,
                             onValueChange = { viewModel.altura = it },
@@ -175,6 +183,7 @@ fun RegisterScreen(
                         ) {
                             Text("Registrarse", color = Color.White)
                         }
+                        //errores
 
                         viewModel.error?.let {
                             Text(

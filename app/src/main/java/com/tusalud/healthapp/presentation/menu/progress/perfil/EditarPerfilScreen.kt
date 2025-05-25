@@ -1,4 +1,7 @@
-
+//Muestra un formulario editable con:
+//Nombre
+//Edad (validada)
+//Peso de inicio y peso objetivo (validados)
 package com.tusalud.healthapp.presentation.menu.progress.perfil
 
 import android.widget.Toast
@@ -24,6 +27,8 @@ fun EditarPerfilScreen(
     val edad by viewModel.edad.collectAsState()
 
     val context = LocalContext.current
+
+    // Al entrar a la pantalla, se cargan los datos del usuario y se muestran mensajes (toast)
 
     LaunchedEffect(Unit) {
         viewModel.cargarDatosUsuario()

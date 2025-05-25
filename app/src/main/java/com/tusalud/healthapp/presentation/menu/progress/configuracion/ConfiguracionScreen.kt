@@ -20,8 +20,11 @@ fun ConfiguracionScreen(
     viewModel: ConfiguracionViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+
+    //  estado de las notificaciones (activadas o no)
     val notificaciones by viewModel.notificacionesActivadas.collectAsState()
 
+    //  mensajes emitidos por el ViewModel para mostrarlos como Toast
     LaunchedEffect(Unit) {
         viewModel.toastMessage.collectLatest { message ->
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
@@ -34,6 +37,7 @@ fun ConfiguracionScreen(
             .padding(horizontal = 16.dp, vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Botón para volver a la pantalla anterior
         Button(
             onClick = { navController.popBackStack() },
             modifier = Modifier.align(Alignment.Start)
@@ -43,6 +47,7 @@ fun ConfiguracionScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Título de la pantalla
         Text(
             "Configuración",
             fontSize = 28.sp,
@@ -50,12 +55,14 @@ fun ConfiguracionScreen(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
+        // Botón para solicitar el restablecimiento de contraseña por correo
         Button(onClick = { viewModel.sendPasswordResetEmail() }) {
             Text("Cambiar contraseña")
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // Sección para activar o desactivar notificaciones
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -70,6 +77,7 @@ fun ConfiguracionScreen(
 
         Spacer(modifier = Modifier.height(40.dp))
 
+        // Botón para cerrar sesión
         Button(onClick = {
             viewModel.logout {
                 navController.navigate("login") {
@@ -81,9 +89,3 @@ fun ConfiguracionScreen(
         }
     }
 }
-
-
-
-
-
-

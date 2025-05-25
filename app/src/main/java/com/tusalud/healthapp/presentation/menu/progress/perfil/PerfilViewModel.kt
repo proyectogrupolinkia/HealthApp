@@ -1,3 +1,8 @@
+/**
+ * ViewModel para la pantalla de perfil del usuario.
+ * Maneja los datos del usuario, el cierre de sesión y la eliminación de cuenta.
+ */
+
 package com.tusalud.healthapp.presentation.menu.progress.perfil
 
 import androidx.lifecycle.ViewModel
@@ -17,16 +22,20 @@ class PerfilViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val deleteUserAccountUseCase: DeleteUserAccountUseCase
 ) : ViewModel() {
+    // Nombre del usuario
 
     private val _displayName = MutableStateFlow("Usuario")
     val displayName: StateFlow<String> = _displayName
+    // Correo electrónico del usuario
 
     private val _email = MutableStateFlow("sin correo")
     val email: StateFlow<String> = _email
+    // Peso inicial y objetivo (no expuestos directamente)
 
     private val _pesoInicio = MutableStateFlow("")
     private val _pesoObjetivo = MutableStateFlow("")
 
+    // Control de diálogos
     private val _showLogoutDialog = MutableStateFlow(false)
     val showLogoutDialog: StateFlow<Boolean> = _showLogoutDialog
 
@@ -35,11 +44,13 @@ class PerfilViewModel @Inject constructor(
 
     private val _showDeleteDialog = MutableStateFlow(false)
     val showDeleteDialog: StateFlow<Boolean> = _showDeleteDialog
-
+ //Al inciar  se cargan los datos del perfil
     init {
         cargarDatosUsuario()
     }
-
+    /**
+     * Carga los datos del usuario llamando al caso de uso getUserProfileUseCase.
+     */
     internal fun cargarDatosUsuario() {
         viewModelScope.launch {
             val result = getUserProfileUseCase()
@@ -68,7 +79,10 @@ class PerfilViewModel @Inject constructor(
         logoutUseCase()
         onLogoutComplete()
     }
-
+    /**
+     * Llama al caso de uso deleteUserAccountUseCasex para eliminar la cuenta del usuario.
+     * Ejecuta una acción de cierre al finalizar.
+     */
     fun eliminarCuenta(onComplete: () -> Unit) {
         viewModelScope.launch {
             val result = deleteUserAccountUseCase()

@@ -1,3 +1,5 @@
+
+//Esta clase define el estilo visual de la app.
 package com.tusalud.healthapp.ui.theme
 
 import androidx.compose.material3.*
@@ -18,7 +20,7 @@ private val LightColorScheme = lightColorScheme(
 fun AppTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = LightColorScheme,
-        typography = Typography(), // o tu propia tipografía
+        typography = Typography(),
         content = content
     )
 }

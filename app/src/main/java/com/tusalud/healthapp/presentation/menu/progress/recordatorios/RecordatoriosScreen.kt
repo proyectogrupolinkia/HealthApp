@@ -1,3 +1,7 @@
+/**
+ * Pantalla que permite al usuario gestionar recordatorios personalizados.
+ * Puede agregar, visualizar y eliminar recordatorios.
+ */
 package com.tusalud.healthapp.presentation.menu.progress.recordatorios
 
 import androidx.compose.foundation.layout.*
@@ -20,6 +24,8 @@ fun RecordatoriosScreen(
     navController: NavHostController,
     viewModel: RecordatoriosViewModel = hiltViewModel()
 ) {
+    // Recoge los estados desde el ViewModel
+
     val recordatorios by viewModel.recordatorios.collectAsState()
     val nuevoRecordatorio by viewModel.nuevoRecordatorio.collectAsState()
 
@@ -29,6 +35,8 @@ fun RecordatoriosScreen(
             .padding(horizontal = 16.dp, vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Botón para volver a la pantalla anterior
+
         Button(
             onClick = { navController.popBackStack() },
             modifier = Modifier.align(Alignment.Start)
@@ -37,6 +45,7 @@ fun RecordatoriosScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+        // Título principal
 
         Text(
             "Recordatorios",
@@ -44,6 +53,7 @@ fun RecordatoriosScreen(
             color = Color(0xFF00C6A7),
             modifier = Modifier.padding(bottom = 16.dp)
         )
+        // Campo de texto para escribir un nuevo recordatorio
 
         OutlinedTextField(
             value = nuevoRecordatorio,
@@ -53,6 +63,7 @@ fun RecordatoriosScreen(
         )
 
         Spacer(modifier = Modifier.height(8.dp))
+        // Botón para agregar un nuevo recordatorio
 
         Button(
             onClick = { viewModel.agregarRecordatorio() },
@@ -82,6 +93,9 @@ fun RecordatoriosScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(text = item, fontSize = 16.sp)
+
+                            // Botón para eliminar el recordatorio
+
                             IconButton(onClick = { viewModel.eliminarRecordatorio(item) }) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,

@@ -1,3 +1,7 @@
+/**
+* Pantalla para recuperar la contraseña mediante el envío de un correo electrónico.
+* */
+
 package com.tusalud.healthapp.presentation.reset
 
 import androidx.compose.animation.AnimatedVisibility
@@ -27,6 +31,7 @@ import com.tusalud.healthapp.presentation.login.LoginViewModel
 @Composable
 fun PasswordResetScreen(navController: NavHostController, viewModel: LoginViewModel = hiltViewModel()) {
     Scaffold(
+        // Barra superior con botón de retroceso
         topBar = {
             TopAppBar(
                 title = {},
@@ -66,7 +71,7 @@ fun PasswordResetScreen(navController: NavHostController, viewModel: LoginViewMo
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !viewModel.loading
                         )
-
+                        // Mensaje de error si el correo no es válido
                         if (!viewModel.isEmailValid(viewModel.email) && viewModel.email.isNotEmpty()) {
                             Text("Correo no válido", color = Color.Red, fontSize = 12.sp)
                         }
@@ -91,7 +96,7 @@ fun PasswordResetScreen(navController: NavHostController, viewModel: LoginViewMo
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(top = 8.dp)
                         )
-
+// Muestra errores de Firebase
 
                         viewModel.error?.let {
                             Text(text = it, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
@@ -102,6 +107,9 @@ fun PasswordResetScreen(navController: NavHostController, viewModel: LoginViewMo
         }
     }
 }
+/**
+ * Composable reutilizable que genera un fondo animado con gradiente dinámico.
+ */
 
 @Composable
 fun AnimatedGradientBackground(content: @Composable BoxScope.() -> Unit) {

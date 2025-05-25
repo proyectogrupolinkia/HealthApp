@@ -87,45 +87,44 @@ fun MeditacionScreen(navController: NavHostController,
     }
 }
 
-        /** Función que hace un listado con todos los ejercicios disponibles y
-         * los muestra en un determinado formato.
-         * */
-        @Composable
-        fun ListaEjercicios(ejercicios: List<EjercicioMeditacion>) {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                ejercicios.forEach { ejercicio ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFFEB3B)
+/** Función que hace un listado con todos los ejercicios disponibles y
+ * los muestra en un determinado formato.
+ * */
+@Composable
+fun ListaEjercicios(ejercicios: List<EjercicioMeditacion>) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        ejercicios.forEach { ejercicio ->
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFFFEB3B)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = ejercicio.nombre,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
                         ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = ejercicio.nombre,
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = Color(0xFF1B5E20)
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = ejercicio.descripcion,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Duración: ${ejercicio.duracionMinutos} min",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color(0xFF000901)
-                            )
-                        }
-                    }
+                        color = Color(0xFF1B5E20)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = ejercicio.descripcion,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Duración: ${ejercicio.duracionMinutos} min",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFF000901)
+                    )
                 }
             }
         }
-
+    }
+}

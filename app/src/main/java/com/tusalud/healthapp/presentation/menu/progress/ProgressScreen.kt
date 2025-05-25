@@ -1,4 +1,7 @@
 
+//La función ProgressScreen es una pantalla principal de seguimiento de progreso del usuario en tu app HealthApp. Muestra información clave como el peso actual, IMC, peso objetivo, un gráfico de evolución del peso y botones para acceder a otras funcionalidades
+// como meditación, desafíos y actualizar el peso.
+
 package com.tusalud.healthapp.presentation.menu.progress
 
 
@@ -42,18 +45,31 @@ fun ProgressScreen(
     navController: NavHostController,
     viewModel: ProgressViewModel = hiltViewModel()
 ) {
+
+    // Se recogen los estados del progreso y los pesos desde el ViewModel
+
     val progressState by viewModel.progress.collectAsState()
     val pesos by viewModel.pesos.collectAsState()
+
+    // Se detecta la orientación del dispositivo
+
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
+
+    // Se lanzan efectos al cargar la pantalla para obtener datos actualizados
     LaunchedEffect(Unit) {
         viewModel.loadProgress()
         viewModel.cargarPesosDesdeFirebase()
     }
 
+    // Solo si hay datos de progreso disponibles
+
     progressState?.let { progress ->
         if (isLandscape) {
+
+            // Diseño horizontal (landscape): divide en dos columnas
+
             Row(
                 modifier = Modifier
                     .fillMaxSize()
@@ -61,6 +77,8 @@ fun ProgressScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Columna izquierda con tarjetas de progreso y botones
+
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -81,12 +99,18 @@ fun ProgressScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier.fillMaxWidth()
                     ) {
+                        // Tarjetas con información: peso, IMC, objetivo
+
+
                         ProgressInfoCard(title = "Peso", value = "${progress.peso} kg")
                         ProgressInfoCard(title = "IMC", value = String.format("%.2f", progress.bmi))
                         ProgressInfoCard(title = "Peso objetivo", value = "${progress.pesoObjetivo ?: "--"} kg")
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    // Miniatura de evolución del peso
+
 
                     Box(
                         modifier = Modifier
@@ -125,6 +149,7 @@ fun ProgressScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Botón hacia desafíos activos
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -148,6 +173,7 @@ fun ProgressScreen(
                         }
                     }
 
+                    // Botón hacia meditación
                     Button(
                         onClick = { navController.navigate("meditacion") },
                         modifier = Modifier
@@ -165,6 +191,8 @@ fun ProgressScreen(
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
                     }
+
+                    // Botón para actualizar peso
 
                     Button(
                         onClick = { navController.navigate("actualizar_peso") },
@@ -185,6 +213,8 @@ fun ProgressScreen(
                     }
                 }
 
+                // Columna derecha: imagen decorativa
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -203,6 +233,8 @@ fun ProgressScreen(
                 }
             }
         } else {
+            // Diseño vertical (portrait)
+
             val scrollState = rememberScrollState()
 
             Column(
@@ -221,6 +253,8 @@ fun ProgressScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Tarjetas de peso, IMC, objetivo
+
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth()
@@ -231,6 +265,7 @@ fun ProgressScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+                // Gráfico
 
                 Box(
                     modifier = Modifier
@@ -269,6 +304,8 @@ fun ProgressScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Desafío activo
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -291,6 +328,7 @@ fun ProgressScreen(
                         )
                     }
                 }
+                // Botón a meditación
 
                 Button(
                     onClick = { navController.navigate("meditacion") },
@@ -309,6 +347,7 @@ fun ProgressScreen(
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                 }
+                // Imagen decorativa
 
                 Box(
                     modifier = Modifier
@@ -326,6 +365,7 @@ fun ProgressScreen(
                         contentScale = ContentScale.Fit
                     )
                 }
+                // Botón para actualizar peso
 
                 Button(
                     onClick = { navController.navigate("actualizar_peso") },

@@ -36,12 +36,12 @@ fun EvolucionPesoScreen(
 ) {
     val pesosConFechas by viewModel.pesosConFechas.collectAsState()
     val pesoObjetivo by viewModel.pesoObjetivo.collectAsState()
-    val context = LocalContext.current
 
-    // 🔄 Recargar SIEMPRE al entrar
+    // Recarga los datos cada vez que se entra en la pantalla
     LaunchedEffect(true) {
         viewModel.cargarDatosEvolucion()
     }
+    // Intenta convertir el peso objetivo a Float (puede venir como String, Double, etc.)
 
     val pesoObjetivoFloat: Float? = when (pesoObjetivo) {
         is Float -> pesoObjetivo
@@ -75,18 +75,24 @@ fun EvolucionPesoScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Si hay datos y el peso objetivo es válido, renderizar gráfico
+
                 if (pesosConFechas.isNotEmpty() && pesoObjetivoFloat != null) {
 
-                    val fechas = pesosConFechas.map { it.second }
+                    val fechas = pesosConFechas.map { it.second } // Extraer las fechas para el eje X
 
                     AndroidView(
                         factory = { context: Context ->
                             val chart = LineChart(context).apply {
+                                // Configuración base del gráfico
+
                                 layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
                                 setTouchEnabled(true)
                                 isDragEnabled = true
                                 setScaleEnabled(true)
                                 description.isEnabled = false
+
+                                // Configuración del eje X con etiquetas de fechas
 
                                 xAxis.position = XAxisPosition.BOTTOM
                                 xAxis.granularity = 1f
@@ -98,11 +104,14 @@ fun EvolucionPesoScreen(
                                     }
                                 }
 
+                                // Eje derecho deshabilitado, izquierdo con líneas guías
+
                                 axisRight.isEnabled = false
                                 axisLeft.removeAllLimitLines()
                                 axisLeft.enableGridDashedLine(10f, 10f, 0f)
                                 axisLeft.setDrawLimitLinesBehindData(true)
                             }
+                            // Convertir los datos a Entry para graficar
 
                             val entries = pesosConFechas.mapIndexedNotNull { index, (pesoRaw, _) ->
                                 try {
@@ -119,6 +128,8 @@ fun EvolucionPesoScreen(
                                     null
                                 }
                             }
+                            // Calcular el rango Y dinámicamente
+
 
                             val pesosSolo = entries.map { it.y }
                             val yMin = minOf(pesosSolo.minOrNull() ?: 0f, pesoObjetivoFloat)
@@ -126,6 +137,8 @@ fun EvolucionPesoScreen(
 
                             chart.axisLeft.axisMinimum = yMin - 1f
                             chart.axisLeft.axisMaximum = yMax + 1f
+
+                            // Línea de referencia del peso objetivo
 
                             chart.axisLeft.addLimitLine(
                                 LimitLine(pesoObjetivoFloat, "Peso Objetivo").apply {
@@ -157,6 +170,8 @@ fun EvolucionPesoScreen(
                             .height(400.dp)
                     )
                 } else {
+                    // Mensaje mientras se cargan los datos
+
                     Text("Cargando datos...", style = MaterialTheme.typography.bodyMedium)
                 }
             }

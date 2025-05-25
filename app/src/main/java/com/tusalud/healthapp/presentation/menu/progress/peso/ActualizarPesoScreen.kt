@@ -31,16 +31,24 @@ fun ActualizarPesoScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    // Estado del campo de entrada y su validez
+
+
     var nuevoPeso by remember { mutableStateOf("") }
     var pesoValido by remember { mutableStateOf(false) }
 
+    // Estado reactivo del snackbar (desde el ViewModel)
+
     val snackbarActivo by viewModel.snackbarActivo.collectAsState()
     val snackbarMensaje by viewModel.snackbarMensaje.collectAsState()
+
+    // Launcher para pedir permiso de notificación
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { /* resultado del permiso */ }
     )
+    // Solicita permiso si es necesario
 
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -53,6 +61,7 @@ fun ActualizarPesoScreen(
             }
         }
     }
+    // Muestra el snackbar cuando snackbarActivo se vuelve true
 
     LaunchedEffect(snackbarActivo) {
         if (snackbarActivo) {
@@ -87,6 +96,7 @@ fun ActualizarPesoScreen(
             verticalArrangement = Arrangement.Top
         ) {
             Spacer(modifier = Modifier.height(40.dp))
+            // Campo para ingresar el nuevo peso
 
             OutlinedTextField(
                 value = nuevoPeso,
@@ -108,6 +118,7 @@ fun ActualizarPesoScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // Mensaje de error si el peso es inválido
 
             if (nuevoPeso.isNotEmpty() && !pesoValido) {
                 Text(
@@ -119,6 +130,7 @@ fun ActualizarPesoScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+            // Botón para guardar el peso
 
             Button(
                 onClick = {

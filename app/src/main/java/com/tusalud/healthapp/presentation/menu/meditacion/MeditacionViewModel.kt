@@ -23,7 +23,7 @@ class MeditacionViewModel : ViewModel(){
     /** Función que muestra un pequeño delay para acto seguido, cargar un conjunto de
      * ejercicios predefinidos por el usuario.
      * */
-     fun cargarEjercicios() {
+    fun cargarEjercicios() {
         viewModelScope.launch {
             // Simulamos una carga demorada (como una API o BD)
             kotlinx.coroutines.delay(1000)
